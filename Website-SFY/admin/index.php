@@ -7,6 +7,7 @@
  * - Mencari & menambahkan lagu baru dari Spotify
  * - Moderasi/menghapus pesan dari user
  */
+header('Content-Type: text/html; charset=utf-8');
 
 require_once __DIR__ . '/../backend/koneksi.php';
 

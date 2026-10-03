@@ -3,6 +3,7 @@
  * /Website-SFY/index.php
  * SongForYou — Archive Your Feelings Through Music
  */
+header('Content-Type: text/html; charset=utf-8');
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $parsedPath = parse_url($requestUri, PHP_URL_PATH);
