@@ -16,12 +16,24 @@
   },
   "routes": [
     {
+      "src": "/admin/index\\.php",
+      "dest": "/admin/index.php"
+    },
+    {
+      "src": "/admin/?$",
+      "dest": "/admin/index.php"
+    },
+    {
       "src": "/admin/(.*)",
       "dest": "/admin/index.php"
     },
     {
-      "src": "/backend/(.*)",
-      "dest": "/backend/$1"
+      "src": "/backend/([^/]+\\.php)(.*)",
+      "dest": "/backend/$1$2"
+    },
+    {
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webp|mp3|mp4|json))",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",

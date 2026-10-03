@@ -16,7 +16,7 @@ if (substr($parsedPath, -1) !== '/' && !str_ends_with($parsedPath, '.php')) {
 
 // Redirect /admin ke admin/index.php jika diperlukan
 if (preg_match('/\/admin\/?$/i', $parsedPath)) {
-    header('Location: ./admin/index.php');
+    header('Location: /admin/index.php');
     exit;
 }
 ?>
@@ -943,7 +943,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         <div class="nav-container">
             <a href="#" class="brand-logo">SONGFORYOU<span>.PROJECT</span></a>
             <div class="nav-buttons">
-                <a href="./admin/index.php" class="btn-nav-dashboard">DASHBOARD</a>
+                <a href="/admin/index.php" class="btn-nav-dashboard">DASHBOARD</a>
                 <button onclick="scrollToForm()" class="btn-nav-create">CREATE MESSAGE</button>
             </div>
         </div>
