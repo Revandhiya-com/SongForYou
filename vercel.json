@@ -1,29 +1,40 @@
 {
   "version": 2,
   "functions": {
-    "Website-SFY/**/*.php": {
+    "Website-SFY/index.php": {
       "runtime": "vercel-php@0.7.2"
     },
-    "*.php": {
+    "Website-SFY/backend/*.php": {
+      "runtime": "vercel-php@0.7.2"
+    },
+    "Website-SFY/admin/*.php": {
       "runtime": "vercel-php@0.7.2"
     }
   },
   "routes": [
     {
-      "src": "/Website-SFY/admin/(.*)",
+      "src": "/admin/index\\.php",
       "dest": "/Website-SFY/admin/index.php"
     },
     {
-      "src": "/Website-SFY/backend/(.*)",
-      "dest": "/Website-SFY/backend/$1"
+      "src": "/admin/?$",
+      "dest": "/Website-SFY/admin/index.php"
     },
     {
-      "src": "/Website-SFY/(.*)",
-      "dest": "/Website-SFY/index.php"
+      "src": "/admin/(.*)",
+      "dest": "/Website-SFY/admin/index.php"
+    },
+    {
+      "src": "/backend/([^/]+\\.php)(.*)",
+      "dest": "/Website-SFY/backend/$1$2"
+    },
+    {
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webp|mp3))",
+      "dest": "/Website-SFY/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.php"
+      "dest": "/Website-SFY/index.php"
     }
   ]
 }
