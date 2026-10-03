@@ -1,5 +1,5 @@
 <?php
-// api/debug_conn.php - TEMPORARY: test exact connection error
+// api/debug_conn.php - TEMPORARY: test IPv4 Supabase pooler hosts
 header('Content-Type: application/json');
 
 function getDbEnv($key, $default = '') {
@@ -10,43 +10,62 @@ function getDbEnv($key, $default = '') {
     return $default;
 }
 
-$host = getDbEnv('DB_HOST');
-$user = getDbEnv('DB_USER', 'postgres');
-$pass = getDbEnv('DB_PASS');
-$db   = getDbEnv('DB_NAME', 'postgres');
+$rawHost = getDbEnv('DB_HOST');
+$user    = getDbEnv('DB_USER', 'postgres');
+$pass    = getDbEnv('DB_PASS');
+$db      = getDbEnv('DB_NAME', 'postgres');
 
-// Auto-build pooler username: postgres.{project-ref}
-$poolerUser = $user;
-if (preg_match('/^db\.([a-z0-9]+)\.supabase\.co$/', $host, $m)) {
-    $poolerUser = 'postgres.' . $m[1];
-} elseif (strpos($user, '.') !== false) {
-    $poolerUser = $user; // already pooler format
+// Extract project ref
+$projectRef = 'xaqvthzzzvecvqvjlcpg';
+if (preg_match('/^db\.([a-z0-9]+)\.supabase\.co$/', $rawHost, $m)) {
+    $projectRef = $m[1];
 }
 
-$results = [];
-$attempts = [
-    ["pgsql:host={$host};port=6543;dbname={$db};sslmode=require", $poolerUser],
-    ["pgsql:host={$host};port=6543;dbname={$db};sslmode=prefer",  $poolerUser],
-    ["pgsql:host={$host};port=5432;dbname={$db};sslmode=require", $poolerUser],
-    ["pgsql:host={$host};port=5432;dbname={$db};sslmode=require", $user],
-    ["pgsql:host={$host};port=5432;dbname={$db};sslmode=prefer",  $user],
+$poolerUser = "postgres.{$projectRef}";
+
+// List of possible Supabase Pooler regional hosts (all IPv4 compatible)
+$regions = [
+    'ap-southeast-1', // Singapore (Most likely for Indo)
+    'us-east-1',      // N. Virginia
+    'us-west-1',      // N. California
+    'eu-central-1',   // Frankfurt
+    'ap-northeast-1', // Tokyo
+    'ap-south-1',     // Mumbai
+    'sa-east-1',      // Sao Paulo
+    'ca-central-1',   // Canada
+    'eu-west-1',      // Ireland
+    'eu-west-2',      // London
+    'eu-west-3',      // Paris
+    'ap-southeast-2'  // Sydney
 ];
 
-foreach ($attempts as [$dsn, $dbUser]) {
+$results = [];
+
+// If DB_HOST is already a pooler host, test it first
+$hostsToTest = [];
+if (strpos($rawHost, 'pooler.supabase.com') !== false) {
+    $hostsToTest[] = $rawHost;
+}
+
+foreach ($regions as $r) {
+    $hostsToTest[] = "aws-0-{$r}.pooler.supabase.com";
+}
+
+foreach ($hostsToTest as $h) {
+    $dsn6543 = "pgsql:host={$h};port=6543;dbname={$db};sslmode=require";
     try {
-        $conn = new PDO($dsn, $dbUser, $pass, [PDO::ATTR_TIMEOUT => 5]);
-        $results[] = ['dsn' => $dsn, 'user' => $dbUser, 'status' => 'SUCCESS'];
+        $conn = new PDO($dsn6543, $poolerUser, $pass, [PDO::ATTR_TIMEOUT => 3]);
+        $results[] = ['host' => $h, 'port' => 6543, 'status' => 'SUCCESS', 'user' => $poolerUser];
         $conn = null;
-        break;
+        break; // Stop on first success!
     } catch (PDOException $e) {
-        $results[] = ['dsn' => $dsn, 'user' => $dbUser, 'status' => 'FAIL', 'error' => $e->getMessage()];
+        $results[] = ['host' => $h, 'port' => 6543, 'status' => 'FAIL', 'error' => $e->getMessage()];
     }
 }
 
 echo json_encode([
-    'host'       => substr($host, 0, 15) . '***',
+    'projectRef' => $projectRef,
     'poolerUser' => $poolerUser,
-    'directUser' => $user,
-    'attempts'   => $results
+    'tested'     => $results
 ], JSON_PRETTY_PRINT);
 ?>
