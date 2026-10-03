@@ -2,7 +2,7 @@
 // spotify_helper.php
 
 require_once __DIR__ . '/spotify_config.php';
-define('TOKEN_FILE', __DIR__ . '/spotify_token.json');
+define('TOKEN_FILE', sys_get_temp_dir() . '/spotify_token.json');
 
 /**
  * Berfungsi mengambil Access Token yang valid.
@@ -11,7 +11,7 @@ define('TOKEN_FILE', __DIR__ . '/spotify_token.json');
 function getValidAccessToken() {
     // 1. Cek apakah file penyimpanan token sudah ada
     if (file_exists(TOKEN_FILE)) {
-        $tokenData = json_decode(file_get_contents(TOKEN_FILE), true);
+        $tokenData = json_decode(@file_get_contents(TOKEN_FILE), true);
         
         // Cek apakah token masih berlaku (diberi buffer 10 detik untuk amannya)
         if (isset($tokenData['access_token']) && isset($tokenData['expires_at']) && time() < ($tokenData['expires_at'] - 10)) {
@@ -48,6 +48,7 @@ function refreshClientAccessToken() {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -57,14 +58,14 @@ function refreshClientAccessToken() {
         $data = json_decode($response, true);
         
         // Hitung timestamp kapan token ini akan expired (waktu sekarang + 3600 detik)
-        $data['expires_at'] = time() + $data['expires_in'];
+        $data['expires_at'] = time() + ($data['expires_in'] ?? 3600);
         
         // Simpan ke file json lokal agar request berikutnya tidak perlu tembak API akun lagi
-        file_put_contents(TOKEN_FILE, json_encode($data));
+        @file_put_contents(TOKEN_FILE, json_encode($data));
         
-        return $data['access_token'];
+        return $data['access_token'] ?? null;
     } else {
-        die("Gagal mengambil token dari Spotify. Periksa Client ID & Secret Anda. HTTP Code: " . $httpCode);
+        return null;
     }
 }
 
@@ -72,7 +73,10 @@ function refreshClientAccessToken() {
  * Fungsi pembantu (Helper) untuk mempermudah HTTP GET Request ke Spotify API
  */
 function spotifyGetRequest($endpoint, $queryParams = []) {
-    $accessToken = getValidAccessToken(); // Otomatis valid / auto-refresh di sini
+    $accessToken = getValidAccessToken();
+    if (!$accessToken) {
+        return ['error' => ['status' => 500, 'message' => 'Gagal mengambil Spotify Access Token']];
+    }
     
     $url = 'https://api.spotify.com' . $endpoint;
     if (!empty($queryParams)) {
@@ -82,6 +86,7 @@ function spotifyGetRequest($endpoint, $queryParams = []) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Authorization: Bearer ' . $accessToken
     ]);
