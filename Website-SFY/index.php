@@ -943,7 +943,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         <div class="nav-container">
             <a href="#" class="brand-logo">SONGFORYOU<span>.PROJECT</span></a>
             <div class="nav-buttons">
-                <a href="/admin/index.php" class="btn-nav-dashboard">DASHBOARD</a>
                 <button onclick="scrollToForm()" class="btn-nav-create">CREATE MESSAGE</button>
             </div>
         </div>
