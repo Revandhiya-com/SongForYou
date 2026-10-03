@@ -6,22 +6,10 @@
       "includeFiles": "Website-SFY/**"
     }
   },
-  "routes": [
-    {
-      "src": "^/admin(/.*)?$",
-      "dest": "/api/admin.php"
-    },
-    {
-      "src": "^/backend/(.*)",
-      "dest": "/api/backend.php?endpoint=$1"
-    },
-    {
-      "src": "^/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webp|mp3|mp4|json))$",
-      "dest": "/Website-SFY/$1"
-    },
-    {
-      "src": "^/(.*)$",
-      "dest": "/api/index.php"
-    }
+  "rewrites": [
+    { "source": "/admin", "destination": "/api/admin.php" },
+    { "source": "/admin/(.*)", "destination": "/api/admin.php" },
+    { "source": "/backend/:endpoint*", "destination": "/api/backend.php?endpoint=:endpoint*" },
+    { "source": "/(.*)", "destination": "/api/index.php" }
   ]
 }
