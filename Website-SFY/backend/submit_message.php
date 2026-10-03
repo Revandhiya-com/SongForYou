@@ -103,9 +103,9 @@ try {
             "UPDATE songs SET
                 title = :title,
                 artist = :artist,
-                cover_url = CASE WHEN LENGTH(:cover) > 0 THEN :cover ELSE cover_url END,
-                spotify_url = CASE WHEN LENGTH(:surl) > 0 THEN :surl ELSE spotify_url END,
-                preview_url = CASE WHEN :purl IS NOT NULL AND LENGTH(:purl2) > 0 THEN :purl3 ELSE preview_url END
+                cover_url = COALESCE(NULLIF(:cover, ''), cover_url),
+                spotify_url = COALESCE(NULLIF(:surl, ''), spotify_url),
+                preview_url = COALESCE(NULLIF(:purl, ''), preview_url)
              WHERE id = :id"
         );
         $stmtUpdate->execute([
@@ -113,29 +113,44 @@ try {
             ':artist' => $s_artist,
             ':cover'  => $s_cover,
             ':surl'   => $s_spotify_url,
-            ':purl'   => $s_preview_url,
-            ':purl2'  => $s_preview_url ?? '',
-            ':purl3'  => $s_preview_url,
+            ':purl'   => $s_preview_url ?? '',
             ':id'     => $songId,
         ]);
     } else {
         // Insert lagu baru
-        $stmtInsertSong = $conn->prepare(
-            "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
-             VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)
-             RETURNING id"
-        );
-        $stmtInsertSong->execute([
-            ':spotify_id'  => $songKey,
-            ':title'       => $s_title,
-            ':artist'      => $s_artist,
-            ':cover_url'   => $s_cover,
-            ':meaning'     => $s_meaning,
-            ':spotify_url' => $s_spotify_url,
-            ':preview_url' => $s_preview_url,
-        ]);
-        $inserted = $stmtInsertSong->fetch();
-        $songId = $inserted ? (int)$inserted['id'] : 0;
+        if (($dbDriver ?? 'mysql') === 'pgsql') {
+            $stmtInsertSong = $conn->prepare(
+                "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
+                 VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)
+                 RETURNING id"
+            );
+            $stmtInsertSong->execute([
+                ':spotify_id'  => $songKey,
+                ':title'       => $s_title,
+                ':artist'      => $s_artist,
+                ':cover_url'   => $s_cover,
+                ':meaning'     => $s_meaning,
+                ':spotify_url' => $s_spotify_url,
+                ':preview_url' => $s_preview_url,
+            ]);
+            $inserted = $stmtInsertSong->fetch();
+            $songId = $inserted ? (int)$inserted['id'] : 0;
+        } else {
+            $stmtInsertSong = $conn->prepare(
+                "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
+                 VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)"
+            );
+            $stmtInsertSong->execute([
+                ':spotify_id'  => $songKey,
+                ':title'       => $s_title,
+                ':artist'      => $s_artist,
+                ':cover_url'   => $s_cover,
+                ':meaning'     => $s_meaning,
+                ':spotify_url' => $s_spotify_url,
+                ':preview_url' => $s_preview_url,
+            ]);
+            $songId = (int)$conn->lastInsertId();
+        }
     }
 
     if ($songId === 0) {
@@ -199,22 +214,39 @@ try {
     }
 
     // ─── INSERT ke tabel messages ────────────────────────────
-    $stmt = $conn->prepare(
-        "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
-         VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)
-         RETURNING id"
-    );
-    $stmt->execute([
-        ':user_id'        => $userId,
-        ':song_id'        => $songId,
-        ':recipient_name' => $receiver,
-        ':sender_name'    => $senderName,
-        ':message'        => $message,
-        ':images'         => $imagesVal,
-        ':slug'           => $slug,
-    ]);
-    $newRow = $stmt->fetch();
-    $newId  = $newRow ? (int)$newRow['id'] : 0;
+    if (($dbDriver ?? 'mysql') === 'pgsql') {
+        $stmt = $conn->prepare(
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)
+             RETURNING id"
+        );
+        $stmt->execute([
+            ':user_id'        => $userId,
+            ':song_id'        => $songId,
+            ':recipient_name' => $receiver,
+            ':sender_name'    => $senderName,
+            ':message'        => $message,
+            ':images'         => $imagesVal,
+            ':slug'           => $slug,
+        ]);
+        $newRow = $stmt->fetch();
+        $newId  = $newRow ? (int)$newRow['id'] : 0;
+    } else {
+        $stmt = $conn->prepare(
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)"
+        );
+        $stmt->execute([
+            ':user_id'        => $userId,
+            ':song_id'        => $songId,
+            ':recipient_name' => $receiver,
+            ':sender_name'    => $senderName,
+            ':message'        => $message,
+            ':images'         => $imagesVal,
+            ':slug'           => $slug,
+        ]);
+        $newId = (int)$conn->lastInsertId();
+    }
 
     http_response_code(201);
     echo json_encode([

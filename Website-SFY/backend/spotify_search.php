@@ -23,7 +23,7 @@ $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 
 // ─── Function untuk mengambil Access Token Spotify ────────────────
 function getSpotifyAccessToken() {
-    $tokenFile = __DIR__ . '/spotify_token.json';
+    $tokenFile = sys_get_temp_dir() . '/spotify_token.json';
     
     if (file_exists($tokenFile)) {
         $cache = json_decode(file_get_contents($tokenFile), true);
@@ -143,20 +143,44 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
 
         if (isset($conn) && $conn) {
             $spotifyId = $item['id'];
-            $stmtSync = mysqli_prepare($conn, 
-                "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)
-                 ON DUPLICATE KEY UPDATE 
-                    title = VALUES(title), 
-                    artist = VALUES(artist), 
-                    cover_url = VALUES(cover_url), 
-                    spotify_url = VALUES(spotify_url), 
-                    preview_url = IFNULL(VALUES(preview_url), preview_url)"
-            );
-            if ($stmtSync) {
-                mysqli_stmt_bind_param($stmtSync, 'sssssss', $spotifyId, $titleName, $artistName, $cover, $meaning, $spotifyUrl, $previewUrl);
-                mysqli_stmt_execute($stmtSync);
-                mysqli_stmt_close($stmtSync);
+            try {
+                $stmtCheck = $conn->prepare("SELECT id FROM songs WHERE spotify_id = :id LIMIT 1");
+                $stmtCheck->execute([':id' => $spotifyId]);
+                if ($stmtCheck->fetch()) {
+                    $stmtSync = $conn->prepare(
+                        "UPDATE songs SET 
+                            title = :title, 
+                            artist = :artist, 
+                            cover_url = COALESCE(NULLIF(:cover, ''), cover_url), 
+                            spotify_url = COALESCE(NULLIF(:surl, ''), spotify_url), 
+                            preview_url = COALESCE(NULLIF(:purl, ''), preview_url)
+                         WHERE spotify_id = :id"
+                    );
+                    $stmtSync->execute([
+                        ':title'  => $titleName,
+                        ':artist' => $artistName,
+                        ':cover'  => $cover,
+                        ':surl'   => $spotifyUrl,
+                        ':purl'   => $previewUrl ?? '',
+                        ':id'     => $spotifyId,
+                    ]);
+                } else {
+                    $stmtSync = $conn->prepare(
+                        "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
+                         VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)"
+                    );
+                    $stmtSync->execute([
+                        ':spotify_id'  => $spotifyId,
+                        ':title'       => $titleName,
+                        ':artist'      => $artistName,
+                        ':cover_url'   => $cover,
+                        ':meaning'     => $meaning,
+                        ':spotify_url' => $spotifyUrl,
+                        ':preview_url' => $previewUrl,
+                    ]);
+                }
+            } catch (Exception $eSync) {
+                // Ignore sync error if DB is unreachable
             }
         }
 
