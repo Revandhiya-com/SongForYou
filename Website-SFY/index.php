@@ -1135,6 +1135,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         const getApiUrl = (endpoint) => {
+            // On Vercel: /backend/xxx -> routes to /api/backend.php?endpoint=xxx
+            // On local: ./backend/xxx -> serves file directly
+            const isVercel = window.location.hostname.includes('vercel.app') || 
+                             window.location.hostname.includes('vercel.com') ||
+                             (!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1'));
+            if (isVercel) {
+                return '/backend/' + endpoint;
+            }
             let base = window.location.pathname;
             if (!base.endsWith('/')) {
                 if (!base.endsWith('.php')) {
