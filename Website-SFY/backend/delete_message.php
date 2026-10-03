@@ -31,8 +31,8 @@ if ($method !== 'DELETE') {
 
 require_once __DIR__ . '/koneksi.php';
 
-$id   = isset($_GET['id'])   ? (int)$_GET['id']          : 0;
-$slug = isset($_GET['slug']) ? trim($_GET['slug'])         : '';
+$id   = isset($_GET['id'])   ? (int)$_GET['id']     : 0;
+$slug = isset($_GET['slug']) ? trim($_GET['slug'])    : '';
 
 if ($id <= 0 && empty($slug)) {
     http_response_code(400);
@@ -40,18 +40,16 @@ if ($id <= 0 && empty($slug)) {
     exit;
 }
 
-if ($id > 0) {
-    $stmt = mysqli_prepare($conn, "DELETE FROM messages WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, 'i', $id);
-} else {
-    $stmt = mysqli_prepare($conn, "DELETE FROM messages WHERE slug = ?");
-    mysqli_stmt_bind_param($stmt, 's', $slug);
-}
+try {
+    if ($id > 0) {
+        $stmt = $conn->prepare("DELETE FROM messages WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+    } else {
+        $stmt = $conn->prepare("DELETE FROM messages WHERE slug = :slug");
+        $stmt->execute([':slug' => $slug]);
+    }
 
-if (mysqli_stmt_execute($stmt)) {
-    $affected = mysqli_stmt_affected_rows($stmt);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
+    $affected = $stmt->rowCount();
 
     if ($affected > 0) {
         echo json_encode(['success' => true, 'message' => 'Pesan berhasil dihapus.']);
@@ -59,12 +57,8 @@ if (mysqli_stmt_execute($stmt)) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Pesan tidak ditemukan.']);
     }
-} else {
-    $error = mysqli_error($conn);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Gagal menghapus pesan.', 'error' => $error]);
+    echo json_encode(['success' => false, 'message' => 'Gagal menghapus pesan.', 'error' => $e->getMessage()]);
 }
 ?>

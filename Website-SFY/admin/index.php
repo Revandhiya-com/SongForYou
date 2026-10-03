@@ -21,14 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $songId = (int)$_POST['song_id'];
         $meaning = trim($_POST['meaning']);
         
-        $stmt = mysqli_prepare($conn, "UPDATE songs SET meaning = ? WHERE id = ?");
-        mysqli_stmt_bind_param($stmt, 'si', $meaning, $songId);
-        if (mysqli_stmt_execute($stmt)) {
-            $message = 'Makna lagu berhasil diperbarui!';
-        } else {
-            $error = 'Gagal memperbarui makna lagu: ' . mysqli_error($conn);
+        try {
+            $stmt = $conn->prepare("UPDATE songs SET meaning = :meaning WHERE id = :id");
+            if ($stmt->execute([':meaning' => $meaning, ':id' => $songId])) {
+                $message = 'Makna lagu berhasil diperbarui!';
+            } else {
+                $error = 'Gagal memperbarui makna lagu.';
+            }
+        } catch (PDOException $e) {
+            $error = 'Gagal memperbarui makna lagu: ' . $e->getMessage();
         }
-        mysqli_stmt_close($stmt);
     } 
     
     elseif ($action === 'add_song') {
@@ -45,103 +47,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $meaning = trim($_POST['meaning']);
 
-        // Cek apakah spotify_id sudah ada
-        $checkStmt = mysqli_prepare($conn, "SELECT id FROM songs WHERE spotify_id = ? LIMIT 1");
-        mysqli_stmt_bind_param($checkStmt, 's', $spotifyId);
-        mysqli_stmt_execute($checkStmt);
-        mysqli_stmt_store_result($checkStmt);
-        $exists = mysqli_stmt_num_rows($checkStmt) > 0;
-        mysqli_stmt_close($checkStmt);
+        try {
+            // Cek apakah spotify_id sudah ada
+            $checkStmt = $conn->prepare("SELECT id FROM songs WHERE spotify_id = :spotify_id LIMIT 1");
+            $checkStmt->execute([':spotify_id' => $spotifyId]);
+            $exists = $checkStmt->fetch() !== false;
 
-        if ($exists) {
-            // Update makna saja
-            $updateStmt = mysqli_prepare($conn, "UPDATE songs SET meaning = ?, preview_url = IFNULL(preview_url, ?) WHERE spotify_id = ?");
-            mysqli_stmt_bind_param($updateStmt, 'sss', $meaning, $previewUrl, $spotifyId);
-            if (mysqli_stmt_execute($updateStmt)) {
-                $message = 'Lagu sudah ada di DB. Makna lagu berhasil diperbarui!';
+            if ($exists) {
+                // Update makna saja (COALESCE agar tidak overwrite preview_url jika kosong)
+                $updateStmt = $conn->prepare("UPDATE songs SET meaning = :meaning, preview_url = COALESCE(preview_url, :preview_url) WHERE spotify_id = :spotify_id");
+                if ($updateStmt->execute([':meaning' => $meaning, ':preview_url' => $previewUrl, ':spotify_id' => $spotifyId])) {
+                    $message = 'Lagu sudah ada di DB. Makna lagu berhasil diperbarui!';
+                } else {
+                    $error = 'Gagal memperbarui lagu.';
+                }
             } else {
-                $error = 'Gagal memperbarui lagu: ' . mysqli_error($conn);
+                // Insert lagu baru
+                $insertStmt = $conn->prepare(
+                    "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
+                     VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)"
+                );
+                if ($insertStmt->execute([':spotify_id' => $spotifyId, ':title' => $title, ':artist' => $artist, ':cover_url' => $coverUrl, ':meaning' => $meaning, ':spotify_url' => $spotifyUrl, ':preview_url' => $previewUrl])) {
+                    $message = 'Lagu baru berhasil ditambahkan ke database!';
+                } else {
+                    $error = 'Gagal menambahkan lagu.';
+                }
             }
-            mysqli_stmt_close($updateStmt);
-        } else {
-            // Insert lagu baru
-            $insertStmt = mysqli_prepare($conn, 
-                "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?)"
-            );
-            mysqli_stmt_bind_param($insertStmt, 'sssssss', $spotifyId, $title, $artist, $coverUrl, $meaning, $spotifyUrl, $previewUrl);
-            if (mysqli_stmt_execute($insertStmt)) {
-                $message = 'Lagu baru berhasil ditambahkan ke database!';
-            } else {
-                $error = 'Gagal menambahkan lagu: ' . mysqli_error($conn);
-            }
-            mysqli_stmt_close($insertStmt);
+        } catch (PDOException $e) {
+            $error = 'Error database: ' . $e->getMessage();
         }
     } 
     
     elseif ($action === 'delete_song') {
         $songId = (int)$_POST['song_id'];
-        $stmt = mysqli_prepare($conn, "DELETE FROM songs WHERE id = ?");
-        mysqli_stmt_bind_param($stmt, 'i', $songId);
-        if (mysqli_stmt_execute($stmt)) {
-            $message = 'Lagu berhasil dihapus dari database!';
-        } else {
-            $error = 'Gagal menghapus lagu: ' . mysqli_error($conn);
+        try {
+            $stmt = $conn->prepare("DELETE FROM songs WHERE id = :id");
+            if ($stmt->execute([':id' => $songId])) {
+                $message = 'Lagu berhasil dihapus dari database!';
+            } else {
+                $error = 'Gagal menghapus lagu.';
+            }
+        } catch (PDOException $e) {
+            $error = 'Gagal menghapus lagu: ' . $e->getMessage();
         }
-        mysqli_stmt_close($stmt);
     } 
     
     elseif ($action === 'delete_message') {
         $msgId = (int)$_POST['message_id'];
         
-        // Cari path gambar untuk dihapus jika ada
-        $imgStmt = mysqli_prepare($conn, "SELECT images FROM messages WHERE id = ?");
-        mysqli_stmt_bind_param($imgStmt, 'i', $msgId);
-        mysqli_stmt_execute($imgStmt);
-        $resImg = mysqli_stmt_get_result($imgStmt);
-        if ($rowImg = mysqli_fetch_assoc($resImg)) {
-            $imgPath = $rowImg['images'];
-            if (!empty($imgPath) && strpos($imgPath, '/uploads/') !== false) {
-                $realPath = dirname(__DIR__) . str_replace('/SFY', '', $imgPath);
-                if (file_exists($realPath)) {
-                    @unlink($realPath);
+        try {
+            // Cari path gambar untuk dihapus jika ada
+            $imgStmt = $conn->prepare("SELECT images FROM messages WHERE id = :id");
+            $imgStmt->execute([':id' => $msgId]);
+            $rowImg = $imgStmt->fetch();
+            if ($rowImg) {
+                $imgPath = $rowImg['images'];
+                if (!empty($imgPath) && strpos($imgPath, '/uploads/') !== false) {
+                    $realPath = dirname(__DIR__) . str_replace('/SFY', '', $imgPath);
+                    if (file_exists($realPath)) {
+                        @unlink($realPath);
+                    }
                 }
             }
-        }
-        mysqli_stmt_close($imgStmt);
 
-        $stmt = mysqli_prepare($conn, "DELETE FROM messages WHERE id = ?");
-        mysqli_stmt_bind_param($stmt, 'i', $msgId);
-        if (mysqli_stmt_execute($stmt)) {
-            $message = 'Pesan berhasil dihapus!';
-        } else {
-            $error = 'Gagal menghapus pesan: ' . mysqli_error($conn);
+            $stmt = $conn->prepare("DELETE FROM messages WHERE id = :id");
+            if ($stmt->execute([':id' => $msgId])) {
+                $message = 'Pesan berhasil dihapus!';
+            } else {
+                $error = 'Gagal menghapus pesan.';
+            }
+        } catch (PDOException $e) {
+            $error = 'Gagal menghapus pesan: ' . $e->getMessage();
         }
-        mysqli_stmt_close($stmt);
     }
 }
 
 // ─── 2. Fetch Data ────────────────────────────────────────
-// Ambil daftar lagu
-$songsResult = mysqli_query($conn, "SELECT * FROM songs ORDER BY id DESC");
 $songs = [];
-while ($row = mysqli_fetch_assoc($songsResult)) {
-    $songs[] = $row;
-}
-
-// Ambil daftar pesan
-$messagesResult = mysqli_query($conn, 
-    "SELECT m.*, s.title AS song_title, s.artist AS song_artist 
-     FROM messages m 
-     LEFT JOIN songs s ON m.song_id = s.id 
-     ORDER BY m.id DESC"
-);
 $messagesList = [];
-while ($row = mysqli_fetch_assoc($messagesResult)) {
-    $messagesList[] = $row;
-}
+try {
+    // Ambil daftar lagu
+    $songsResult = $conn->query("SELECT * FROM songs ORDER BY id DESC");
+    $songs = $songsResult->fetchAll();
 
-mysqli_close($conn);
+    // Ambil daftar pesan
+    $messagesResult = $conn->query(
+        "SELECT m.*, s.title AS song_title, s.artist AS song_artist
+         FROM messages m
+         LEFT JOIN songs s ON m.song_id = s.id
+         ORDER BY m.id DESC"
+    );
+    $messagesList = $messagesResult->fetchAll();
+} catch (PDOException $e) {
+    $error = 'Gagal mengambil data: ' . $e->getMessage();
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">

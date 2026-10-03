@@ -19,38 +19,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/koneksi.php';
 
-$result = mysqli_query($conn,
-    "SELECT id, spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url
-     FROM songs
-     ORDER BY id DESC"
-);
+try {
+    $stmt = $conn->query(
+        "SELECT id, spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url
+         FROM songs
+         ORDER BY id DESC"
+    );
+    $rows = $stmt->fetchAll();
 
-if (!$result) {
+    $songs = [];
+    foreach ($rows as $row) {
+        $songs[] = [
+            'id'         => (int)$row['id'],
+            'spotifyId'  => $row['spotify_id'],
+            'title'      => $row['title'],
+            'artist'     => $row['artist'],
+            'coverUrl'   => $row['cover_url'],
+            'meaning'    => $row['meaning'],
+            'spotifyUrl' => $row['spotify_url'],
+            'previewUrl' => $row['preview_url']
+        ];
+    }
+
+    echo json_encode([
+        'success' => true,
+        'count'   => count($songs),
+        'songs'   => $songs
+    ]);
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Query gagal: ' . mysqli_error($conn)]);
-    mysqli_close($conn);
-    exit;
+    echo json_encode(['success' => false, 'message' => 'Query gagal: ' . $e->getMessage()]);
 }
-
-$songs = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $songs[] = [
-        'id'         => (int)$row['id'],
-        'spotifyId'  => $row['spotify_id'],
-        'title'      => $row['title'],
-        'artist'     => $row['artist'],
-        'coverUrl'   => $row['cover_url'],
-        'meaning'    => $row['meaning'],
-        'spotifyUrl' => $row['spotify_url'],
-        'previewUrl' => $row['preview_url']
-    ];
-}
-
-mysqli_close($conn);
-
-echo json_encode([
-    'success' => true,
-    'count'   => count($songs),
-    'songs'   => $songs
-]);
 ?>

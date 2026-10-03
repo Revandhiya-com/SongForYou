@@ -5,12 +5,12 @@
  *
  * Method  : POST
  * Body    : JSON {
- *               receiver      : string,   // recipient_name
- *               senderName    : string?,  // sender_name (boleh kosong/anonim)
- *               songKey       : string,   // spotify_id dari tabel songs
+ *               receiver      : string,
+ *               senderName    : string?,
+ *               songKey       : string,
  *               message       : string,
- *               images        : string?   // path file gambar, opsional
- *               songDetails   : object    // detail lagu Spotify
+ *               images        : string?
+ *               songDetails   : object
  *           }
  * Response: JSON { success, id, slug }
  */
@@ -44,12 +44,12 @@ if (!$data) {
 }
 
 // ─── Ambil & validasi field ──────────────────────────────
-$receiver    = isset($data['receiver'])    ? trim($data['receiver'])             : '';
-$senderName  = isset($data['senderName'])  ? trim($data['senderName'])           : 'Anonim';
-$songKey     = isset($data['songKey'])     ? trim($data['songKey'])              : '';
-$message     = isset($data['message'])     ? trim($data['message'])              : '';
-$images      = isset($data['images'])      ? trim($data['images'])               : '';
-$songDetails = isset($data['songDetails']) ? $data['songDetails']                : null;
+$receiver    = isset($data['receiver'])    ? trim($data['receiver'])    : '';
+$senderName  = isset($data['senderName'])  ? trim($data['senderName'])  : 'Anonim';
+$songKey     = isset($data['songKey'])     ? trim($data['songKey'])     : '';
+$message     = isset($data['message'])     ? trim($data['message'])     : '';
+$images      = isset($data['images'])      ? trim($data['images'])      : '';
+$songDetails = isset($data['songDetails']) ? $data['songDetails']       : null;
 
 if (empty($receiver)) {
     http_response_code(422);
@@ -77,163 +77,144 @@ if (strlen($message) > 5000) {
     exit;
 }
 
-// ─── Synchronize / Upsert ke Tabel `songs` ────────────────
-$s_title   = isset($songDetails['title']) ? trim($songDetails['title']) : 'Lagu Pilihan';
-$s_artist  = isset($songDetails['artist']) ? trim($songDetails['artist']) : 'Spotify Artist';
-$s_cover   = isset($songDetails['coverUrl']) ? trim($songDetails['coverUrl']) : '';
-$s_meaning = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false) 
-    ? trim($songDetails['meaning']) 
-    : getSongMeaning($s_title, $s_artist);
-$s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : '';
-$s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
+try {
+    // ─── Synchronize / Upsert ke Tabel `songs` ────────────────
+    $s_title       = isset($songDetails['title'])      ? trim($songDetails['title'])      : 'Lagu Pilihan';
+    $s_artist      = isset($songDetails['artist'])     ? trim($songDetails['artist'])     : 'Spotify Artist';
+    $s_cover       = isset($songDetails['coverUrl'])   ? trim($songDetails['coverUrl'])   : '';
+    $s_meaning     = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false)
+        ? trim($songDetails['meaning'])
+        : getSongMeaning($s_title, $s_artist);
+    $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : '';
+    $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
 
-// Cek apakah lagu sudah ada berdasarkan spotify_id
-$stmtSong = mysqli_prepare($conn, "SELECT id FROM songs WHERE spotify_id = ? LIMIT 1");
-mysqli_stmt_bind_param($stmtSong, 's', $songKey);
-mysqli_stmt_execute($stmtSong);
-$resSong = mysqli_stmt_get_result($stmtSong);
-$songRow = mysqli_fetch_assoc($resSong);
-mysqli_stmt_close($stmtSong);
+    // Cek apakah lagu sudah ada
+    $stmtSong = $conn->prepare("SELECT id FROM songs WHERE spotify_id = :spotify_id LIMIT 1");
+    $stmtSong->execute([':spotify_id' => $songKey]);
+    $songRow = $stmtSong->fetch();
 
-$songId = 0;
+    $songId = 0;
 
-if ($songRow) {
-    $songId = (int)$songRow['id'];
-    
-    // Update data lagu agar selalu fresh dengan cover & preview_url dari Spotify
-    $stmtUpdate = mysqli_prepare($conn, 
-        "UPDATE songs SET 
-            title = ?, 
-            artist = ?, 
-            cover_url = IF(LENGTH(?) > 0, ?, cover_url), 
-            spotify_url = IF(LENGTH(?) > 0, ?, spotify_url), 
-            preview_url = IF(? IS NOT NULL AND LENGTH(?) > 0, ?, preview_url) 
-         WHERE id = ?"
-    );
-    mysqli_stmt_bind_param($stmtUpdate, 'sssssssssi', 
-        $s_title, $s_artist, 
-        $s_cover, $s_cover, 
-        $s_spotify_url, $s_spotify_url, 
-        $s_preview_url, $s_preview_url, $s_preview_url, 
-        $songId
-    );
-    mysqli_stmt_execute($stmtUpdate);
-    mysqli_stmt_close($stmtUpdate);
-} else {
-    // Insert lagu baru
-    $stmtInsertSong = mysqli_prepare($conn,
-        "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
-         VALUES (?, ?, ?, ?, ?, ?, ?)"
-    );
-    mysqli_stmt_bind_param($stmtInsertSong, 'sssssss',
-        $songKey,
-        $s_title,
-        $s_artist,
-        $s_cover,
-        $s_meaning,
-        $s_spotify_url,
-        $s_preview_url
-    );
-    
-    if (mysqli_stmt_execute($stmtInsertSong)) {
-        $songId = mysqli_insert_id($conn);
+    if ($songRow) {
+        $songId = (int)$songRow['id'];
+
+        // Update data lagu agar selalu fresh
+        $stmtUpdate = $conn->prepare(
+            "UPDATE songs SET
+                title = :title,
+                artist = :artist,
+                cover_url = CASE WHEN LENGTH(:cover) > 0 THEN :cover ELSE cover_url END,
+                spotify_url = CASE WHEN LENGTH(:surl) > 0 THEN :surl ELSE spotify_url END,
+                preview_url = CASE WHEN :purl IS NOT NULL AND LENGTH(:purl2) > 0 THEN :purl3 ELSE preview_url END
+             WHERE id = :id"
+        );
+        $stmtUpdate->execute([
+            ':title'  => $s_title,
+            ':artist' => $s_artist,
+            ':cover'  => $s_cover,
+            ':surl'   => $s_spotify_url,
+            ':purl'   => $s_preview_url,
+            ':purl2'  => $s_preview_url ?? '',
+            ':purl3'  => $s_preview_url,
+            ':id'     => $songId,
+        ]);
+    } else {
+        // Insert lagu baru
+        $stmtInsertSong = $conn->prepare(
+            "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
+             VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)
+             RETURNING id"
+        );
+        $stmtInsertSong->execute([
+            ':spotify_id'  => $songKey,
+            ':title'       => $s_title,
+            ':artist'      => $s_artist,
+            ':cover_url'   => $s_cover,
+            ':meaning'     => $s_meaning,
+            ':spotify_url' => $s_spotify_url,
+            ':preview_url' => $s_preview_url,
+        ]);
+        $inserted = $stmtInsertSong->fetch();
+        $songId = $inserted ? (int)$inserted['id'] : 0;
     }
-    mysqli_stmt_close($stmtInsertSong);
-}
 
-if ($songId === 0) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => "Gagal memproses lagu Spotify di database."]);
-    exit;
-}
+    if ($songId === 0) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Gagal memproses lagu Spotify di database.']);
+        exit;
+    }
 
-// ─── Generate slug unik ───────────────────────────────────
-function generateSlug($name) {
-    $base = preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($name)));
-    $base = trim($base, '-');
-    return $base . '-' . bin2hex(random_bytes(4));
-}
+    // ─── Generate slug unik ───────────────────────────────────
+    function generateSlug($name) {
+        $base = preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($name)));
+        $base = trim($base, '-');
+        return $base . '-' . bin2hex(random_bytes(4));
+    }
 
-$slug = '';
-$attempts = 0;
-do {
-    $slug = generateSlug($receiver);
-    $stmtSlug = mysqli_prepare($conn, "SELECT id FROM messages WHERE slug = ? LIMIT 1");
-    mysqli_stmt_bind_param($stmtSlug, 's', $slug);
-    mysqli_stmt_execute($stmtSlug);
-    mysqli_stmt_store_result($stmtSlug);
-    $exists = mysqli_stmt_num_rows($stmtSlug) > 0;
-    mysqli_stmt_close($stmtSlug);
-    $attempts++;
-} while ($exists && $attempts < 5);
+    $slug = '';
+    $attempts = 0;
+    do {
+        $slug = generateSlug($receiver);
+        $stmtSlug = $conn->prepare("SELECT id FROM messages WHERE slug = :slug LIMIT 1");
+        $stmtSlug->execute([':slug' => $slug]);
+        $exists = $stmtSlug->fetch() !== false;
+        $attempts++;
+    } while ($exists && $attempts < 5);
 
-$userId = 0;
+    $userId = 0;
 
-// ─── Proses Unggah Gambar (Base64) jika ada ────────────────
-$imagesVal = '';
-if (!empty($images)) {
-    if (strpos($images, 'data:image/') === 0) {
-        $parts = explode(',', $images);
-        if (count($parts) === 2) {
-            $header = $parts[0];
-            $dataBase64 = $parts[1];
-            
-            $ext = 'png';
-            if (preg_match('/data:image\/([a-zA-Z0-9+]+);base64/', $header, $matches)) {
-                $ext = $matches[1];
-                if ($ext === 'jpeg') $ext = 'jpg';
-            }
-            
-            $decodedData = base64_decode($dataBase64);
-            if ($decodedData !== false) {
-                // Folder uploads utama (relatif ke file ini)
-                $uploadDir = dirname(__DIR__) . '/uploads';
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
+    // ─── Proses Unggah Gambar (Base64) jika ada ────────────────
+    $imagesVal = '';
+    if (!empty($images)) {
+        if (strpos($images, 'data:image/') === 0) {
+            $parts = explode(',', $images);
+            if (count($parts) === 2) {
+                $header     = $parts[0];
+                $dataBase64 = $parts[1];
+
+                $ext = 'png';
+                if (preg_match('/data:image\/([a-zA-Z0-9+]+);base64/', $header, $matches)) {
+                    $ext = $matches[1];
+                    if ($ext === 'jpeg') $ext = 'jpg';
                 }
-                
-                $filename = uniqid('img_', true) . '.' . $ext;
-                $filePath = $uploadDir . '/' . $filename;
-                
-                if (file_put_contents($filePath, $decodedData) !== false) {
-                    $imagesVal = 'uploads/' . $filename;
 
-                    // Mirror ke XAMPP htdocs agar foto tampil di kedua server
-                    $mirrorDirs = [
-                        'C:/xamppp/htdocs/Website-SFY/uploads',
-                        'C:/xamppp/htdocs/SFY/uploads',
-                    ];
-                    foreach ($mirrorDirs as $mirror) {
-                        if (!file_exists($mirror)) @mkdir($mirror, 0777, true);
-                        @copy($filePath, $mirror . '/' . $filename);
+                $decodedData = base64_decode($dataBase64);
+                if ($decodedData !== false) {
+                    $uploadDir = dirname(__DIR__) . '/uploads';
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+
+                    $filename = uniqid('img_', true) . '.' . $ext;
+                    $filePath = $uploadDir . '/' . $filename;
+
+                    if (file_put_contents($filePath, $decodedData) !== false) {
+                        $imagesVal = 'uploads/' . $filename;
                     }
                 }
             }
+        } else {
+            $imagesVal = $images;
         }
-    } else {
-        $imagesVal = $images;
     }
-}
 
-// ─── INSERT ke tabel messages ────────────────────────────
-$stmt = mysqli_prepare($conn,
-    "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
-     VALUES (?, ?, ?, ?, ?, ?, ?)"
-);
-mysqli_stmt_bind_param($stmt, 'iisssss',
-    $userId,
-    $songId,
-    $receiver,
-    $senderName,
-    $message,
-    $imagesVal,
-    $slug
-);
-
-if (mysqli_stmt_execute($stmt)) {
-    $newId = mysqli_insert_id($conn);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
+    // ─── INSERT ke tabel messages ────────────────────────────
+    $stmt = $conn->prepare(
+        "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
+         VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)
+         RETURNING id"
+    );
+    $stmt->execute([
+        ':user_id'        => $userId,
+        ':song_id'        => $songId,
+        ':recipient_name' => $receiver,
+        ':sender_name'    => $senderName,
+        ':message'        => $message,
+        ':images'         => $imagesVal,
+        ':slug'           => $slug,
+    ]);
+    $newRow = $stmt->fetch();
+    $newId  = $newRow ? (int)$newRow['id'] : 0;
 
     http_response_code(201);
     echo json_encode([
@@ -244,16 +225,12 @@ if (mysqli_stmt_execute($stmt)) {
         'images'    => $imagesVal,
         'timestamp' => time() * 1000
     ]);
-} else {
-    $error = mysqli_error($conn);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-
+} catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
         'message' => 'Gagal menyimpan pesan ke database.',
-        'error'   => $error
+        'error'   => $e->getMessage()
     ]);
 }
 ?>

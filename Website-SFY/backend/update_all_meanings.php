@@ -9,26 +9,26 @@ require_once __DIR__ . '/song_meaning_helper.php';
 
 echo "Mengambil seluruh data lagu dari database...\n";
 
-$res = mysqli_query($conn, "SELECT id, title, artist, meaning FROM songs");
-$updatedCount = 0;
+try {
+    $res = $conn->query("SELECT id, title, artist, meaning FROM songs");
+    $rows = $res->fetchAll();
+    $updatedCount = 0;
 
-while ($row = mysqli_fetch_assoc($res)) {
-    $id = (int)$row['id'];
-    $title = $row['title'];
-    $artist = $row['artist'];
-    $currentMeaning = $row['meaning'];
+    foreach ($rows as $row) {
+        $id     = (int)$row['id'];
+        $title  = $row['title'];
+        $artist = $row['artist'];
 
-    // Jika makna masih bernilai default/generik atau kosong, perbarui
-    $newMeaning = getSongMeaning($title, $artist);
-    
-    $stmt = mysqli_prepare($conn, "UPDATE songs SET meaning = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, 'si', $newMeaning, $id);
-    if (mysqli_stmt_execute($stmt)) {
-        $updatedCount++;
+        $newMeaning = getSongMeaning($title, $artist);
+
+        $stmt = $conn->prepare("UPDATE songs SET meaning = :meaning WHERE id = :id");
+        if ($stmt->execute([':meaning' => $newMeaning, ':id' => $id])) {
+            $updatedCount++;
+        }
     }
-    mysqli_stmt_close($stmt);
-}
 
-echo "BERHASIL memperbarui $updatedCount lagu dengan makna lagu yang akurat dan puitis!\n";
-mysqli_close($conn);
+    echo "BERHASIL memperbarui $updatedCount lagu dengan makna lagu yang akurat dan puitis!\n";
+} catch (PDOException $e) {
+    echo "ERROR: " . $e->getMessage() . "\n";
+}
 ?>
