@@ -23,23 +23,46 @@ $dbDriver = 'mysql';
 
 // 1. Coba koneksi ke PostgreSQL Supabase jika DB_HOST diset (bukan localhost biasa)
 if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
-    $dbUser = !empty($user) ? $user : 'postgres';
     $dbName = !empty($db) ? $db : 'postgres';
+
+    // Deteksi apakah ini Supabase pooler host (IPv4, aman untuk Vercel serverless)
+    // vs direct host (db.xxx.supabase.co yang bisa IPv6 dan tidak bisa di Vercel)
+    $isPoolerHost = (strpos($host, 'pooler.supabase.com') !== false);
+    $isDirectHost = (strpos($host, 'supabase.co') !== false && !$isPoolerHost);
+
+    // Username untuk pooler: postgres.{project-ref}
+    // Jika DB_USER sudah berformat "postgres.xxx" atau DB_POOLER_USER diset, pakai itu
+    $poolerUser = getDbEnv('DB_POOLER_USER', '');
+    if (empty($poolerUser)) {
+        // Auto-extract project-ref dari db.xxxxx.supabase.co jika DB_HOST adalah direct host
+        if ($isDirectHost && preg_match('/^db\.([a-z0-9]+)\.supabase\.co$/', $host, $m)) {
+            $projectRef = $m[1];
+            $poolerUser = 'postgres.' . $projectRef;
+        } elseif (!empty($user) && strpos($user, '.') !== false) {
+            // DB_USER sudah berformat postgres.xxxxx
+            $poolerUser = $user;
+        } else {
+            $poolerUser = !empty($user) ? $user : 'postgres';
+        }
+    }
+    $directUser = !empty($user) ? $user : 'postgres';
     $configuredPort = !empty($port) ? $port : '5432';
 
-    // Supabase Vercel: coba port 6543 (Transaction Pooler) dan 5432 (Direct), semua SSL mode
-    $dsnModes = [
-        // Port 6543 = Supabase Transaction Pooler (RECOMMENDED untuk serverless/Vercel)
-        "pgsql:host={$host};port=6543;dbname={$db};sslmode=require",
-        "pgsql:host={$host};port=6543;dbname={$dbName};sslmode=prefer",
-        "pgsql:host={$host};port=6543;dbname={$dbName}",
-        // Port 5432 = Direct connection (fallback)
-        "pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require",
-        "pgsql:host={$host};port=5432;dbname={$dbName};sslmode=prefer",
-        "pgsql:host={$host};port={$configuredPort};dbname={$dbName}",
+    // Supabase di Vercel WAJIB pakai pooler (IPv4).
+    // Urutan: 6543 pooler → 5432 pooler → 5432 direct (fallback XAMPP/local)
+    $dsnAttempts = [
+        // Supabase Transaction Pooler (port 6543) — paling stabil di Vercel
+        ["pgsql:host={$host};port=6543;dbname={$dbName};sslmode=require", $poolerUser],
+        ["pgsql:host={$host};port=6543;dbname={$dbName};sslmode=prefer",  $poolerUser],
+        ["pgsql:host={$host};port=6543;dbname={$dbName}",                 $poolerUser],
+        // Supabase Session Pooler / Direct (port 5432)
+        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require", $poolerUser],
+        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require", $directUser],
+        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=prefer",  $directUser],
+        ["pgsql:host={$host};port={$configuredPort};dbname={$dbName}",    $directUser],
     ];
 
-    foreach ($dsnModes as $dsn) {
+    foreach ($dsnAttempts as [$dsn, $dbUser]) {
         try {
             $conn = new PDO($dsn, $dbUser, $pass, [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -56,6 +79,7 @@ if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
         }
     }
 }
+
 
 // 2. Jika PostgreSQL belum tersambung, coba MySQL lokal (XAMPP / WAMP)
 if (!$conn) {
