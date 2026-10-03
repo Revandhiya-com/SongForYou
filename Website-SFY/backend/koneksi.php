@@ -25,42 +25,51 @@ $dbDriver = 'mysql';
 if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
     $dbName = !empty($db) ? $db : 'postgres';
 
-    // Deteksi apakah ini Supabase pooler host (IPv4, aman untuk Vercel serverless)
-    // vs direct host (db.xxx.supabase.co yang bisa IPv6 dan tidak bisa di Vercel)
-    $isPoolerHost = (strpos($host, 'pooler.supabase.com') !== false);
-    $isDirectHost = (strpos($host, 'supabase.co') !== false && !$isPoolerHost);
+    // Auto-extract project-ref dari db.xxxxx.supabase.co
+    $projectRef = '';
+    if (preg_match('/^db\.([a-z0-9]+)\.supabase\.co$/i', $host, $m)) {
+        $projectRef = $m[1];
+    } elseif (preg_match('/([a-z0-9]{20})/', $host, $m)) {
+        $projectRef = $m[1];
+    }
 
-    // Username untuk pooler: postgres.{project-ref}
-    // Jika DB_USER sudah berformat "postgres.xxx" atau DB_POOLER_USER diset, pakai itu
     $poolerUser = getDbEnv('DB_POOLER_USER', '');
     if (empty($poolerUser)) {
-        // Auto-extract project-ref dari db.xxxxx.supabase.co jika DB_HOST adalah direct host
-        if ($isDirectHost && preg_match('/^db\.([a-z0-9]+)\.supabase\.co$/', $host, $m)) {
-            $projectRef = $m[1];
+        if (!empty($projectRef)) {
             $poolerUser = 'postgres.' . $projectRef;
         } elseif (!empty($user) && strpos($user, '.') !== false) {
-            // DB_USER sudah berformat postgres.xxxxx
             $poolerUser = $user;
         } else {
             $poolerUser = !empty($user) ? $user : 'postgres';
         }
     }
-    $directUser = !empty($user) ? $user : 'postgres';
-    $configuredPort = !empty($port) ? $port : '5432';
 
-    // Supabase di Vercel WAJIB pakai pooler (IPv4).
-    // Urutan: 6543 pooler → 5432 pooler → 5432 direct (fallback XAMPP/local)
-    $dsnAttempts = [
-        // Supabase Transaction Pooler (port 6543) — paling stabil di Vercel
-        ["pgsql:host={$host};port=6543;dbname={$dbName};sslmode=require", $poolerUser],
-        ["pgsql:host={$host};port=6543;dbname={$dbName};sslmode=prefer",  $poolerUser],
-        ["pgsql:host={$host};port=6543;dbname={$dbName}",                 $poolerUser],
-        // Supabase Session Pooler / Direct (port 5432)
-        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require", $poolerUser],
-        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require", $directUser],
-        ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=prefer",  $directUser],
-        ["pgsql:host={$host};port={$configuredPort};dbname={$dbName}",    $directUser],
-    ];
+    $directUser = !empty($user) ? $user : 'postgres';
+
+    // Daftar regional pooler host IPv4 Supabase (karena Vercel tidak bisa IPv6 direct host)
+    $poolerHosts = [];
+    if (strpos($host, 'pooler.supabase.com') !== false) {
+        $poolerHosts[] = $host;
+    }
+    // Tambahkan regional host pooler populer (Singapore, US, EU, Sydney, etc.)
+    $regions = ['ap-southeast-1', 'us-east-1', 'us-west-1', 'eu-central-1', 'ap-northeast-1', 'ap-south-1', 'sa-east-1', 'ca-central-1'];
+    foreach ($regions as $r) {
+        $poolerHosts[] = "aws-0-{$r}.pooler.supabase.com";
+    }
+
+    // Urutan DSN yang dicoba
+    $dsnAttempts = [];
+
+    // 1. Cobain regional IPv4 pooler hosts di port 6543 & 5432 (Sangat cepat di Serverless Vercel)
+    foreach ($poolerHosts as $pHost) {
+        $dsnAttempts[] = ["pgsql:host={$pHost};port=6543;dbname={$dbName};sslmode=require", $poolerUser];
+        $dsnAttempts[] = ["pgsql:host={$pHost};port=5432;dbname={$dbName};sslmode=require", $poolerUser];
+    }
+
+    // 2. Fallback ke $host asli (jika $host sudah diset ke custom domain / IPv4 direct)
+    $dsnAttempts[] = ["pgsql:host={$host};port=6543;dbname={$dbName};sslmode=require", $poolerUser];
+    $dsnAttempts[] = ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require", $directUser];
+    $dsnAttempts[] = ["pgsql:host={$host};port=5432;dbname={$dbName};sslmode=prefer",  $directUser];
 
     foreach ($dsnAttempts as [$dsn, $dbUser]) {
         try {
@@ -68,7 +77,7 @@ if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::ATTR_TIMEOUT            => 5,
+                PDO::ATTR_TIMEOUT            => 3,
             ]);
             if ($conn) {
                 $dbDriver = 'pgsql';
