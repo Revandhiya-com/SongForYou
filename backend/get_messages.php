@@ -81,6 +81,10 @@ $result = mysqli_stmt_get_result($stmt);
 
 $messages = [];
 while ($row = mysqli_fetch_assoc($result)) {
+    $img = $row['images'];
+    if (!empty($img) && preg_match('#^/SFY/(uploads/.+)$#', $img, $m)) {
+        $img = $m[1];
+    }
     $messages[] = [
         'id'           => (int)$row['id'],
         'receiver'     => $row['recipient_name'],
@@ -93,7 +97,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         'songSpotifyUrl' => $row['song_spotify_url'],
         'previewUrl'   => $row['song_preview_url'],  // url mp3 preview spotify
         'message'      => $row['message'],
-        'images'       => $row['images'],            // path/URL gambar atau null
+        'images'       => $img,                      // path/URL gambar atau null
         'slug'         => $row['slug'],
         'timestamp'    => strtotime($row['created_at']) * 1000  // ke ms untuk JS
     ];

@@ -1,7 +1,7 @@
 <?php
 /*
  * submit_message.php
- * Menyimpan pesan baru ke database.
+ * Menyimpan pesan baru ke database & menyinkronkan data lagu Spotify.
  *
  * Method  : POST
  * Body    : JSON {
@@ -10,13 +10,9 @@
  *               songKey       : string,   // spotify_id dari tabel songs
  *               message       : string,
  *               images        : string?   // path file gambar, opsional
+ *               songDetails   : object    // detail lagu Spotify
  *           }
  * Response: JSON { success, id, slug }
- *
- * Alur:
- *  1. Cari song_id berdasarkan spotify_id (songKey)
- *  2. Generate slug unik
- *  3. INSERT ke tabel messages
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -36,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/koneksi.php';
+require_once __DIR__ . '/song_meaning_helper.php';
 
 $body = file_get_contents('php://input');
 $data = json_decode($body, true);
@@ -48,7 +45,7 @@ if (!$data) {
 
 // ─── Ambil & validasi field ──────────────────────────────
 $receiver    = isset($data['receiver'])    ? trim($data['receiver'])             : '';
-$senderName  = isset($data['senderName'])  ? trim($data['senderName'])           : null;
+$senderName  = isset($data['senderName'])  ? trim($data['senderName'])           : 'Anonim';
 $songKey     = isset($data['songKey'])     ? trim($data['songKey'])              : '';
 $message     = isset($data['message'])     ? trim($data['message'])              : '';
 $images      = isset($data['images'])      ? trim($data['images'])               : '';
@@ -80,7 +77,17 @@ if (strlen($message) > 5000) {
     exit;
 }
 
-// ─── Cari song_id dari spotify_id ────────────────────────
+// ─── Synchronize / Upsert ke Tabel `songs` ────────────────
+$s_title   = isset($songDetails['title']) ? trim($songDetails['title']) : 'Lagu Pilihan';
+$s_artist  = isset($songDetails['artist']) ? trim($songDetails['artist']) : 'Spotify Artist';
+$s_cover   = isset($songDetails['coverUrl']) ? trim($songDetails['coverUrl']) : '';
+$s_meaning = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false) 
+    ? trim($songDetails['meaning']) 
+    : getSongMeaning($s_title, $s_artist);
+$s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : '';
+$s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
+
+// Cek apakah lagu sudah ada berdasarkan spotify_id
 $stmtSong = mysqli_prepare($conn, "SELECT id FROM songs WHERE spotify_id = ? LIMIT 1");
 mysqli_stmt_bind_param($stmtSong, 's', $songKey);
 mysqli_stmt_execute($stmtSong);
@@ -89,17 +96,31 @@ $songRow = mysqli_fetch_assoc($resSong);
 mysqli_stmt_close($stmtSong);
 
 $songId = 0;
+
 if ($songRow) {
     $songId = (int)$songRow['id'];
-} else if ($songDetails) {
-    // Jika lagu belum ada di DB tapi ada info detailnya, insert baru
-    $s_title   = isset($songDetails['title']) ? trim($songDetails['title']) : 'Unknown';
-    $s_artist  = isset($songDetails['artist']) ? trim($songDetails['artist']) : 'Unknown';
-    $s_cover   = isset($songDetails['coverUrl']) ? trim($songDetails['coverUrl']) : '';
-    $s_meaning = isset($songDetails['meaning']) ? trim($songDetails['meaning']) : 'Lagu ini melambangkan pesan dan perasaan mendalam yang ingin disampaikan.';
-    $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : '';
-    $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
-
+    
+    // Update data lagu agar selalu fresh dengan cover & preview_url dari Spotify
+    $stmtUpdate = mysqli_prepare($conn, 
+        "UPDATE songs SET 
+            title = ?, 
+            artist = ?, 
+            cover_url = IF(LENGTH(?) > 0, ?, cover_url), 
+            spotify_url = IF(LENGTH(?) > 0, ?, spotify_url), 
+            preview_url = IF(? IS NOT NULL AND LENGTH(?) > 0, ?, preview_url) 
+         WHERE id = ?"
+    );
+    mysqli_stmt_bind_param($stmtUpdate, 'sssssssssi', 
+        $s_title, $s_artist, 
+        $s_cover, $s_cover, 
+        $s_spotify_url, $s_spotify_url, 
+        $s_preview_url, $s_preview_url, $s_preview_url, 
+        $songId
+    );
+    mysqli_stmt_execute($stmtUpdate);
+    mysqli_stmt_close($stmtUpdate);
+} else {
+    // Insert lagu baru
     $stmtInsertSong = mysqli_prepare($conn,
         "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
          VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -121,20 +142,18 @@ if ($songRow) {
 }
 
 if ($songId === 0) {
-    http_response_code(422);
-    echo json_encode(['success' => false, 'message' => "Lagu dengan key '$songKey' tidak ditemukan di database dan tidak ada detail lagu."]);
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => "Gagal memproses lagu Spotify di database."]);
     exit;
 }
 
 // ─── Generate slug unik ───────────────────────────────────
-// Format: recipient-<random 8 hex chars>  contoh: zahra-a3f9c12b
 function generateSlug($name) {
     $base = preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($name)));
     $base = trim($base, '-');
     return $base . '-' . bin2hex(random_bytes(4));
 }
 
-// Pastikan slug benar-benar unik
 $slug = '';
 $attempts = 0;
 do {
@@ -148,20 +167,17 @@ do {
     $attempts++;
 } while ($exists && $attempts < 5);
 
-// ─── user_id default (0 = anonim) ────────────────────────
 $userId = 0;
 
 // ─── Proses Unggah Gambar (Base64) jika ada ────────────────
 $imagesVal = '';
 if (!empty($images)) {
     if (strpos($images, 'data:image/') === 0) {
-        // Format base64: data:image/png;base64,iVBORw0KGgo...
         $parts = explode(',', $images);
         if (count($parts) === 2) {
             $header = $parts[0];
             $dataBase64 = $parts[1];
             
-            // Cari ekstensi file
             $ext = 'png';
             if (preg_match('/data:image\/([a-zA-Z0-9+]+);base64/', $header, $matches)) {
                 $ext = $matches[1];
@@ -170,7 +186,7 @@ if (!empty($images)) {
             
             $decodedData = base64_decode($dataBase64);
             if ($decodedData !== false) {
-                // Directory uploads di root folder (/SFY/uploads)
+                // Folder uploads utama (relatif ke file ini)
                 $uploadDir = dirname(__DIR__) . '/uploads';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
@@ -180,12 +196,21 @@ if (!empty($images)) {
                 $filePath = $uploadDir . '/' . $filename;
                 
                 if (file_put_contents($filePath, $decodedData) !== false) {
-                    $imagesVal = '/SFY/uploads/' . $filename;
+                    $imagesVal = 'uploads/' . $filename;
+
+                    // Mirror ke XAMPP htdocs agar foto tampil di kedua server
+                    $mirrorDirs = [
+                        'C:/xamppp/htdocs/Website-SFY/uploads',
+                        'C:/xamppp/htdocs/SFY/uploads',
+                    ];
+                    foreach ($mirrorDirs as $mirror) {
+                        if (!file_exists($mirror)) @mkdir($mirror, 0777, true);
+                        @copy($filePath, $mirror . '/' . $filename);
+                    }
                 }
             }
         }
     } else {
-        // Jika sudah berbentuk path, simpan apa adanya
         $imagesVal = $images;
     }
 }

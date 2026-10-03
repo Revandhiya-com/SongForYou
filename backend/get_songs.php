@@ -5,8 +5,6 @@
  *
  * Method  : GET
  * Response: JSON { success, songs[] }
- *
- * Tabel songs: id, spotify_id, title, artist, cover_url, meaning, spotify_url
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -24,8 +22,7 @@ require_once __DIR__ . '/koneksi.php';
 $result = mysqli_query($conn,
     "SELECT id, spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url
      FROM songs
-     WHERE meaning IS NOT NULL AND meaning != ''
-     ORDER BY title ASC"
+     ORDER BY id DESC"
 );
 
 if (!$result) {

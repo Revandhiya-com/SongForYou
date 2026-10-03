@@ -953,6 +953,18 @@ mysqli_close($conn);
             };
         }
 
+        const getAdminApiUrl = (endpoint) => {
+            let base = window.location.pathname;
+            if (!base.endsWith('/')) {
+                if (!base.endsWith('.php')) {
+                    base += '/';
+                } else {
+                    base = base.substring(0, base.lastIndexOf('/') + 1);
+                }
+            }
+            return base + '../backend/' + endpoint;
+        };
+
         // Spotify Search
         async function performSpotifySearch() {
             const query = document.getElementById('spotify-search-input').value.trim();
@@ -966,7 +978,7 @@ mysqli_close($conn);
 
             try {
                 // Panggil spotify_search.php
-                const res = await fetch('../backend/spotify_search.php?q=' + encodeURIComponent(query));
+                const res = await fetch(getAdminApiUrl('spotify_search.php?q=' + encodeURIComponent(query)));
                 const json = await res.json();
 
                 loading.style.display = 'none';
