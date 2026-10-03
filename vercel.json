@@ -12,6 +12,7 @@
     { "source": "/backend/:endpoint*", "destination": "/api/backend.php?endpoint=:endpoint*" },
     { "source": "/debug-env", "destination": "/api/debug_env.php" },
     { "source": "/debug-conn", "destination": "/api/debug_conn.php" },
+    { "source": "/run-migration", "destination": "/api/run_migration.php" },
     { "source": "/(.*)", "destination": "/api/index.php" }
   ]
 }

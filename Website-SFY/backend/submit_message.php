@@ -195,16 +195,22 @@ try {
 
                 $decodedData = base64_decode($dataBase64);
                 if ($decodedData !== false) {
-                    $uploadDir = dirname(__DIR__) . '/uploads';
-                    if (!file_exists($uploadDir)) {
-                        mkdir($uploadDir, 0777, true);
-                    }
+                    try {
+                        $uploadDir = dirname(__DIR__) . '/uploads';
+                        if (!file_exists($uploadDir)) {
+                            @mkdir($uploadDir, 0777, true);
+                        }
 
-                    $filename = uniqid('img_', true) . '.' . $ext;
-                    $filePath = $uploadDir . '/' . $filename;
+                        $filename = uniqid('img_', true) . '.' . $ext;
+                        $filePath = $uploadDir . '/' . $filename;
 
-                    if (file_put_contents($filePath, $decodedData) !== false) {
-                        $imagesVal = 'uploads/' . $filename;
+                        if (@file_put_contents($filePath, $decodedData) !== false) {
+                            $imagesVal = 'uploads/' . $filename;
+                        } else {
+                            $imagesVal = $images;
+                        }
+                    } catch (Exception $e) {
+                        $imagesVal = $images;
                     }
                 }
             }
