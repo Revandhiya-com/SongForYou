@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "functions": {
+    "Website-SFY/**/*.php": {
+      "runtime": "vercel-php@0.7.2"
+    },
+    "*.php": {
+      "runtime": "vercel-php@0.7.2"
+    }
+  },
+  "routes": [
+    {
+      "src": "/Website-SFY/admin/(.*)",
+      "dest": "/Website-SFY/admin/index.php"
+    },
+    {
+      "src": "/Website-SFY/backend/(.*)",
+      "dest": "/Website-SFY/backend/$1"
+    },
+    {
+      "src": "/Website-SFY/(.*)",
+      "dest": "/Website-SFY/index.php"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.php"
+    }
+  ]
+}
