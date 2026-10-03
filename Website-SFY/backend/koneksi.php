@@ -23,14 +23,20 @@ $dbDriver = 'mysql';
 
 // 1. Coba koneksi ke PostgreSQL Supabase jika DB_HOST diset (bukan localhost biasa)
 if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
-    $dbPort = !empty($port) ? $port : '5432';
     $dbUser = !empty($user) ? $user : 'postgres';
     $dbName = !empty($db) ? $db : 'postgres';
-    
+    $configuredPort = !empty($port) ? $port : '5432';
+
+    // Supabase Vercel: coba port 6543 (Transaction Pooler) dan 5432 (Direct), semua SSL mode
     $dsnModes = [
-        "pgsql:host={$host};port={$dbPort};dbname={$dbName};sslmode=require",
-        "pgsql:host={$host};port={$dbPort};dbname={$dbName};sslmode=prefer",
-        "pgsql:host={$host};port={$dbPort};dbname={$dbName}"
+        // Port 6543 = Supabase Transaction Pooler (RECOMMENDED untuk serverless/Vercel)
+        "pgsql:host={$host};port=6543;dbname={$db};sslmode=require",
+        "pgsql:host={$host};port=6543;dbname={$dbName};sslmode=prefer",
+        "pgsql:host={$host};port=6543;dbname={$dbName}",
+        // Port 5432 = Direct connection (fallback)
+        "pgsql:host={$host};port=5432;dbname={$dbName};sslmode=require",
+        "pgsql:host={$host};port=5432;dbname={$dbName};sslmode=prefer",
+        "pgsql:host={$host};port={$configuredPort};dbname={$dbName}",
     ];
 
     foreach ($dsnModes as $dsn) {
@@ -39,6 +45,7 @@ if (!empty($host) && $host !== 'localhost' && $host !== '127.0.0.1') {
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::ATTR_TIMEOUT            => 5,
             ]);
             if ($conn) {
                 $dbDriver = 'pgsql';
