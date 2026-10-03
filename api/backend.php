@@ -3,7 +3,6 @@
 $root = dirname(__DIR__);
 $endpoint = $_GET['endpoint'] ?? '';
 
-// Whitelist endpoint yang diizinkan
 $allowed = [
     'get_messages.php',
     'get_songs.php',
@@ -14,11 +13,14 @@ $allowed = [
     'update_all_meanings.php',
 ];
 
-if (!in_array(basename($endpoint), $allowed)) {
+$cleanEndpoint = basename($endpoint);
+if (empty($cleanEndpoint) || !in_array($cleanEndpoint, $allowed)) {
     http_response_code(404);
-    echo json_encode(['error' => 'Not found']);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Endpoint not found', 'requested' => $endpoint]);
     exit;
 }
 
 chdir($root . '/Website-SFY/backend');
-require $root . '/Website-SFY/backend/' . basename($endpoint);
+set_include_path($root . '/Website-SFY/backend' . PATH_SEPARATOR . $root . '/Website-SFY');
+require $root . '/Website-SFY/backend/' . $cleanEndpoint;

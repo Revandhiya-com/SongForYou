@@ -7,19 +7,19 @@
   },
   "routes": [
     {
-      "src": "/admin(/.*)?$",
+      "src": "^/admin(/.*)?$",
       "dest": "/api/admin.php"
     },
     {
-      "src": "/backend/(.*)",
+      "src": "^/backend/(.*)",
       "dest": "/api/backend.php?endpoint=$1"
     },
     {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webp|mp3))",
+      "src": "^/(.*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|webp|mp3|mp4|json))$",
       "dest": "/Website-SFY/$1"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(.*)$",
       "dest": "/api/index.php"
     }
   ]
