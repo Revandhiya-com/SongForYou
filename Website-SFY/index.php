@@ -551,15 +551,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         .cards-carousel-track {
-            display: flex;
+            display: grid;
+            grid-template-rows: repeat(2, auto);
+            grid-auto-flow: column;
+            grid-auto-columns: 310px;
             gap: 20px;
             width: max-content;
         }
 
         .cards-carousel-track .msg-card {
-            flex: 0 0 320px;
             scroll-snap-align: start;
-            min-height: 290px;
+            min-height: 270px;
+            width: 310px;
         }
 
         .msg-card {
@@ -1023,31 +1026,40 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .form-section { padding: 26px 20px; }
             .spotify-single-bubble { padding: 18px 20px; gap: 16px; }
             .vinyl-disc-container { width: 70px; height: 70px; }
-               @media (max-width: 640px) {
-            .top-bar { display: none; }
-            .navbar { padding: 10px 14px; }
-            .nav-container { gap: 8px; flex-wrap: nowrap; }
-            .brand-logo { font-size: 0.82rem; letter-spacing: 0.5px; min-width: 0; flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .brand-logo span { display: none; }
-            .btn-nav-create { padding: 6px 14px; font-size: 0.68rem; letter-spacing: 0.8px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
+        @media (max-width: 640px) {
+            .top-bar { font-size: 0.62rem; padding: 6px 12px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .navbar { padding: 12px 16px; }
+            .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
+            .brand-logo { font-size: 0.92rem; letter-spacing: 1px; flex-shrink: 1; }
+            .brand-logo span { color: var(--text-muted); font-weight: 400; display: inline; }
+            .btn-nav-create { padding: 8px 16px; font-size: 0.72rem; letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
             
-            .hero-section { padding: 20px 10px 28px; }
-            .hero-tag { font-size: 0.68rem; letter-spacing: 2px; margin-bottom: 14px; }
-            .hero-title { font-size: 1.75rem; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
-            .hero-sub { font-size: 0.82rem; padding: 0 4px; line-height: 1.5; margin-bottom: 24px; }
+            .hero-section { padding: 24px 12px 32px; }
+            .hero-tag { font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 16px; }
+            .hero-title { font-size: 1.85rem; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 16px; }
+            .hero-sub { font-size: 0.85rem; padding: 0 4px; line-height: 1.5; margin-bottom: 28px; }
             
             .search-container { max-width: 100%; margin-bottom: 40px; }
-            .search-input { padding: 12px 14px 12px 38px; font-size: 0.78rem; letter-spacing: 0.5px; border-radius: 10px; }
-            .search-input::placeholder { font-size: 0.72rem; letter-spacing: 0.5px; }
-            .search-container i { left: 14px; font-size: 0.8rem; }
+            .search-input { padding: 13px 16px 13px 42px; font-size: 0.82rem; letter-spacing: 0.5px; border-radius: 10px; }
+            .search-input::placeholder { font-size: 0.75rem; letter-spacing: 0.5px; }
+            .search-container i { left: 16px; font-size: 0.85rem; }
             
-            .main-wrapper { padding: 14px 10px 60px; }
-            .features-grid { grid-template-columns: 1fr; gap: 20px; padding-top: 30px; margin-bottom: 40px; }
-            .feature-title { font-size: 0.95rem; }
-            .feature-desc { font-size: 0.82rem; }
+            .main-wrapper { padding: 16px 12px 60px; }
+            .features-grid { grid-template-columns: 1fr; gap: 24px; padding-top: 35px; margin-bottom: 50px; }
+            .feature-title { font-size: 1rem; }
+            .feature-desc { font-size: 0.85rem; }
             
-            .cards-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 50px; }
-            .msg-card { padding: 16px; min-height: auto; border-radius: 14px; }
+            .cards-carousel-track {
+                grid-template-rows: repeat(2, auto);
+                grid-auto-columns: 275px;
+                gap: 14px;
+            }
+            .cards-carousel-track .msg-card {
+                width: 275px;
+                min-height: 250px;
+                padding: 18px;
+                border-radius: 14px;
+            }
             .msg-card-tag { font-size: 0.65rem; padding: 3px 8px; margin-bottom: 12px; }
             .msg-card-quote { font-size: 1.15rem; margin-bottom: 14px; line-height: 1.4; }
             .msg-card-image { height: 130px; margin-bottom: 10px; border-radius: 6px; }
@@ -1056,23 +1068,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .msg-card-audiobar .song-meta .title { font-size: 0.8rem; }
             .msg-card-audiobar .song-meta .artist { font-size: 0.7rem; }
             
-            .form-section { padding: 18px 14px; margin-bottom: 40px; border-radius: 14px; scroll-margin-top: 80px; }
-            .form-title { font-size: 1.2rem; }
-            .form-subtitle { font-size: 0.85rem; margin-bottom: 20px; padding-bottom: 16px; }
-            .form-group { margin-bottom: 20px; }
-            .form-label { font-size: 0.68rem; margin-bottom: 6px; }
-            .form-control { padding: 10px 12px; font-size: 0.85rem; border-radius: 6px; }
-            textarea.form-control { min-height: 110px; }
-            .file-upload-box { padding: 14px 10px; }
-            .file-upload-box span { font-size: 0.78rem; }
-            .song-results-dropdown { max-height: 200px; }
-            .btn-submit-form { padding: 13px; font-size: 0.78rem; letter-spacing: 1px; border-radius: 6px; }
+            .form-section { padding: 22px 16px; margin-bottom: 50px; border-radius: 14px; scroll-margin-top: 80px; }
+            .form-title { font-size: 1.35rem; }
+            .form-subtitle { font-size: 0.88rem; margin-bottom: 24px; padding-bottom: 18px; }
+            .form-group { margin-bottom: 22px; }
+            .form-label { font-size: 0.7rem; margin-bottom: 8px; }
+            .form-control { padding: 12px 14px; font-size: 0.88rem; border-radius: 8px; }
+            textarea.form-control { min-height: 120px; }
+            .file-upload-box { padding: 16px 12px; }
+            .file-upload-box span { font-size: 0.8rem; }
+            .song-results-dropdown { max-height: 220px; }
+            .btn-submit-form { padding: 14px; font-size: 0.82rem; letter-spacing: 1px; border-radius: 8px; }
             
             /* Modal / Fullscreen view on Mobile HP */
-            .fullscreen-message-page { padding: 16px 10px 40px; }
-            .btn-fullscreen-back { margin-bottom: 16px; padding: 7px 14px; font-size: 0.68rem; }
-            .modal-header-title { font-size: 1.4rem; margin-bottom: 4px; line-height: 1.2; }
-            .modal-header-sub { font-size: 0.8rem; margin-bottom: 18px; line-height: 1.4; }
+            .fullscreen-message-page { padding: 18px 12px 40px; }
+            .btn-fullscreen-back { margin-bottom: 18px; padding: 8px 16px; font-size: 0.7rem; }
+            .modal-header-title { font-size: 1.5rem; margin-bottom: 6px; line-height: 1.25; }
+            .modal-header-sub { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45; }
             
             .spotify-single-bubble {
                 padding: 12px 14px;
