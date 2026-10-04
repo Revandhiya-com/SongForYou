@@ -1,37 +1,4 @@
 <?php
-// scratch/build_batched_migration.php - Build SMALL batch files (one per 80 songs)
-// Each batch is a separate small PHP file with only 80 songs embedded
-
-$local = new PDO("mysql:host=localhost;dbname=songforyou;charset=utf8mb4", "root", "", [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-]);
-
-$songs    = $local->query("SELECT * FROM songs ORDER BY id")->fetchAll();
-$messages = $local->query("SELECT * FROM messages ORDER BY id")->fetchAll();
-
-$batchSize   = 80;
-$totalSongs  = count($songs);
-$totalBatches = ceil($totalSongs / $batchSize);
-
-echo "Total songs: {$totalSongs}\n";
-echo "Total batches: {$totalBatches}\n";
-
-// The main router: delegates to the right batch file
-$router = '<?php
-set_time_limit(25);
-header("Content-Type: application/json; charset=utf-8");
-$batch = isset($_GET["batch"]) ? (int)$_GET["batch"] : 0;
-$batchFile = __DIR__ . "/migration_batch_{$batch}.php";
-if (!file_exists($batchFile)) {
-    echo json_encode(["error" => "Batch {$batch} file not found. Max batch: ' . ($totalBatches - 1) . '"]);
-    exit;
-}
-require $batchFile;
-?>';
-
-// Common logic (included by each batch file)
-$commonLogic = '<?php
 // Shared migration logic
 require_once __DIR__ . "/../Website-SFY/backend/koneksi.php";
 if (!$conn || $dbDriver !== "pgsql") {
@@ -81,47 +48,4 @@ if ($isLastBatch) {
 $totalInSupabase = (int)$conn->query("SELECT COUNT(*) FROM songs")->fetchColumn();
 $msgsInSupabase  = (int)$conn->query("SELECT COUNT(*) FROM messages")->fetchColumn();
 echo json_encode(["batch" => $batchNum, "songs_added" => $songsAdded, "messages_added" => $msgsAdded, "done" => $isLastBatch, "total_in_supabase" => $totalInSupabase, "msgs_in_supabase" => $msgsInSupabase, "next_batch" => $isLastBatch ? null : ($batchNum + 1), "errors" => array_slice($errors, 0, 3)], JSON_PRETTY_PRINT);
-?>';
-
-$apiDir = dirname(__DIR__) . '/api';
-
-// Write main router
-file_put_contents($apiDir . '/run_migration.php', $router);
-echo "Wrote: api/run_migration.php\n";
-
-// Write common logic
-file_put_contents($apiDir . '/migration_common.php', $commonLogic);
-echo "Wrote: api/migration_common.php\n";
-
-// Export messages for last batch
-$msgsExport = var_export($messages, true);
-$allSongsExport = var_export($songs, true);
-
-// Write each batch file
-for ($b = 0; $b < $totalBatches; $b++) {
-    $slice = array_slice($songs, $b * $batchSize, $batchSize);
-    $isLast = ($b === $totalBatches - 1);
-    $sliceExport = var_export($slice, true);
-    
-    $batchPHP = "<?php\n";
-    $batchPHP .= "\$batchNum = {$b};\n";
-    $batchPHP .= "\$isLastBatch = " . ($isLast ? 'true' : 'false') . ";\n";
-    $batchPHP .= "\$batchSongs = {$sliceExport};\n";
-    if ($isLast) {
-        $batchPHP .= "\$allLocalSongs = {$allSongsExport};\n";
-        $batchPHP .= "\$allMessages = {$msgsExport};\n";
-    } else {
-        $batchPHP .= "\$allLocalSongs = [];\n";
-        $batchPHP .= "\$allMessages = [];\n";
-    }
-    $batchPHP .= "require __DIR__ . '/migration_common.php';\n";
-    $batchPHP .= "?>\n";
-    
-    $batchFile = $apiDir . "/migration_batch_{$b}.php";
-    file_put_contents($batchFile, $batchPHP);
-    $kb = round(filesize($batchFile) / 1024);
-    echo "Wrote: api/migration_batch_{$b}.php ({$kb}KB)\n";
-}
-
-echo "\nDone! Total batches: {$totalBatches}\n";
 ?>

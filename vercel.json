@@ -4,6 +4,10 @@
     "api/*.php": {
       "runtime": "vercel-php@0.7.2",
       "includeFiles": "Website-SFY/**"
+    },
+    "api/run_migration.php": {
+      "runtime": "vercel-php@0.7.2",
+      "includeFiles": "Website-SFY/**|api/migration_*.php"
     }
   },
   "rewrites": [
