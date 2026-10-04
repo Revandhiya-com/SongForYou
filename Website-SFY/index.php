@@ -1494,12 +1494,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             // Reset Audio State & Vinyl Disc Rotation
             stopPlaybackState();
 
-            // Set audio preview url
-            let audioUrl = msg.previewUrl;
-
-            // Jika previewUrl di DB kosong (Spotify tidak sediakan), ambil dari iTunes langsung
-            if (!audioUrl && msg.songTitle && msg.songArtist) {
+            // Selalu verifikasi dan dapatkan preview audio 100% akurat dari iTunes (country=ID) / Deezer
+            let audioUrl = null;
+            if (msg.songTitle && msg.songArtist) {
                 audioUrl = await getItunesPreview(msg.songTitle, msg.songArtist);
+            }
+            if (!audioUrl) {
+                audioUrl = msg.previewUrl;
             }
 
             if (audioUrl) {

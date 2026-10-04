@@ -1,6 +1,6 @@
 <?php
 // Shared migration logic
-require_once __DIR__ . "/../Website-SFY/backend/koneksi.php";
+require_once __DIR__ . "/koneksi.php";
 if (!$conn || $dbDriver !== "pgsql") {
     echo json_encode(["error" => "PostgreSQL not active"]);
     exit;
@@ -10,7 +10,7 @@ $errors = [];
 $stmtInsert = $conn->prepare("
     INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url, created_at)
     VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url, :created_at)
-    ON CONFLICT (spotify_id) DO NOTHING
+    ON CONFLICT (spotify_id) DO UPDATE SET meaning = EXCLUDED.meaning, preview_url = EXCLUDED.preview_url
 ");
 foreach ($batchSongs as $s) {
     try {
