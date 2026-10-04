@@ -479,12 +479,87 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        /* Message Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 80px;
+        /* Horizontal Cards Carousel & Auto-Slider */
+        .archive-carousel-section {
+            margin-bottom: 90px;
+            position: relative;
+        }
+
+        .archive-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+
+        .archive-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .archive-title {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .carousel-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-carousel-prev, .btn-carousel-next {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        .btn-carousel-prev:hover, .btn-carousel-next:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--text-main);
+            transform: scale(1.05);
+        }
+
+        .carousel-wrapper {
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 4px 24px;
+            margin: 0 -4px;
+            scrollbar-width: none;
+        }
+
+        .carousel-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cards-carousel-track {
+            display: flex;
+            gap: 20px;
+            width: max-content;
+        }
+
+        .cards-carousel-track .msg-card {
+            flex: 0 0 320px;
+            scroll-snap-align: start;
+            min-height: 290px;
         }
 
         .msg-card {
@@ -495,7 +570,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 280px;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -1108,10 +1182,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             </div>
         </section>
 
-        <!-- Archived Messages Grid Section -->
-        <section id="archiveSection">
-            <div id="messagesGrid" class="cards-grid">
-                <!-- Cards render dynamically via JS -->
+        <!-- Archived Messages Section with Horizontal Auto-Slider -->
+        <section id="archiveSection" class="archive-carousel-section">
+            <div class="archive-section-header">
+                <div>
+                    <span class="archive-tag">ARCHIVED MEMORIES</span>
+                    <h2 class="archive-title">SOUND CAPSULES</h2>
+                </div>
+                <div class="carousel-controls">
+                    <button class="btn-carousel-prev" onclick="scrollCarousel(-1)" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="btn-carousel-next" onclick="scrollCarousel(1)" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="carousel-wrapper" id="carouselWrapper">
+                <div id="messagesGrid" class="cards-carousel-track">
+                    <!-- Cards render dynamically via JS -->
+                </div>
             </div>
         </section>
 
@@ -1331,6 +1418,31 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         };
 
 
+        let carouselAutoScrollTimer = null;
+        let isCarouselHovered = false;
+
+        function startCarouselAutoScroll() {
+            if (carouselAutoScrollTimer) clearInterval(carouselAutoScrollTimer);
+            
+            carouselAutoScrollTimer = setInterval(() => {
+                const wrapper = document.getElementById('carouselWrapper');
+                if (!wrapper || isCarouselHovered) return;
+
+                if (wrapper.scrollLeft >= (wrapper.scrollWidth - wrapper.clientWidth - 4)) {
+                    wrapper.scrollLeft = 0;
+                } else {
+                    wrapper.scrollLeft += 1.2;
+                }
+            }, 30);
+        }
+
+        function scrollCarousel(dir) {
+            const wrapper = document.getElementById('carouselWrapper');
+            if (!wrapper) return;
+            const amount = 300 * dir;
+            wrapper.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+
         // Fetch Messages from DB
         async function fetchMessages() {
             try {
@@ -1339,6 +1451,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 if (data.success) {
                     allMessages = data.messages;
                     renderMessages(allMessages);
+                    startCarouselAutoScroll();
                 }
             } catch (err) {
                 console.error('Fetch messages error:', err);
@@ -1721,6 +1834,19 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         // Close fullscreen view with ESC key on laptop
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeFullScreenMessage();
+        });
+
+        // Setup Carousel Mouse & Touch Listeners for Smooth Auto-Scroll & Pause
+        window.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.getElementById('carouselWrapper');
+            if (wrapper) {
+                wrapper.addEventListener('mouseenter', () => { isCarouselHovered = true; });
+                wrapper.addEventListener('mouseleave', () => { isCarouselHovered = false; });
+                wrapper.addEventListener('touchstart', () => { isCarouselHovered = true; }, { passive: true });
+                wrapper.addEventListener('touchend', () => {
+                    setTimeout(() => { isCarouselHovered = false; }, 3000);
+                }, { passive: true });
+            }
         });
     </script>
 </body>
