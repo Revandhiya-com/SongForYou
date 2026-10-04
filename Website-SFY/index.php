@@ -949,90 +949,109 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .form-section { padding: 26px 20px; }
             .spotify-single-bubble { padding: 18px 20px; gap: 16px; }
             .vinyl-disc-container { width: 70px; height: 70px; }
-        }
-
-        @media (max-width: 480px) {
-            .top-bar { font-size: 0.62rem; padding: 6px 10px; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .navbar { padding: 12px 14px; }
-            .brand-logo { font-size: 0.9rem; }
-            .btn-nav-create { padding: 7px 14px; font-size: 0.7rem; }
+               @media (max-width: 640px) {
+            .top-bar { display: none; }
+            .navbar { padding: 10px 14px; }
+            .nav-container { gap: 8px; flex-wrap: nowrap; }
+            .brand-logo { font-size: 0.82rem; letter-spacing: 0.5px; min-width: 0; flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .brand-logo span { display: none; }
+            .btn-nav-create { padding: 6px 14px; font-size: 0.68rem; letter-spacing: 0.8px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
             
-            .hero-section { padding: 24px 12px 32px; }
-            .hero-title { font-size: 1.85rem; letter-spacing: -0.5px; line-height: 1.25; }
-            .hero-sub { font-size: 0.85rem; padding: 0 6px; line-height: 1.5; }
+            .hero-section { padding: 20px 10px 28px; }
+            .hero-tag { font-size: 0.68rem; letter-spacing: 2px; margin-bottom: 14px; }
+            .hero-title { font-size: 1.75rem; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
+            .hero-sub { font-size: 0.82rem; padding: 0 4px; line-height: 1.5; margin-bottom: 24px; }
             
-            .main-wrapper { padding: 16px 10px; }
-            .features-grid { grid-template-columns: 1fr; gap: 24px; }
-            .cards-grid { grid-template-columns: 1fr; gap: 16px; }
-            .msg-card { padding: 18px; min-height: auto; }
-            .msg-card-quote { font-size: 1.2rem; margin-bottom: 14px; }
-            .msg-card-image { height: 140px; margin-bottom: 12px; }
+            .search-container { max-width: 100%; margin-bottom: 40px; }
+            .search-input { padding: 12px 14px 12px 38px; font-size: 0.78rem; letter-spacing: 0.5px; border-radius: 10px; }
+            .search-input::placeholder { font-size: 0.72rem; letter-spacing: 0.5px; }
+            .search-container i { left: 14px; font-size: 0.8rem; }
             
-            .form-section { padding: 20px 14px; margin-bottom: 40px; border-radius: 14px; }
-            .form-title { font-size: 1.25rem; }
-            .form-group label { font-size: 0.7rem; }
-            .form-control { padding: 12px 14px; font-size: 0.88rem; }
-            .song-results-dropdown { max-height: 220px; }
-            .btn-submit-form { padding: 14px; font-size: 0.82rem; }
+            .main-wrapper { padding: 14px 10px 60px; }
+            .features-grid { grid-template-columns: 1fr; gap: 20px; padding-top: 30px; margin-bottom: 40px; }
+            .feature-title { font-size: 0.95rem; }
+            .feature-desc { font-size: 0.82rem; }
+            
+            .cards-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 50px; }
+            .msg-card { padding: 16px; min-height: auto; border-radius: 14px; }
+            .msg-card-tag { font-size: 0.65rem; padding: 3px 8px; margin-bottom: 12px; }
+            .msg-card-quote { font-size: 1.15rem; margin-bottom: 14px; line-height: 1.4; }
+            .msg-card-image { height: 130px; margin-bottom: 10px; border-radius: 6px; }
+            .msg-card-audiobar { padding: 8px 10px; gap: 10px; border-radius: 8px; }
+            .msg-card-audiobar img { width: 34px; height: 34px; }
+            .msg-card-audiobar .song-meta .title { font-size: 0.8rem; }
+            .msg-card-audiobar .song-meta .artist { font-size: 0.7rem; }
+            
+            .form-section { padding: 18px 14px; margin-bottom: 40px; border-radius: 14px; scroll-margin-top: 80px; }
+            .form-title { font-size: 1.2rem; }
+            .form-subtitle { font-size: 0.85rem; margin-bottom: 20px; padding-bottom: 16px; }
+            .form-group { margin-bottom: 20px; }
+            .form-label { font-size: 0.68rem; margin-bottom: 6px; }
+            .form-control { padding: 10px 12px; font-size: 0.85rem; border-radius: 6px; }
+            textarea.form-control { min-height: 110px; }
+            .file-upload-box { padding: 14px 10px; }
+            .file-upload-box span { font-size: 0.78rem; }
+            .song-results-dropdown { max-height: 200px; }
+            .btn-submit-form { padding: 13px; font-size: 0.78rem; letter-spacing: 1px; border-radius: 6px; }
             
             /* Modal / Fullscreen view on Mobile HP */
-            .fullscreen-message-page { padding: 18px 12px 40px; }
-            .btn-fullscreen-back { margin-bottom: 18px; padding: 8px 16px; font-size: 0.7rem; }
-            .modal-header-title { font-size: 1.5rem; margin-bottom: 6px; line-height: 1.25; }
-            .modal-header-sub { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45; }
+            .fullscreen-message-page { padding: 16px 10px 40px; }
+            .btn-fullscreen-back { margin-bottom: 16px; padding: 7px 14px; font-size: 0.68rem; }
+            .modal-header-title { font-size: 1.4rem; margin-bottom: 4px; line-height: 1.2; }
+            .modal-header-sub { font-size: 0.8rem; margin-bottom: 18px; line-height: 1.4; }
             
             .spotify-single-bubble {
-                padding: 14px 16px;
-                gap: 12px;
-                border-radius: 16px;
-                margin-bottom: 20px;
+                padding: 12px 14px;
+                gap: 10px;
+                border-radius: 14px;
+                margin-bottom: 18px;
                 background: #111115;
                 border: 1px solid rgba(255, 255, 255, 0.15);
             }
             .vinyl-disc-container {
-                width: 58px;
-                height: 58px;
+                width: 52px;
+                height: 52px;
             }
             .vinyl-disc-container::after {
-                width: 12px;
-                height: 12px;
+                width: 10px;
+                height: 10px;
             }
             .spotify-player-info h4 {
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 line-height: 1.2;
                 margin-bottom: 2px;
             }
             .spotify-player-info p {
-                font-size: 0.78rem;
-                margin-bottom: 6px;
+                font-size: 0.75rem;
+                margin-bottom: 4px;
             }
             .spotify-audio-controls {
-                gap: 10px;
+                gap: 8px;
             }
             .spotify-play-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 0.88rem;
+                width: 36px;
+                height: 36px;
+                font-size: 0.85rem;
             }
             .modal-message-text {
-                font-size: 1.2rem;
-                line-height: 1.5;
-                margin-bottom: 20px;
+                font-size: 1.15rem;
+                line-height: 1.45;
+                margin-bottom: 18px;
                 padding: 0 2px;
             }
             .modal-meaning-box {
-                padding: 12px 14px;
-                font-size: 0.82rem;
+                padding: 10px 12px;
+                font-size: 0.8rem;
             }
             #fullAttachmentImg {
-                max-height: 280px !important;
+                max-height: 260px !important;
             }
             .toast {
                 bottom: 16px;
                 right: 16px;
                 left: 16px;
                 text-align: center;
-                font-size: 0.75rem;
+                font-size: 0.72rem;
             }
         }
     </style>
@@ -1066,7 +1085,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             <!-- Search Bar -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="SEARCH A NAME (E.G. ZAHRA, LOUIS)..." autocomplete="off">
+                <input type="text" id="searchInput" class="search-input" placeholder="SEARCH A NAME..." autocomplete="off">
             </div>
 
             <!-- 3 Features Columns -->
