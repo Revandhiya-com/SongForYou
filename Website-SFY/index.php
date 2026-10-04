@@ -1165,20 +1165,76 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             return base + path;
         };
 
-        // Helper: Ambil preview URL dari iTunes Search API (gratis, no-auth, CORS ok)
+        // Helper: Ambil preview URL dari iTunes Search API (country=ID) & Deezer API Fallback
         const getItunesPreview = async (title, artist) => {
+            const cleanTitle = (title || '').replace(/\(feat\.[^)]+\)/gi, '').replace(/\([^)]+\)/g, '').replace(/\[[^\]]+\]/g, '').replace(/-\s*.*$/, '').trim();
+            const cleanArtist = (artist || '').split(',')[0].split('&')[0].trim();
+            const q = encodeURIComponent(`${cleanTitle} ${cleanArtist}`);
+
+            // 1. Tembak iTunes API dengan region ID (country=ID)
             try {
-                const q = encodeURIComponent(title + ' ' + artist);
-                const res = await fetch(`https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=3`, { signal: AbortSignal.timeout(4000) });
+                const res = await fetch(`https://itunes.apple.com/search?term=${q}&country=ID&media=music&entity=song&limit=10`, { signal: AbortSignal.timeout(3500) });
                 const data = await res.json();
+
                 if (data.results && data.results.length > 0) {
+                    const targetTitle = cleanTitle.toLowerCase();
+                    const targetArtist = cleanArtist.toLowerCase();
+
+                    // Priority 1: Match judul dan penyanyi secara akurat
+                    for (const track of data.results) {
+                        if (!track.previewUrl) continue;
+                        const trTitle = (track.trackName || '').toLowerCase();
+                        const trArtist = (track.artistName || '').toLowerCase();
+                        if ((trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) &&
+                            (trArtist.includes(targetArtist) || targetArtist.includes(trArtist))) {
+                            return track.previewUrl;
+                        }
+                    }
+
+                    // Priority 2: Match judul jika penyanyi mirip
+                    for (const track of data.results) {
+                        if (!track.previewUrl) continue;
+                        const trTitle = (track.trackName || '').toLowerCase();
+                        if (trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) {
+                            return track.previewUrl;
+                        }
+                    }
+
                     for (const track of data.results) {
                         if (track.previewUrl) return track.previewUrl;
                     }
                 }
-            } catch(e) { /* timeout / network error */ }
+            } catch(e) {}
+
+            // 2. Fallback: Deezer Search API (Gratis, fast, no-auth)
+            try {
+                const res2 = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`, { signal: AbortSignal.timeout(3500) });
+                const data2 = await res2.json();
+
+                if (data2.data && data2.data.length > 0) {
+                    const targetTitle = cleanTitle.toLowerCase();
+                    const targetArtist = cleanArtist.toLowerCase();
+
+                    for (const track of data2.data) {
+                        if (!track.preview) continue;
+                        const trTitle = (track.title || '').toLowerCase();
+                        const trArtist = (track.artist && track.artist.name ? track.artist.name : '').toLowerCase();
+
+                        if ((trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) &&
+                            (trArtist.includes(targetArtist) || targetArtist.includes(trArtist))) {
+                            return track.preview;
+                        }
+                    }
+
+                    for (const track of data2.data) {
+                        if (track.preview) return track.preview;
+                    }
+                }
+            } catch(e) {}
+
             return null;
         };
+
 
         // Fetch Messages from DB
         async function fetchMessages() {
@@ -1460,7 +1516,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     if (audioInstance.duration && !isNaN(audioInstance.duration)) {
                         const durMins = Math.floor(audioInstance.duration / 60);
                         const durSecs = Math.floor(audioInstance.duration % 60).toString().padStart(2, '0');
-                        document.getElementById('fullAudioTime').textContent = `00:00 / ${durMins}:${durSecs}`;
+                        
+                        // Reff/Korus untuk sampel audio 30 detik biasanya dimulai di detik 12 - 15 (45% durasi)
+                        const targetReff = Math.min(14, audioInstance.duration * 0.45);
+                        try {
+                            audioInstance.currentTime = targetReff;
+                        } catch(e) {}
+
+                        const curMins = Math.floor(targetReff / 60);
+                        const curSecs = Math.floor(targetReff % 60).toString().padStart(2, '0');
+                        document.getElementById('fullAudioTime').textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
                     }
                 };
             } else {
@@ -1488,18 +1553,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 playBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-left: 2px;"></i>';
                 vinyl.classList.remove('is-playing');
             } else {
-                // Saat pertama kali tombol Play diklik untuk pesan ini atau jika lagu sudah selesai, WAJIB reset ke detik 0!
-                if (!currentCardHasPlayed || audioInstance.ended || (audioInstance.duration && audioInstance.currentTime >= audioInstance.duration - 0.3)) {
-                    try {
-                        audioInstance.currentTime = 0;
-                    } catch(e) {}
-                    currentCardHasPlayed = true;
-                }
-                
+                const isReStart = !currentCardHasPlayed || audioInstance.ended || (audioInstance.duration && audioInstance.currentTime >= audioInstance.duration - 0.3);
+
                 audioInstance.play().then(() => {
                     isAudioPlaying = true;
                     playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
                     vinyl.classList.add('is-playing');
+
+                    // Setel timestamp ke Reff/Korus setelah audio diputar agar tidak ter-reset browser
+                    if (isReStart) {
+                        try {
+                            const targetReffTime = Math.min(14, (audioInstance.duration || 30) * 0.45);
+                            audioInstance.currentTime = targetReffTime;
+                        } catch(e) {
+                            console.error('Reff seek error:', e);
+                        }
+                        currentCardHasPlayed = true;
+                    }
                 }).catch(err => {
                     console.error('Audio play error:', err);
                     showToast('Klik sekali lagi untuk memutar lagu.');

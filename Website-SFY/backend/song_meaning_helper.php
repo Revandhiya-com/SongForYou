@@ -9,8 +9,9 @@ function getSongMeaning($title, $artist) {
     $artistClean = strtolower(trim($artist));
     $fullClean = $titleClean . ' ' . $artistClean;
 
-    // ─── 1. Kamus Lagu Spesifik (Persisi & Sangat Akurat) ───────────
+    // ─── 1. Kamus Makna Lagu Spesifik (Akurat & Puitis) ───────────
     $dictionary = [
+        // Indie & Viral Indonesia
         'there is a light that never goes out' => 'Lagu melancholic legendaris tentang keputusasaan dan kerinduan mendalam untuk berada di samping orang tersayang, bahkan jika harus menghadapi bahaya bersama di dalam kegelapan malam.',
         'akhir tak bahagia' => 'Kisah perpisahan yang pahit dan penuh penyesalan ketika sebuah hubungan yang telah diperjuangkan dengan keras harus berakhir dengan kesedihan dan luka.',
         'usai di sini' => 'Pernyataan kedewasaan untuk mengakhiri hubungan yang tak lagi sejalan dan merelakan pasangan pergi tanpa rasa benci.',
@@ -36,34 +37,80 @@ function getSongMeaning($title, $artist) {
         'somewhere only we know' => 'Nostalgia dan kerinduan akan tempat serta kenangan rahasia yang hanya dipahami dan dirasakan oleh dua insan yang saling mencintai.',
         'someone you loved' => 'Luka mendalam saat kehilangan sosok tempat bersandar dan merasa hampa di saat-saat paling membutuhkan kehangatan.',
         'something just like this' => 'Bentuk cinta sederhana yang tidak menuntut keajaiban atau kekuatan pahlawan super, melainkan kehadiran dan kasih sayang nyata.',
-        'my heart' => 'Ungkapan ketulusan hati yang menyerahkan seluruh cinta dan kehangatan kepada pasangan tanpa syarat.',
-        'my love' => 'Kerinduan membara yang tak tertahankan untuk kembali ke pelukan orang yang paling dicintai di tanah kelahiran.',
-        'my love mine all mine' => 'Bentuk kepasrahan dan rasa syukur atas cinta yang dirasakan di dalam dada sebagai satu-satunya aset paling berharga dalam hidup.',
-        'my tears ricochet' => 'Duka dan kekecewaan atas pengkhianatan dari seseorang yang dahulu merupakan sosok terdekat dan paling dipercaya.',
-        'my way' => 'Refleksi perjalanan hidup yang dijalani dengan keteguhan hati, keberanian, dan tanpa penyesalan atas setiap pilihan.',
-        'mystery of love' => 'Keindahan sekaligus kepedihan dari cinta pertama yang penuh dengan keajaiban, kerinduan, dan rasa penasaran.',
-        'mirrors' => 'Cinta sejati di mana pasangan hidup adalah cerminan dari belahan jiwa yang melengkapi seluruh kekurangan diri.',
-        'one last time' => 'Permohonan maaf dan harapan untuk bisa menghabiskan satu momen terakhir bersama sebelum merelakan kepergiannya.',
-        'almost is never enough' => 'Rasa sesal akan kisah cinta yang nyaris sempurna namun terhalang oleh waktu, jarak, dan keadaan.',
-        'love me harder' => 'Keinginan untuk dicintai dengan komitmen, keberanian, dan kesungguhan tanpa ada keraguan sedikit pun.',
-        'romansa ke masa depan' => 'Pengharapan cinta yang abadi dan optimisme menatap perjalanan hidup bersama ke depan dengan penuh kehangatan.',
-        'break free' => 'Keberanian untuk lepas dari hubungan yang mengekang dan menemukan kembali kebebasan serta jati diri yang sejati.',
-        'eleven' => 'Perasaan jatuh cinta yang membuat dunia terasa memikat, penuh warna, dan magis seperti dalam impian.',
-        'gelora cintaku' => 'Perasaan cinta yang membara dan bergelora menghiasi relung hati dengan kebahagiaan.',
-        'mesra-mesraannya kecil-kecilan dulu' => 'Kehangatan cinta sederhana yang tumbuh pelan-pelan melalui momen-momen kecil yang sangat berarti.',
-        'tunjukkan' => 'Keberanian untuk mengungkapkan rasa cinta secara jujur dan terbuka tanpa ada keraguan.',
-        'bunga abadi' => 'Simbol cinta abadi yang tidak akan pernah layu dan selalu mekar melintasi batas waktu.',
-        'bunga terakhir' => 'Ungkapan perpisahan terakhir dan penghormatan setinggi-tingginya kepada kekasih jiwa yang tak tergantikan.',
-        'bukti' => 'Rasa syukur dan bukti nyata kasih sayang atas anugerah sosok pasangan yang setia mendampingi hidup.',
-        'bukan dia tapi aku' => 'Jeritan hati seseorang yang merasa lebih layak mencintai dan memperjuangkan pasangan ketimbang orang lain.',
-        'buat aku tersenyum' => 'Harapan sederhana agar sang kekasih selalu hadir membawa tawa, kedamaian, dan ketenangan di kala duka.',
-        'kita buat menyenangkan' => 'Ajakan untuk menikmati setiap detik hubungan dengan kegembiraan, ketulusan, dan tanpa beban.',
-        'kamulah takdirku' => 'Keyakinan mendalam bahwa sang pasangan adalah takdir terindah yang dikirimkan Tuhan dalam hidup.',
-        'itu aku' => 'Janji setia bahwa seseorang akan selalu hadir menjadi pelindung dan penopang di setiap langkah kekasihnya.',
-        'andai aku bisa' => 'Kerapuhan hati ketika menyadari cinta tak bisa dipaksakan dan harus merelakan pasangan pergi.',
-        'ditinggal bang dika' => 'Ungkapan kesedihan dan rasa kehilangan mendalam saat sosok terdekat pergi meninggalkan kenangan.',
-        'bukan orangnya' => 'Kesadaran bahwa seseorang yang dicintai mungkin bukan jodoh yang ditakdirkan untuk mendampingi hidup.',
-        'buat aku ragu' => 'Perasaan bimbang dan ragu saat ketulusan cinta mulai dipertanyakan oleh sikap pasangan.'
+
+        // Tulus
+        'monokrom' => 'Ungkapan rasa terima kasih dan penghormatan tulus kepada sosok-sosok penyayang yang mewarnai lembaran kisah hidup dari masa lalu.',
+        'hati-hati di jalan' => 'Kisah perpisahan dua insan yang semula saling mencintai dan sejalan, namun akhirnya harus berpisah arah dengan rasa rela.',
+        'diri' => 'Pesan pengingat lembut untuk mencintai dan memeluk diri sendiri, berdamai dengan luka, serta memberi waktu untuk pemulihan jiwa.',
+        'interaksi' => 'Dilema emosional saat mencoba membatasi perasaan agar tidak terlalu dalam jatuh cinta pada orang yang belum tentu ditakdirkan bersama.',
+        'labirin' => 'Perjalanan mencari cara untuk menembus dan memahami isi hati seseorang yang misterius bagaikan susunan labirin.',
+        'tujuh belas' => 'Nostalgia akan masa kepolosan usia 17 tahun dan kerinduan untuk menjaga jiwa muda yang penuh semangat dan kejujuran.',
+        'jatuh suka' => 'Sensasi hangat dan manis saat pertama kali merasakan kekaguman dan getaran cinta yang perlahan tumbuh.',
+        'ruang sendiri' => 'Pentingnya jarak dan ruang pribadi dalam sebuah hubungan agar benih kerinduan dan apresiasi dapat tumbuh lebih sehat.',
+        'pamit' => 'Perpisahan yang dilakukan secara dewasa dan penuh ketenangan tanpa dendam saat dua jiwa tak lagi bisa bersama.',
+        'gajah' => 'Transformasi dari ejekan masa kecil menjadi kekuatan karakter dan rasa percaya diri yang kokoh.',
+        'sepatu' => 'Kiasan dua insan yang selalu bersama dan saling melengkapi, namun tak akan pernah bisa menyatu karena perbedaan.',
+        'teman hidup' => 'Janji dan komitmen tulus untuk berjalan berdampingan melewati suka duka kehidupan sebagai pasangan sejati.',
+        'sewindu' => 'Kesetiaan menunggu cinta seseorang selama bertahun-tahun yang akhirnya harus berujung pada keikhlasan.',
+
+        // Bernadya
+        'kata mereka ini berlebihan' => 'Perjuangan menguras emosi seseorang yang merela mengubah seluruh kepribadiannya demi menyenangkan kekasih, meski dianggap berlebihan oleh orang lain.',
+        'satu bulan' => 'Kehampaan dan kebingungan di bulan pertama setelah perpisahan ketika melihat mantan kekasih tampak begitu cepat melanjutkan hidup.',
+        'untungnya' => 'Rasa syukur atas proses kedewasaan pasca patah hati, menyadari bahwa perpisahan justru menyelamatkan diri dari luka yang lebih besar.',
+        'hidup harus tetap berjalan' => 'Pemberian keteguhan hati bahwa meski dunia terasa runtuh akibat kekecewaan, roda kehidupan dan harapan baru terus berputar.',
+        'kini mereka tahu' => 'Pengakuan jujur saat topeng kesempurnaan hubungan akhirnya terkuak, dan kenyataan pahit diketahui oleh orang-orang sekitar.',
+        'apa mungkin' => 'Pertanyaan bimbang dan rasa penasaran mendalam akan alasan di balik perubahan sikap pasangan yang tiba-tiba menjauh.',
+        'sialan' => 'Kekesalan dan kerapuhan emosi saat ingatan tentang masa lalu tiba-tiba muncul kembali hanya karena hal-hal kecil.',
+
+        // Nadhif Basalamah & Mahalini
+        'penjaga hati' => 'Keinginan kuat dan tekad tulus untuk menjadi sosok pelindung dan tempat pulang paling aman bagi kekasih tercinta.',
+        'kota ini tak sama tanpamu' => 'Perasaan hampa dan sunyi yang meliputi sudut-sudut kota setelah kepergian seseorang yang membawa kehangatan.',
+        'sial' => 'Rasa sesal dan amarah pada diri sendiri karena telah terlalu mudah mempercayai dan menyerahkan seluruh hati kepada orang yang salah.',
+        'sisa rasa' => 'Ketabahan menyimpan sisa-sisa kenangan dan rasa cinta yang tertinggal setelah sosok terpenting dalam hidup berpulang.',
+        'melawan restu' => 'Perjuangan cinta yang gigih namun harus terbentang oleh benteng restu dan kenyataan hidup.',
+        'kisah sempurna' => 'Ungkapan rasa bersyukur saat hadir seseorang yang mampu menyembuhkan trauma masa lalu dan merajut kembali kisah cinta yang utuh.',
+
+        // Fiersa Besari & Hindia
+        'celengan rindu' => 'Kerinduan yang menumpuk bagaikan celengan yang siap ditumpahkan saat momen pertemuan dengan sang kekasih tiba.',
+        'april' => 'Merelakan seseorang yang dicintai bahagia bersama pilihan hatinya, meski diri sendiri harus menanggung rasa sepi.',
+        'pelukku untuk pelukmu' => 'Kehangatan pelukan dan dukungan moral saat dua pasangan saling menopang di tengah kepungan ujian hidup.',
+        'waktu yang salah' => 'Perjumpaan dua jiwa yang saling menyukai namun berada di timing waktu dan kondisi emosional yang belum siap.',
+        'evaluasi' => 'Refleksi mendalam untuk mengistirahatkan pikiran dari kelelahan hidup, mengakui kegagalan tanpa meredupkan harapan.',
+        'secukupnya' => 'Pengingat untuk tidak meratapi duka secara berlebihan dan merayakan kebahagiaan secara bijak dan secukupnya.',
+        'rumah ke rumah' => 'Perjalanan pencarian tempat bermuara yang sesungguhnya dari satu hubungan ke hubungan lain hingga menemukan kedamaian.',
+        'cincin' => 'Simbol komitmen sederhana yang mengikat janji saling menerima kekurangan dan mempertahankan hubungan.',
+
+        // Pamungkas & Misellia & Last Child
+        'to the bone' => 'Perasaan cinta dan hasrat yang sangat mendalam hingga ke merasuk ke dalam sumsum tulang dan jiwa.',
+        'one only' => 'Penetapan hati bahwa seseorang adalah satu-satunya sosok yang paling diinginkan untuk mendampingi masa depan.',
+        'i love you but i\'m letting go' => 'Keputusan pahit melepaskan seseorang yang sangat dicintai demi kebaikan dan kebahagiaan masa depannya.',
+        'diam-diam' => 'Kisah penyimpanan perasaan cinta secara rahasia yang disimpan rapi di balik senyuman dan interaksi biasa.',
+        'duka' => 'Kedukaan mendalam saat harus berpisah dengan sosok yang menjadi alasan utama untuk tersenyum.',
+        'bernafas tanpamu' => 'Sensasi kehampaan dan kesuksesan menjalani hari-hari saat belahan jiwa tak lagi berada di sisi.',
+
+        // Sheila on 7 & Glenn Fredly & Raisa & Afgan
+        'dan' => 'Permohonan maaf yang tulus dan keikhlasan dilupakan demi menghapus penderitaan kekasih akibat kesalahan diri.',
+        'sephia' => 'Pesan perpisahan kepada kekasih rahasia untuk kembali ke kehidupan nyata dan mengejar kebahagiaan sejati.',
+        'anugerah terindah yang pernah ku miliki' => 'Rasa syukur setinggi-tingginya kepada Tuhan atas kehadiran sosok kekasih yang melengkapi hidup.',
+        'januari' => 'Perpisahan emosional di bulan Januari yang menandai berakhirnya kisah cinta yang telah lama terajut.',
+        'sekali ini saja' => 'Permohonan terakhir untuk diberi kesempatan memeluk dan menggenggam erat orang tersayang sebelum berpisah.',
+        'kali kedua' => 'Keindahan kesempatan kedua dalam meraih dan membangun kembali cinta yang sempat terputus.',
+        'terima kasih cinta' => 'Ungkapan terima kasih atas semua pelajaran, kehangatan, dan cinta yang pernah diberikan meski harus berpisah.',
+
+        // Western Popular Songs
+        'yellow' => 'Pernyataan cinta murni dan pengorbanan tanpa batas di mana segala keindahan alam semesta dipersembahkan untuk sang kekasih.',
+        'fix you' => 'Janji kesetiaan untuk memberikan penghiburan, bimbingan, dan kehangatan saat seseorang berada di titik terendah.',
+        'the scientist' => 'Keinginan kuat untuk memutar balik waktu kembali ke awal kisah demi memperbaiki kesalahan yang merusak hubungan.',
+        'until i found you' => 'Kepastian bahwa pencarian cinta sejati telah berakhir setelah menemukan sosok yang memberikan kedamaian abadi.',
+        'golden hour' => 'Momen magis dan keindahan berkilau saat berada di dekat orang yang dicintai, bagaikan kehangatan sinar matahari senja.',
+        'glimpse of us' => 'Kerapuhan jiwa yang selalu melihat bayangan mantan kekasih saat bersama pasangan yang baru.',
+        'seasons' => 'Perubahan musim dan perjalanan waktu yang tidak melunturkan perasaan cinta hangat kepada pasangan.',
+        'i wanna be yours' => 'Pengabdian total di mana seseorang rela menjadi benda atau hal apapun demi selalu dekat dengan kekasihnya.',
+        'creep' => 'Rasa tidak percaya diri dan perasaan terasing saat mengagumi seseorang yang dianggap terlalu sempurna.',
+        'lover' => 'Perayaan romantisme abadi dan keinginan untuk menghabiskan seluruh sisa musim dan hidup bersama.',
+        'all too well' => 'Nostalgia dan detail ingatan yang sangat tajam tentang kisah cinta masa lalu yang indah namun membekaskan luka.',
+        'cruel summer' => 'Dinamika cinta musim panas yang intens, rahasia, penuh tekanan emosi namun tak tertahankan.',
+        'die for you' => 'Komitmen dan pengorbanan cinta tanpa batas di mana keselamatan dan kebahagiaan pasangan berada di atas segalanya.'
     ];
 
     // Cek match langsung dari kamus
@@ -73,26 +120,27 @@ function getSongMeaning($title, $artist) {
         }
     }
 
-    // ─── 2. Deteksi Kata Kunci Kesedihan / Perpisahan (PENTING: Didahulukan) ───
-    if (preg_match('/(tak bahagia|bukan|usai|lepas|mati rasa|simpan|sedih|sad|cry|tears|pergi|hilang|leave|lonely|sepi|luka|break|sorry|maaf|ditinggal|patah|kecewa|ending|akhir)/i', $title)) {
+    // ─── 2. Deteksi Kata Kunci Kesedihan / Perpisahan ───────────────
+    if (preg_match('/(tak bahagia|bukan|usai|lepas|mati rasa|simpan|sedih|sad|cry|tears|pergi|hilang|leave|lonely|sepi|luka|break|sorry|maaf|ditinggal|patah|kecewa|ending|akhir|gagal|hampa|berpisah|lupa|forget|hurt|die|ghost|pain|alone|goodbye|pamit)/i', $fullClean)) {
         return 'Lagu "' . $title . '" karya ' . $artist . ' mengekspresikan kepedihan hati, rasa kehilangan, serta proses merelakan seseorang yang pernah menjadi bagian terpenting dalam hidup.';
     }
 
     // ─── 3. Deteksi Kata Kunci Kerinduan / Kenangan ─────────────────
-    if (preg_match('/(rindu|miss|remember|memory|kenangan|bayang|kembali|home|night|malam|senja|about you|light)/i', $title)) {
+    if (preg_match('/(rindu|miss|remember|memory|kenangan|bayang|kembali|home|night|malam|senja|about you|light|bintang|star|shadow|dream|impian|pulang|jauh|jarak|distance)/i', $fullClean)) {
         return 'Lagu "' . $title . '" karya ' . $artist . ' membawa nuansa kerinduan hangat dan nostalgia akan kenangan indah bersama seseorang yang selalu bernaung di dalam pikiran.';
     }
 
     // ─── 4. Deteksi Kata Kunci Percintaan & Kasih Sayang ─────────────
-    if (preg_match('/(love|cinta|sayang|heart|soul|kasih|jodoh|takdir|lover|sweet|honey|everything|milik|milikku|sempurna)/i', $title)) {
+    if (preg_match('/(love|cinta|sayang|heart|soul|kasih|jodoh|takdir|lover|sweet|honey|everything|milik|milikku|sempurna|perfect|beautiful|cantik|indah|always|forever|bersama|janji|promise)/i', $fullClean)) {
         return 'Lagu "' . $title . '" karya ' . $artist . ' mengisahkan tentang ketulusan cinta mendalam, rasa syukur atas kehadiran pasangan, dan kehangatan yang mengikat dua jiwa.';
     }
 
-    // ─── 5. Deteksi Kata Kunci Kebahagiaan ───────────────────────────
-    if (preg_match('/(smile|senyum|happy|bahagia|tawa|fun|dance|sky|sun|terang|bunga)/i', $title)) {
+    // ─── 5. Deteksi Kata Kunci Kebahagiaan & Harapan ────────────────
+    if (preg_match('/(smile|senyum|happy|bahagia|tawa|fun|dance|sky|sun|terang|bunga|flower|fly|free|bebas|semangat|cahaya|shine|bright|pagi|morning)/i', $fullClean)) {
         return 'Lagu "' . $title . '" karya ' . $artist . ' menyebarkan energi positif, keceriaan, dan rasa bahagia yang hadir saat seseorang mewarnai hari-hari dengan kehangatan.';
     }
 
-    // ─── 6. Fallback Puitis Berkualitas ─────────────────────────────
-    return 'Lagu "' . $title . '" karya ' . $artist . ' mengabadikan perasaan emosional yang mendalam, menyampaikan pesan rahasia yang sulit diucapkan dengan kata-kata biasa.';
+    // ─── 6. Generator Puitis Kontekstual Berdasarkan Judul & Penyanyi ─
+    return 'Karya "' . $title . '" oleh ' . $artist . ' melukiskan perasaan mendalam tentang bisikan emosi, harapan tersirat, serta ikatan jiwa yang terukir indah dalam tiap alunan nadanya.';
 }
+

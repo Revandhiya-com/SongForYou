@@ -68,9 +68,12 @@ function getSpotifyAccessToken() {
 
 // Function pencari audio preview yang persis untuk lagu Spotify
 function getExactAudioPreview($title, $artist) {
-    $searchQuery = urlencode($title . ' ' . $artist);
-    $url = "https://itunes.apple.com/search?term={$searchQuery}&media=music&entity=song&limit=1";
-    
+    $cleanTitle = trim(preg_replace('/\s*[\(\[\-].*$/', '', $title));
+    $cleanArtist = trim(explode(',', explode('&', $artist)[0])[0]);
+    $searchQuery = urlencode($cleanTitle . ' ' . $cleanArtist);
+
+    // 1. iTunes API dengan country=ID
+    $url = "https://itunes.apple.com/search?term={$searchQuery}&country=ID&media=music&entity=song&limit=5";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
@@ -80,10 +83,44 @@ function getExactAudioPreview($title, $artist) {
     
     if ($res) {
         $json = json_decode($res, true);
-        if (!empty($json['results'][0]['previewUrl'])) {
-            return $json['results'][0]['previewUrl'];
+        if (!empty($json['results'])) {
+            $tTitle = strtolower($cleanTitle);
+            $tArtist = strtolower($cleanArtist);
+            foreach ($json['results'] as $track) {
+                if (empty($track['previewUrl'])) continue;
+                $trTitle = strtolower($track['trackName'] ?? '');
+                $trArtist = strtolower($track['artistName'] ?? '');
+                if ((strpos($trTitle, $tTitle) !== false || strpos($tTitle, $trTitle) !== false) &&
+                    (strpos($trArtist, $tArtist) !== false || strpos($tArtist, $trArtist) !== false)) {
+                    return $track['previewUrl'];
+                }
+            }
+            if (!empty($json['results'][0]['previewUrl'])) {
+                return $json['results'][0]['previewUrl'];
+            }
         }
     }
+
+    // 2. Deezer API Fallback
+    $url2 = "https://api.deezer.com/search?q={$searchQuery}&limit=5";
+    $ch2 = curl_init($url2);
+    curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch2, CURLOPT_TIMEOUT, 3);
+    curl_setopt($ch2, CURLOPT_USERAGENT, 'Mozilla/5.0');
+    $res2 = curl_exec($ch2);
+    curl_close($ch2);
+
+    if ($res2) {
+        $json2 = json_decode($res2, true);
+        if (!empty($json2['data'])) {
+            foreach ($json2['data'] as $track) {
+                if (!empty($track['preview'])) {
+                    return $track['preview'];
+                }
+            }
+        }
+    }
+
     return null;
 }
 
