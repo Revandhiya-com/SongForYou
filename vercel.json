@@ -7,8 +7,7 @@
     }
   },
   "rewrites": [
-    { "source": "/admin", "destination": "/api/admin.php" },
-    { "source": "/admin/(.*)", "destination": "/api/admin.php" },
+    { "source": "/admin(.*)", "destination": "/api/admin.php" },
     { "source": "/backend/:endpoint*", "destination": "/api/backend.php?endpoint=:endpoint*" },
     { "source": "/(.*)", "destination": "/api/index.php" }
   ]
