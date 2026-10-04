@@ -82,6 +82,7 @@ try {
     $s_title       = isset($songDetails['title'])      ? trim($songDetails['title'])      : 'Lagu Pilihan';
     $s_artist      = isset($songDetails['artist'])     ? trim($songDetails['artist'])     : 'Spotify Artist';
     $s_cover       = isset($songDetails['coverUrl'])   ? trim($songDetails['coverUrl'])   : '';
+    $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : ('https://open.spotify.com/track/' . $songKey);
     $s_meaning     = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false)
         ? trim($songDetails['meaning'])
         : getSongMeaning($s_title, $s_artist);

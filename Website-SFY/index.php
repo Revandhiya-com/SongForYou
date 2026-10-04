@@ -25,7 +25,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>SONGFORYOU.PROJECT — Digital Sound Archive</title>
     <meta name="description" content="Archive your feelings through music. Ungkapkan perasaanmu secara rahasia dan lampirkan lagu yang mewakilinya.">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1032,93 +1032,109 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         @media (max-width: 640px) {
-            .top-bar { font-size: 0.6rem; padding: 6px 14px; letter-spacing: 0.8px; }
-            .navbar { padding: 12px 18px; }
+            html, body {
+                touch-action: manipulation;
+                -webkit-text-size-adjust: 100%;
+                overflow-x: hidden;
+            }
+
+            .top-bar { font-size: 0.58rem; padding: 6px 10px; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .navbar { padding: 12px 14px; }
             .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-            .brand-logo { font-size: 0.88rem; letter-spacing: 0.8px; }
+            .brand-logo { font-size: 0.82rem; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
             .brand-logo span { color: var(--text-muted); font-weight: 400; }
-            .btn-nav-create { padding: 8px 16px; font-size: 0.7rem; letter-spacing: 0.8px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
+            .btn-nav-create { padding: 7px 14px; font-size: 0.65rem; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
 
-            .hero-section { padding: 24px 18px 36px; }
-            .hero-tag { font-size: 0.68rem; letter-spacing: 2px; margin-bottom: 16px; }
-            .hero-title { font-size: 1.9rem; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
-            .hero-sub { font-size: 0.85rem; padding: 0 4px; line-height: 1.55; margin-bottom: 28px; }
+            .hero-section { padding: 20px 14px 28px; }
+            .hero-tag { font-size: 0.62rem; letter-spacing: 2px; margin-bottom: 12px; }
+            .hero-title { font-size: 1.7rem; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 12px; }
+            .hero-sub { font-size: 0.8rem; padding: 0; line-height: 1.5; margin-bottom: 22px; max-width: 95%; margin-left: auto; margin-right: auto; }
 
-            .search-container { max-width: 100%; margin-bottom: 40px; }
-            .search-input { padding: 13px 16px 13px 42px; font-size: 0.82rem; letter-spacing: 0.5px; border-radius: 10px; }
-            .search-input::placeholder { font-size: 0.75rem; letter-spacing: 0.5px; }
-            .search-container i { left: 16px; font-size: 0.85rem; }
+            .search-container { max-width: 100%; margin-bottom: 30px; }
+            .search-input { padding: 12px 14px 12px 40px; font-size: 0.8rem; letter-spacing: 0.5px; border-radius: 10px; }
+            .search-input::placeholder { font-size: 0.72rem; letter-spacing: 0.5px; }
+            .search-container i { left: 14px; font-size: 0.82rem; }
 
-            .main-wrapper { padding: 16px 18px 60px; overflow-x: hidden; }
-            .features-grid { grid-template-columns: 1fr; gap: 22px; padding-top: 30px; margin-bottom: 44px; }
+            .main-wrapper { padding: 12px 14px 50px; overflow-x: hidden; }
+            .features-grid { grid-template-columns: 1fr; gap: 18px; padding-top: 24px; margin-bottom: 36px; }
             .feature-item { padding-right: 0; }
-            .feature-title { font-size: 0.95rem; }
-            .feature-desc { font-size: 0.85rem; }
+            .feature-num { font-size: 0.75rem; margin-bottom: 6px; }
+            .feature-title { font-size: 0.88rem; margin-bottom: 6px; letter-spacing: 1px; }
+            .feature-desc { font-size: 0.8rem; line-height: 1.45; }
 
-            /* Archive Carousel - Mobile */
-            .archive-carousel-section { margin-bottom: 50px; }
-            .archive-section-header { flex-direction: row; align-items: center; margin-bottom: 16px; gap: 12px; }
-            .archive-title { font-size: 1.3rem; }
-            .archive-tag { font-size: 0.65rem; margin-bottom: 4px; }
-            .carousel-controls { gap: 8px; }
-            .btn-carousel-prev, .btn-carousel-next { width: 32px; height: 32px; font-size: 0.75rem; }
-            .carousel-wrapper { padding: 8px 0 18px; margin: 0; }
+            /* Archive Carousel - Mobile Single Row Clean Design */
+            .archive-carousel-section { margin-bottom: 40px; }
+            .archive-section-header { flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 14px; gap: 8px; }
+            .archive-title { font-size: 1.15rem; letter-spacing: 0.5px; }
+            .archive-tag { font-size: 0.6rem; margin-bottom: 3px; }
+            .carousel-controls { gap: 6px; }
+            .btn-carousel-prev, .btn-carousel-next { width: 30px; height: 30px; font-size: 0.7rem; }
+            .carousel-wrapper { padding: 6px 0 16px; margin: 0; }
 
             .cards-carousel-track {
-                grid-template-rows: repeat(2, auto);
-                grid-auto-columns: 260px;
-                gap: 12px;
+                grid-template-rows: 1fr;
+                grid-auto-columns: 270px;
+                gap: 14px;
             }
             .cards-carousel-track .msg-card {
-                width: 260px;
-                min-height: 240px;
+                width: 270px;
+                min-height: 220px;
                 padding: 16px;
                 border-radius: 14px;
             }
-            .msg-card-tag { font-size: 0.65rem; padding: 3px 8px; margin-bottom: 10px; }
-            .msg-card-quote { font-size: 1.1rem; margin-bottom: 12px; line-height: 1.4; }
-            .msg-card-image { height: 120px; margin-bottom: 10px; border-radius: 6px; }
-            .msg-card-audiobar { padding: 8px 10px; gap: 10px; border-radius: 8px; }
-            .msg-card-audiobar img { width: 32px; height: 32px; }
-            .msg-card-audiobar .song-meta .title { font-size: 0.78rem; }
-            .msg-card-audiobar .song-meta .artist { font-size: 0.68rem; }
+            .msg-card-tag { font-size: 0.62rem; padding: 3px 8px; margin-bottom: 10px; }
+            .msg-card-quote {
+                font-size: 0.98rem;
+                margin-bottom: 12px;
+                line-height: 1.45;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .msg-card-image { height: 110px; margin-bottom: 10px; border-radius: 6px; object-fit: cover; width: 100%; }
+            .msg-card-audiobar { padding: 8px 10px; gap: 8px; border-radius: 8px; }
+            .msg-card-audiobar img { width: 30px; height: 30px; border-radius: 4px; }
+            .msg-card-audiobar .song-meta .title { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+            .msg-card-audiobar .song-meta .artist { font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 
-            .form-section { padding: 22px 18px; margin-bottom: 50px; border-radius: 14px; scroll-margin-top: 80px; }
-            .form-title { font-size: 1.3rem; }
-            .form-subtitle { font-size: 0.88rem; margin-bottom: 22px; padding-bottom: 16px; }
-            .form-group { margin-bottom: 20px; }
-            .form-label { font-size: 0.7rem; margin-bottom: 8px; }
-            .form-control { padding: 12px 14px; font-size: 0.88rem; border-radius: 8px; }
-            textarea.form-control { min-height: 120px; }
-            .file-upload-box { padding: 16px 12px; }
-            .file-upload-box span { font-size: 0.8rem; }
-            .song-results-dropdown { max-height: 220px; }
-            .btn-submit-form { padding: 14px; font-size: 0.82rem; letter-spacing: 1px; border-radius: 8px; }
+            .form-section { padding: 20px 14px; margin-bottom: 40px; border-radius: 14px; scroll-margin-top: 70px; }
+            .form-title { font-size: 1.2rem; }
+            .form-subtitle { font-size: 0.82rem; margin-bottom: 18px; padding-bottom: 12px; }
+            .form-group { margin-bottom: 16px; }
+            .form-label { font-size: 0.68rem; margin-bottom: 6px; }
+            .form-control { padding: 11px 12px; font-size: 0.84rem; border-radius: 8px; }
+            textarea.form-control { min-height: 110px; }
+            .file-upload-box { padding: 14px 10px; }
+            .file-upload-box span { font-size: 0.78rem; }
+            .song-results-dropdown { max-height: 200px; }
+            .btn-submit-form { padding: 13px; font-size: 0.8rem; letter-spacing: 0.8px; border-radius: 8px; }
 
             /* Modal / Fullscreen view on Mobile HP */
-            .fullscreen-message-page { padding: 18px 14px 40px; }
-            .btn-fullscreen-back { margin-bottom: 16px; padding: 8px 16px; font-size: 0.7rem; }
-            .modal-header-title { font-size: 1.5rem; margin-bottom: 6px; line-height: 1.25; }
-            .modal-header-sub { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45; }
+            .fullscreen-message-page { padding: 16px 12px 30px; }
+            .btn-fullscreen-back { margin-bottom: 14px; padding: 7px 14px; font-size: 0.68rem; }
+            .modal-header-title { font-size: 1.35rem; margin-bottom: 4px; line-height: 1.2; }
+            .modal-header-sub { font-size: 0.78rem; margin-bottom: 16px; line-height: 1.4; }
 
             .spotify-single-bubble {
-                padding: 14px 16px;
-                gap: 12px;
-                border-radius: 14px;
-                margin-bottom: 18px;
+                padding: 12px 14px;
+                gap: 10px;
+                border-radius: 12px;
+                margin-bottom: 16px;
                 background: #111115;
                 border: 1px solid rgba(255, 255, 255, 0.15);
             }
-            .vinyl-disc-container { width: 56px; height: 56px; }
-            .vinyl-disc-container::after { width: 12px; height: 12px; }
-            .spotify-player-info h4 { font-size: 0.92rem; line-height: 1.2; margin-bottom: 2px; }
-            .spotify-player-info p { font-size: 0.78rem; margin-bottom: 4px; }
-            .spotify-audio-controls { gap: 8px; }
-            .spotify-play-btn { width: 36px; height: 36px; font-size: 0.85rem; }
-            .modal-message-text { font-size: 1.15rem; line-height: 1.45; margin-bottom: 18px; padding: 0 4px; }
-            .modal-meaning-box { padding: 12px 14px; font-size: 0.82rem; }
-            #fullAttachmentImg { max-height: 260px !important; }
-            .toast { bottom: 16px; right: 14px; left: 14px; text-align: center; font-size: 0.72rem; }
+            .vinyl-disc-container { width: 50px; height: 50px; }
+            .vinyl-disc-container::after { width: 10px; height: 10px; }
+            .spotify-player-info h4 { font-size: 0.88rem; line-height: 1.2; margin-bottom: 2px; }
+            .spotify-player-info p { font-size: 0.72rem; margin-bottom: 3px; }
+            .spotify-audio-controls { gap: 6px; }
+            .spotify-play-btn { width: 34px; height: 34px; font-size: 0.8rem; }
+            .modal-message-text { font-size: 1.05rem; line-height: 1.45; margin-bottom: 16px; padding: 0; }
+            .modal-meaning-box { padding: 10px 12px; font-size: 0.78rem; }
+            #fullAttachmentImg { max-height: 220px !important; }
+            .toast { bottom: 14px; right: 12px; left: 12px; text-align: center; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -1828,8 +1844,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (e.key === 'Escape') closeFullScreenMessage();
         });
 
-        // Setup Carousel Mouse & Touch Listeners for Smooth Auto-Scroll & Pause
+        // Setup Carousel Mouse & Touch Listeners & Prevent Zoom Out
         window.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+            document.addEventListener('touchmove', function (event) {
+                if (event.scale !== undefined && event.scale !== 1) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+
             const wrapper = document.getElementById('carouselWrapper');
             if (wrapper) {
                 wrapper.addEventListener('mouseenter', () => { isCarouselHovered = true; });
