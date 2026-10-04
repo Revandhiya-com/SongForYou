@@ -922,16 +922,36 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             opacity: 1;
         }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .features-grid { grid-template-columns: 1fr; gap: 30px; }
-            .hero-title { font-size: 2.8rem; }
-            .navbar { padding: 16px 20px; }
-            .modal-header-title { font-size: 2rem; }
-            .modal-message-text { font-size: 1.4rem; }
+        /* Universal Responsive Layout System for Laptop, Tablet, and Mobile HP */
+        @media (min-width: 1200px) {
+            .features-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+            .hero-title { font-size: 4rem; }
+            .spotify-single-bubble { padding: 24px 28px; gap: 24px; }
+            .vinyl-disc-container { width: 94px; height: 94px; }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 1199px) and (min-width: 769px) {
+            .features-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+            .hero-title { font-size: 3.2rem; }
+            .navbar { padding: 16px 30px; }
+            .form-section { padding: 32px 30px; }
+            .spotify-single-bubble { padding: 20px 22px; gap: 20px; }
+            .vinyl-disc-container { width: 80px; height: 80px; }
+        }
+
+        @media (max-width: 768px) and (min-width: 481px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+            .hero-title { font-size: 2.5rem; }
+            .navbar { padding: 14px 20px; }
+            .form-section { padding: 26px 20px; }
+            .spotify-single-bubble { padding: 18px 20px; gap: 16px; }
+            .vinyl-disc-container { width: 70px; height: 70px; }
+        }
+
+        @media (max-width: 480px) {
             .top-bar { font-size: 0.62rem; padding: 6px 10px; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .navbar { padding: 12px 14px; }
             .brand-logo { font-size: 0.9rem; }
@@ -942,6 +962,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .hero-sub { font-size: 0.85rem; padding: 0 6px; line-height: 1.5; }
             
             .main-wrapper { padding: 16px 10px; }
+            .features-grid { grid-template-columns: 1fr; gap: 24px; }
             .cards-grid { grid-template-columns: 1fr; gap: 16px; }
             .msg-card { padding: 18px; min-height: auto; }
             .msg-card-quote { font-size: 1.2rem; margin-bottom: 14px; }
@@ -1677,6 +1698,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
+        // Close fullscreen view with ESC key on laptop
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeFullScreenMessage();
+        });
     </script>
 </body>
 </html>
