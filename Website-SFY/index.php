@@ -1517,16 +1517,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     if (audioInstance.duration && !isNaN(audioInstance.duration)) {
                         const durMins = Math.floor(audioInstance.duration / 60);
                         const durSecs = Math.floor(audioInstance.duration % 60).toString().padStart(2, '0');
-                        
-                        // Reff/Korus untuk sampel audio 30 detik biasanya dimulai di detik 12 - 15 (45% durasi)
-                        const targetReff = Math.min(14, audioInstance.duration * 0.45);
+                        document.getElementById('fullAudioTime').textContent = `00:00 / ${durMins}:${durSecs}`;
+                        document.getElementById('fullProgressBarFill').style.width = '0%';
                         try {
-                            audioInstance.currentTime = targetReff;
+                            audioInstance.currentTime = 0;
                         } catch(e) {}
-
-                        const curMins = Math.floor(targetReff / 60);
-                        const curSecs = Math.floor(targetReff % 60).toString().padStart(2, '0');
-                        document.getElementById('fullAudioTime').textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
                     }
                 };
             } else {
@@ -1556,21 +1551,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             } else {
                 const isReStart = !currentCardHasPlayed || audioInstance.ended || (audioInstance.duration && audioInstance.currentTime >= audioInstance.duration - 0.3);
 
+                if (isReStart) {
+                    try {
+                        audioInstance.currentTime = 0;
+                    } catch(e) {}
+                    currentCardHasPlayed = true;
+                }
+
                 audioInstance.play().then(() => {
                     isAudioPlaying = true;
                     playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
                     vinyl.classList.add('is-playing');
-
-                    // Setel timestamp ke Reff/Korus setelah audio diputar agar tidak ter-reset browser
-                    if (isReStart) {
-                        try {
-                            const targetReffTime = Math.min(14, (audioInstance.duration || 30) * 0.45);
-                            audioInstance.currentTime = targetReffTime;
-                        } catch(e) {
-                            console.error('Reff seek error:', e);
-                        }
-                        currentCardHasPlayed = true;
-                    }
                 }).catch(err => {
                     console.error('Audio play error:', err);
                     showToast('Klik sekali lagi untuk memutar lagu.');
