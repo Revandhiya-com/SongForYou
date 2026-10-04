@@ -86,8 +86,22 @@ try {
         ? trim($songDetails['meaning'])
         : getSongMeaning($s_title, $s_artist);
     $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
-    if (empty($s_preview_url) && function_exists('getExactAudioPreview')) {
-        $s_preview_url = getExactAudioPreview($s_title, $s_artist);
+    if (empty($s_preview_url)) {
+        $cleanTitle = trim(preg_replace('/\s*[\(\[\-].*$/', '', $s_title));
+        $cleanArtist = trim(explode(',', explode('&', $s_artist)[0])[0]);
+        $q = urlencode($cleanTitle . ' ' . $cleanArtist);
+        $resPreview = @file_get_contents("https://itunes.apple.com/search?term={$q}&country=ID&media=music&entity=song&limit=5");
+        if ($resPreview) {
+            $jsonPreview = json_decode($resPreview, true);
+            if (!empty($jsonPreview['results'])) {
+                foreach ($jsonPreview['results'] as $tr) {
+                    if (!empty($tr['previewUrl'])) {
+                        $s_preview_url = $tr['previewUrl'];
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     // Cek apakah lagu sudah ada
