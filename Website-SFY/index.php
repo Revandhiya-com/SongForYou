@@ -1032,24 +1032,24 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         @media (max-width: 640px) {
-            .top-bar { font-size: 0.6rem; padding: 6px 12px; letter-spacing: 0.8px; }
-            .navbar { padding: 12px 16px; }
+            .top-bar { font-size: 0.6rem; padding: 6px 14px; letter-spacing: 0.8px; }
+            .navbar { padding: 12px 18px; }
             .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
             .brand-logo { font-size: 0.88rem; letter-spacing: 0.8px; }
             .brand-logo span { color: var(--text-muted); font-weight: 400; }
             .btn-nav-create { padding: 8px 16px; font-size: 0.7rem; letter-spacing: 0.8px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
 
-            .hero-section { padding: 28px 16px 36px; }
+            .hero-section { padding: 24px 18px 36px; }
             .hero-tag { font-size: 0.68rem; letter-spacing: 2px; margin-bottom: 16px; }
             .hero-title { font-size: 1.9rem; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
-            .hero-sub { font-size: 0.85rem; padding: 0 8px; line-height: 1.55; margin-bottom: 28px; }
+            .hero-sub { font-size: 0.85rem; padding: 0 4px; line-height: 1.55; margin-bottom: 28px; }
 
             .search-container { max-width: 100%; margin-bottom: 40px; }
             .search-input { padding: 13px 16px 13px 42px; font-size: 0.82rem; letter-spacing: 0.5px; border-radius: 10px; }
             .search-input::placeholder { font-size: 0.75rem; letter-spacing: 0.5px; }
             .search-container i { left: 16px; font-size: 0.85rem; }
 
-            .main-wrapper { padding: 16px 14px 60px; }
+            .main-wrapper { padding: 16px 18px 60px; overflow-x: hidden; }
             .features-grid { grid-template-columns: 1fr; gap: 22px; padding-top: 30px; margin-bottom: 44px; }
             .feature-item { padding-right: 0; }
             .feature-title { font-size: 0.95rem; }
@@ -1062,7 +1062,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .archive-tag { font-size: 0.65rem; margin-bottom: 4px; }
             .carousel-controls { gap: 8px; }
             .btn-carousel-prev, .btn-carousel-next { width: 32px; height: 32px; font-size: 0.75rem; }
-            .carousel-wrapper { padding: 8px 2px 18px; }
+            .carousel-wrapper { padding: 8px 0 18px; margin: 0; }
 
             .cards-carousel-track {
                 grid-template-rows: repeat(2, auto);
@@ -1083,7 +1083,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .msg-card-audiobar .song-meta .title { font-size: 0.78rem; }
             .msg-card-audiobar .song-meta .artist { font-size: 0.68rem; }
 
-            .form-section { padding: 22px 16px; margin-bottom: 50px; border-radius: 14px; scroll-margin-top: 80px; }
+            .form-section { padding: 22px 18px; margin-bottom: 50px; border-radius: 14px; scroll-margin-top: 80px; }
             .form-title { font-size: 1.3rem; }
             .form-subtitle { font-size: 0.88rem; margin-bottom: 22px; padding-bottom: 16px; }
             .form-group { margin-bottom: 20px; }
