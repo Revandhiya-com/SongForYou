@@ -85,8 +85,10 @@ try {
     $s_meaning     = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false)
         ? trim($songDetails['meaning'])
         : getSongMeaning($s_title, $s_artist);
-    $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : '';
     $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
+    if (empty($s_preview_url) && function_exists('getExactAudioPreview')) {
+        $s_preview_url = getExactAudioPreview($s_title, $s_artist);
+    }
 
     // Cek apakah lagu sudah ada
     $stmtSong = $conn->prepare("SELECT id FROM songs WHERE spotify_id = :spotify_id LIMIT 1");
