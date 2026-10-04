@@ -25,7 +25,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SONGFORYOU.PROJECT — Digital Sound Archive</title>
     <meta name="description" content="Archive your feelings through music. Ungkapkan perasaanmu secara rahasia dan lampirkan lagu yang mewakilinya.">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1018,60 +1018,75 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .vinyl-disc-container { width: 80px; height: 80px; }
         }
 
-        @media (max-width: 768px) and (min-width: 481px) {
+        @media (max-width: 768px) and (min-width: 641px) {
             .features-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
             .hero-title { font-size: 2.5rem; }
             .navbar { padding: 14px 20px; }
             .form-section { padding: 26px 20px; }
             .spotify-single-bubble { padding: 18px 20px; gap: 16px; }
             .vinyl-disc-container { width: 70px; height: 70px; }
+            .archive-section-header { flex-direction: row; align-items: center; }
+            .archive-title { font-size: 1.5rem; }
+            .cards-carousel-track { grid-auto-columns: 280px; }
+            .cards-carousel-track .msg-card { width: 280px; }
+        }
+
         @media (max-width: 640px) {
-            .top-bar { font-size: 0.62rem; padding: 6px 12px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .top-bar { font-size: 0.6rem; padding: 6px 12px; letter-spacing: 0.8px; }
             .navbar { padding: 12px 16px; }
-            .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; }
-            .brand-logo { font-size: 0.92rem; letter-spacing: 1px; flex-shrink: 1; }
-            .brand-logo span { color: var(--text-muted); font-weight: 400; display: inline; }
-            .btn-nav-create { padding: 8px 16px; font-size: 0.72rem; letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
-            
-            .hero-section { padding: 24px 12px 32px; }
-            .hero-tag { font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 16px; }
-            .hero-title { font-size: 1.85rem; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 16px; }
-            .hero-sub { font-size: 0.85rem; padding: 0 4px; line-height: 1.5; margin-bottom: 28px; }
-            
+            .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+            .brand-logo { font-size: 0.88rem; letter-spacing: 0.8px; }
+            .brand-logo span { color: var(--text-muted); font-weight: 400; }
+            .btn-nav-create { padding: 8px 16px; font-size: 0.7rem; letter-spacing: 0.8px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
+
+            .hero-section { padding: 28px 16px 36px; }
+            .hero-tag { font-size: 0.68rem; letter-spacing: 2px; margin-bottom: 16px; }
+            .hero-title { font-size: 1.9rem; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 14px; }
+            .hero-sub { font-size: 0.85rem; padding: 0 8px; line-height: 1.55; margin-bottom: 28px; }
+
             .search-container { max-width: 100%; margin-bottom: 40px; }
             .search-input { padding: 13px 16px 13px 42px; font-size: 0.82rem; letter-spacing: 0.5px; border-radius: 10px; }
             .search-input::placeholder { font-size: 0.75rem; letter-spacing: 0.5px; }
             .search-container i { left: 16px; font-size: 0.85rem; }
-            
-            .main-wrapper { padding: 16px 12px 60px; }
-            .features-grid { grid-template-columns: 1fr; gap: 24px; padding-top: 35px; margin-bottom: 50px; }
-            .feature-title { font-size: 1rem; }
+
+            .main-wrapper { padding: 16px 14px 60px; }
+            .features-grid { grid-template-columns: 1fr; gap: 22px; padding-top: 30px; margin-bottom: 44px; }
+            .feature-item { padding-right: 0; }
+            .feature-title { font-size: 0.95rem; }
             .feature-desc { font-size: 0.85rem; }
-            
+
+            /* Archive Carousel - Mobile */
+            .archive-carousel-section { margin-bottom: 50px; }
+            .archive-section-header { flex-direction: row; align-items: center; margin-bottom: 16px; gap: 12px; }
+            .archive-title { font-size: 1.3rem; }
+            .archive-tag { font-size: 0.65rem; margin-bottom: 4px; }
+            .carousel-controls { gap: 8px; }
+            .btn-carousel-prev, .btn-carousel-next { width: 32px; height: 32px; font-size: 0.75rem; }
+            .carousel-wrapper { padding: 8px 2px 18px; }
+
             .cards-carousel-track {
                 grid-template-rows: repeat(2, auto);
-                grid-auto-columns: 275px;
-                gap: 14px;
+                grid-auto-columns: 260px;
+                gap: 12px;
             }
             .cards-carousel-track .msg-card {
-                width: 275px;
-                min-height: 250px;
-                padding: 18px;
+                width: 260px;
+                min-height: 240px;
+                padding: 16px;
                 border-radius: 14px;
             }
-            .msg-card-tag { font-size: 0.65rem; padding: 3px 8px; margin-bottom: 12px; }
-            .msg-card-quote { font-size: 1.15rem; margin-bottom: 14px; line-height: 1.4; }
-            .msg-card-image { height: 130px; margin-bottom: 10px; border-radius: 6px; }
+            .msg-card-tag { font-size: 0.65rem; padding: 3px 8px; margin-bottom: 10px; }
+            .msg-card-quote { font-size: 1.1rem; margin-bottom: 12px; line-height: 1.4; }
+            .msg-card-image { height: 120px; margin-bottom: 10px; border-radius: 6px; }
             .msg-card-audiobar { padding: 8px 10px; gap: 10px; border-radius: 8px; }
-            .msg-card-audiobar img { width: 34px; height: 34px; }
-            .msg-card-audiobar .song-meta .title { font-size: 0.8rem; }
-            .msg-card-audiobar .song-meta .artist { font-size: 0.7rem; }
-            
+            .msg-card-audiobar img { width: 32px; height: 32px; }
+            .msg-card-audiobar .song-meta .title { font-size: 0.78rem; }
+            .msg-card-audiobar .song-meta .artist { font-size: 0.68rem; }
+
             .form-section { padding: 22px 16px; margin-bottom: 50px; border-radius: 14px; scroll-margin-top: 80px; }
-            .form-title { font-size: 1.35rem; }
-            .form-subtitle { font-size: 0.88rem; margin-bottom: 24px; padding-bottom: 18px; }
-            .form-group { margin-bottom: 22px; }
+            .form-title { font-size: 1.3rem; }
+            .form-subtitle { font-size: 0.88rem; margin-bottom: 22px; padding-bottom: 16px; }
+            .form-group { margin-bottom: 20px; }
             .form-label { font-size: 0.7rem; margin-bottom: 8px; }
             .form-control { padding: 12px 14px; font-size: 0.88rem; border-radius: 8px; }
             textarea.form-control { min-height: 120px; }
@@ -1079,66 +1094,31 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .file-upload-box span { font-size: 0.8rem; }
             .song-results-dropdown { max-height: 220px; }
             .btn-submit-form { padding: 14px; font-size: 0.82rem; letter-spacing: 1px; border-radius: 8px; }
-            
+
             /* Modal / Fullscreen view on Mobile HP */
-            .fullscreen-message-page { padding: 18px 12px 40px; }
-            .btn-fullscreen-back { margin-bottom: 18px; padding: 8px 16px; font-size: 0.7rem; }
+            .fullscreen-message-page { padding: 18px 14px 40px; }
+            .btn-fullscreen-back { margin-bottom: 16px; padding: 8px 16px; font-size: 0.7rem; }
             .modal-header-title { font-size: 1.5rem; margin-bottom: 6px; line-height: 1.25; }
             .modal-header-sub { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45; }
-            
+
             .spotify-single-bubble {
-                padding: 12px 14px;
-                gap: 10px;
+                padding: 14px 16px;
+                gap: 12px;
                 border-radius: 14px;
                 margin-bottom: 18px;
                 background: #111115;
                 border: 1px solid rgba(255, 255, 255, 0.15);
             }
-            .vinyl-disc-container {
-                width: 52px;
-                height: 52px;
-            }
-            .vinyl-disc-container::after {
-                width: 10px;
-                height: 10px;
-            }
-            .spotify-player-info h4 {
-                font-size: 0.9rem;
-                line-height: 1.2;
-                margin-bottom: 2px;
-            }
-            .spotify-player-info p {
-                font-size: 0.75rem;
-                margin-bottom: 4px;
-            }
-            .spotify-audio-controls {
-                gap: 8px;
-            }
-            .spotify-play-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 0.85rem;
-            }
-            .modal-message-text {
-                font-size: 1.15rem;
-                line-height: 1.45;
-                margin-bottom: 18px;
-                padding: 0 2px;
-            }
-            .modal-meaning-box {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
-            #fullAttachmentImg {
-                max-height: 260px !important;
-            }
-            .toast {
-                bottom: 16px;
-                right: 16px;
-                left: 16px;
-                text-align: center;
-                font-size: 0.72rem;
-            }
+            .vinyl-disc-container { width: 56px; height: 56px; }
+            .vinyl-disc-container::after { width: 12px; height: 12px; }
+            .spotify-player-info h4 { font-size: 0.92rem; line-height: 1.2; margin-bottom: 2px; }
+            .spotify-player-info p { font-size: 0.78rem; margin-bottom: 4px; }
+            .spotify-audio-controls { gap: 8px; }
+            .spotify-play-btn { width: 36px; height: 36px; font-size: 0.85rem; }
+            .modal-message-text { font-size: 1.15rem; line-height: 1.45; margin-bottom: 18px; padding: 0 4px; }
+            .modal-meaning-box { padding: 12px 14px; font-size: 0.82rem; }
+            #fullAttachmentImg { max-height: 260px !important; }
+            .toast { bottom: 16px; right: 14px; left: 14px; text-align: center; font-size: 0.72rem; }
         }
     </style>
 </head>
