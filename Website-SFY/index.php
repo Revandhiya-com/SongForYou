@@ -1615,8 +1615,21 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const songKey = document.getElementById('selectedSongKey').value;
             const fileInput = document.getElementById('fileInput');
 
+            if (!receiver) {
+                alert('Silakan isi nama penerima terlebih dahulu!');
+                document.getElementById('receiver').focus();
+                return;
+            }
+
             if (!selectedSong) {
                 alert('Silakan pilih lagu dari hasil pencarian Spotify terlebih dahulu!');
+                document.getElementById('songSearchInput').focus();
+                return;
+            }
+
+            if (!message) {
+                alert('Silakan tulis pesan rahasiamu terlebih dahulu!');
+                document.getElementById('messageText').focus();
                 return;
             }
 
@@ -1625,7 +1638,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             let base64Img = '';
             if (fileInput.files && fileInput.files[0]) {
-                base64Img = await fileToBase64(fileInput.files[0]);
+                try {
+                    base64Img = await fileToBase64(fileInput.files[0]);
+                } catch(e) {
+                    console.warn('Image process error:', e);
+                }
             }
 
             const payload = {
@@ -1652,7 +1669,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 });
                 const data = await res.json();
 
-                if (data.success) {
+                if (res.ok && data.success) {
                     showToast('PESAN RAHASIA BERHASIL DISIMPAN!');
                     document.getElementById('createMessageForm').reset();
                     document.getElementById('fileNameDisplay').textContent = 'Pilih Foto (Klik atau seret)';
@@ -1665,11 +1682,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         document.getElementById('archiveSection').scrollIntoView({ behavior: 'smooth' });
                     }
                 } else {
-                    alert('Gagal mengirim pesan: ' + (data.message || 'Error'));
+                    alert('Gagal mengirim pesan: ' + (data.message || data.error || 'Terjadi kesalahan server'));
                 }
             } catch (err) {
                 console.error('Submit error:', err);
-                alert('Terjadi kesalahan koneksi.');
+                alert('Gagal mengirim pesan: Terjadi kesalahan jaringan. Coba periksa koneksi atau ukuran foto.');
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'KIRIM PESAN RAHASIA';
@@ -1814,11 +1831,40 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 850;
+
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                            } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Kompresi foto menjadi JPEG ringan (~80KB - 150KB) agar tidak melebihi kuota Vercel 4.5MB
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = () => resolve(e.target.result);
+                };
+                reader.onerror = () => resolve('');
             });
         }
 
