@@ -79,6 +79,11 @@ try {
         if (!empty($img) && preg_match('#^/SFY/(uploads/.+)$#', $img, $m)) {
             $img = $m[1];
         }
+        $pUrl = $row['song_preview_url'];
+        if ((stripos($row['song_title'], 'Bila') !== false && stripos($row['song_artist'], 'Raisa') !== false) || strpos($pUrl, 'mzaf_1404835599913133440') !== false) {
+            $pUrl = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/77/59/2b77594c-8cc6-c252-9f90-d4be3af9d30d/mzaf_11665507368448228605.plus.aac.p.m4a';
+        }
+
         $messages[] = [
             'id'             => (int)$row['id'],
             'receiver'       => $row['recipient_name'],
@@ -89,7 +94,7 @@ try {
             'songCover'      => $row['song_cover'],
             'songMeaning'    => $row['song_meaning'],
             'songSpotifyUrl' => $row['song_spotify_url'],
-            'previewUrl'     => $row['song_preview_url'],
+            'previewUrl'     => $pUrl,
             'message'        => $row['message'],
             'images'         => $img,
             'slug'           => $row['slug'],

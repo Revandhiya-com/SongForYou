@@ -930,6 +930,90 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .modal-header-title { font-size: 2rem; }
             .modal-message-text { font-size: 1.4rem; }
         }
+
+        @media (max-width: 640px) {
+            .top-bar { font-size: 0.62rem; padding: 6px 10px; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .navbar { padding: 12px 14px; }
+            .brand-logo { font-size: 0.9rem; }
+            .btn-nav-create { padding: 7px 14px; font-size: 0.7rem; }
+            
+            .hero-section { padding: 24px 12px 32px; }
+            .hero-title { font-size: 1.85rem; letter-spacing: -0.5px; line-height: 1.25; }
+            .hero-sub { font-size: 0.85rem; padding: 0 6px; line-height: 1.5; }
+            
+            .main-wrapper { padding: 16px 10px; }
+            .cards-grid { grid-template-columns: 1fr; gap: 16px; }
+            .msg-card { padding: 18px; min-height: auto; }
+            .msg-card-quote { font-size: 1.2rem; margin-bottom: 14px; }
+            .msg-card-image { height: 140px; margin-bottom: 12px; }
+            
+            .form-section { padding: 20px 14px; margin-bottom: 40px; border-radius: 14px; }
+            .form-title { font-size: 1.25rem; }
+            .form-group label { font-size: 0.7rem; }
+            .form-control { padding: 12px 14px; font-size: 0.88rem; }
+            .song-results-dropdown { max-height: 220px; }
+            .btn-submit-form { padding: 14px; font-size: 0.82rem; }
+            
+            /* Modal / Fullscreen view on Mobile HP */
+            .fullscreen-message-page { padding: 18px 12px 40px; }
+            .btn-fullscreen-back { margin-bottom: 18px; padding: 8px 16px; font-size: 0.7rem; }
+            .modal-header-title { font-size: 1.5rem; margin-bottom: 6px; line-height: 1.25; }
+            .modal-header-sub { font-size: 0.82rem; margin-bottom: 20px; line-height: 1.45; }
+            
+            .spotify-single-bubble {
+                padding: 14px 16px;
+                gap: 12px;
+                border-radius: 16px;
+                margin-bottom: 20px;
+                background: #111115;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+            }
+            .vinyl-disc-container {
+                width: 58px;
+                height: 58px;
+            }
+            .vinyl-disc-container::after {
+                width: 12px;
+                height: 12px;
+            }
+            .spotify-player-info h4 {
+                font-size: 0.95rem;
+                line-height: 1.2;
+                margin-bottom: 2px;
+            }
+            .spotify-player-info p {
+                font-size: 0.78rem;
+                margin-bottom: 6px;
+            }
+            .spotify-audio-controls {
+                gap: 10px;
+            }
+            .spotify-play-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 0.88rem;
+            }
+            .modal-message-text {
+                font-size: 1.2rem;
+                line-height: 1.5;
+                margin-bottom: 20px;
+                padding: 0 2px;
+            }
+            .modal-meaning-box {
+                padding: 12px 14px;
+                font-size: 0.82rem;
+            }
+            #fullAttachmentImg {
+                max-height: 280px !important;
+            }
+            .toast {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                text-align: center;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1165,13 +1249,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             return base + path;
         };
 
-        // Helper: Ambil preview URL dari iTunes Search API (country=ID) & Deezer API Fallback
+        // Helper: Ambil preview URL dari iTunes Search API (country=ID)
         const getItunesPreview = async (title, artist) => {
             const cleanTitle = (title || '').replace(/\(feat\.[^)]+\)/gi, '').replace(/\([^)]+\)/g, '').replace(/\[[^\]]+\]/g, '').replace(/-\s*.*$/, '').trim();
             const cleanArtist = (artist || '').split(',')[0].split('&')[0].trim();
             const q = encodeURIComponent(`${cleanTitle} ${cleanArtist}`);
 
-            // 1. Tembak iTunes API dengan region ID (country=ID)
             try {
                 const res = await fetch(`https://itunes.apple.com/search?term=${q}&country=ID&media=music&entity=song&limit=10`, { signal: AbortSignal.timeout(3500) });
                 const data = await res.json();
@@ -1191,43 +1274,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         }
                     }
 
-                    // Priority 2: Match judul jika penyanyi mirip
+                    // Priority 2: Substring match untuk penyanyi & judul
                     for (const track of data.results) {
                         if (!track.previewUrl) continue;
                         const trTitle = (track.trackName || '').toLowerCase();
-                        if (trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) {
-                            return track.previewUrl;
-                        }
-                    }
-
-                    for (const track of data.results) {
-                        if (track.previewUrl) return track.previewUrl;
-                    }
-                }
-            } catch(e) {}
-
-            // 2. Fallback: Deezer Search API (Gratis, fast, no-auth)
-            try {
-                const res2 = await fetch(`https://api.deezer.com/search?q=${q}&limit=5`, { signal: AbortSignal.timeout(3500) });
-                const data2 = await res2.json();
-
-                if (data2.data && data2.data.length > 0) {
-                    const targetTitle = cleanTitle.toLowerCase();
-                    const targetArtist = cleanArtist.toLowerCase();
-
-                    for (const track of data2.data) {
-                        if (!track.preview) continue;
-                        const trTitle = (track.title || '').toLowerCase();
-                        const trArtist = (track.artist && track.artist.name ? track.artist.name : '').toLowerCase();
-
+                        const trArtist = (track.artistName || '').toLowerCase();
                         if ((trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) &&
                             (trArtist.includes(targetArtist) || targetArtist.includes(trArtist))) {
-                            return track.preview;
+                            return track.previewUrl;
                         }
-                    }
-
-                    for (const track of data2.data) {
-                        if (track.preview) return track.preview;
                     }
                 }
             } catch(e) {}
@@ -1494,13 +1549,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             // Reset Audio State & Vinyl Disc Rotation
             stopPlaybackState();
 
-            // Selalu verifikasi dan dapatkan preview audio 100% akurat dari iTunes (country=ID) / Deezer
-            let audioUrl = null;
-            if (msg.songTitle && msg.songArtist) {
+            // Gunakan previewUrl dari DB terlebih dahulu (100% verified & accurate). Jika kosong baru cari via getItunesPreview
+            let audioUrl = msg.previewUrl;
+            if (!audioUrl && msg.songTitle && msg.songArtist) {
                 audioUrl = await getItunesPreview(msg.songTitle, msg.songArtist);
-            }
-            if (!audioUrl) {
-                audioUrl = msg.previewUrl;
             }
 
             if (audioUrl) {
