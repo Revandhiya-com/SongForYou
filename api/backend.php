@@ -11,7 +11,6 @@ $allowed = [
     'spotify_search.php',
     'spotify_token.php',
     'update_all_meanings.php',
-    'run_migration.php',
 ];
 
 $cleanEndpoint = basename($endpoint);
