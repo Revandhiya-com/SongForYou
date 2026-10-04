@@ -956,6 +956,27 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             padding: 0 10px;
         }
 
+        .modal-attachment-container {
+            width: 100%;
+            margin: 25px 0 35px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #121216;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .modal-attachment-container img {
+            width: 100%;
+            max-height: 520px;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+            margin: 0 auto;
+        }
+
         .modal-meaning-box {
             background: rgba(29, 185, 84, 0.08);
             border-left: 3px solid var(--spotify-green);
@@ -1283,8 +1304,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             <div class="modal-divider">— ALSO, HERE'S A MESSAGE FROM THE SENDER:</div>
             <div class="modal-message-text" id="fullMessageText">"test"</div>
 
-            <div id="fullAttachmentBox" style="display: none; margin-bottom: 30px; text-align: center;">
-                <img id="fullAttachmentImg" src="" alt="Attachment" style="max-width: 100%; border-radius: 12px; max-height: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+            <div id="fullAttachmentBox" class="modal-attachment-container" style="display: none;">
+                <img id="fullAttachmentImg" src="" alt="Attachment">
             </div>
 
             <div id="fullMeaningBox" class="modal-meaning-box" style="display: none;">
@@ -1841,7 +1862,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxDim = 850;
+                        const maxDim = 1400;
 
                         if (width > maxDim || height > maxDim) {
                             if (width > height) {
@@ -1858,8 +1879,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // Kompresi foto menjadi JPEG ringan (~80KB - 150KB) agar tidak melebihi kuota Vercel 4.5MB
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+                        // Kompresi foto berkualitas tinggi HD (~250KB - 400KB) agar tetap tajam dan jauh di bawah batas 4.5MB Vercel
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                         resolve(dataUrl);
                     };
                     img.onerror = () => resolve(e.target.result);
