@@ -1785,7 +1785,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                 ${meaning ? `
                     <div class="meaning-box" style="margin-bottom:1.5rem;">
-                        <div class="meaning-lbl"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
+                        <div class="meaning-lbl">Makna</div>
                         <p class="meaning-txt">${escapeHtml(meaning)}</p>
                     </div>
                 ` : ''}

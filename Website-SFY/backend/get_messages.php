@@ -132,6 +132,12 @@ try {
             }
         }
 
+        // Jangan menampilkan teks template atau hasil yang belum benar-benar
+        // spesifik. Makna akan muncul setelah entri tersebut dikurasi.
+        if (!hasUsableSongMeaning($meaning)) {
+            $meaning = '';
+        }
+
         $messages[] = [
             'id'             => (int)$row['id'],
             'receiver'       => $row['recipient_name'],

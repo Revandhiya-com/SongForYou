@@ -83,12 +83,22 @@ function hasUsableSongMeaning($meaning) {
         'melukiskan perasaan mendalam tentang bisikan emosi',
         'sedang disiapkan dari sumber lirik lagu',
         'makna tematiknya belum dapat diverifikasi',
-        'makna spesifik untuk'
+        'makna spesifik untuk',
+        'lagu ini menggambarkan rasa takut akan kehilangan orang tersayang',
+        'lagu ini menggambarkan perasaan cinta yang mendalam namun diiringi kerapuhan',
+        'mengekspresikan kepedihan hati, rasa kehilangan, serta proses merelakan',
+        'membawa nuansa kerinduan hangat dan nostalgia',
+        'mengisahkan tentang ketulusan cinta mendalam, rasa syukur atas kehadiran pasangan',
+        'menyebarkan energi positif, keceriaan, dan rasa bahagia'
     ];
     foreach ($legacyMarkers as $marker) {
         if (mb_stripos($meaning, $marker, 0, 'UTF-8') !== false) return false;
     }
-    return !str_starts_with($meaning, 'Karya "');
+    if (str_starts_with($meaning, 'Karya "')) return false;
+
+    // Pola ini berasal dari generator lama berbasis kata kunci, bukan dari
+    // penjelasan khusus sebuah lagu. Jangan tampilkan sebagai makna spesifik.
+    return !preg_match('/^Lagu\s+.+\s+karya\s+.+\s+(mengisahkan|menggambarkan|menyebarkan)/ui', $meaning);
 }
 
 function buildMeaningFromLyrics($title, $artist, $lyrics) {
@@ -114,7 +124,7 @@ function buildMeaningFromLyrics($title, $artist, $lyrics) {
     $secondary = $themesFound[1] ?? null;
     $meaning = '"' . $title . '" oleh ' . $artist . ' menyoroti ' . $primary;
     if ($secondary) $meaning .= ' sekaligus ' . $secondary;
-    return $meaning . '. Ringkasan ini dibuat dari tema yang terdeteksi pada lirik lagu tersebut.';
+    return $meaning . '.';
 }
 
 function getSongMeaning($title, $artist, $lookUpLyrics = true, $spotifyId = '') {
@@ -300,14 +310,9 @@ function getSongMeaning($title, $artist, $lookUpLyrics = true, $spotifyId = '') 
         }
     }
 
-    if ($lookUpLyrics) {
-        $lyrics = fetchLyricsForMeaning($title, $artist);
-        if ($lyrics !== '') return buildMeaningFromLyrics($title, $artist, $lyrics);
-    }
-
-    if (!$lookUpLyrics) return '';
-
-    return 'Makna tematik "' . $title . '" oleh ' . $artist . ' belum dapat diverifikasi dari lirik yang tersedia.';
+    // Jangan menyusun makna dari kata kunci lirik. Tanpa entri kamus yang
+    // cocok, hasilnya terlalu umum untuk disebut makna spesifik.
+    return '';
 
     // ─── 2. Deteksi Kata Kunci Kesedihan / Perpisahan ───────────────
     if (preg_match('/(tak bahagia|bukan|usai|lepas|mati rasa|simpan|sedih|sad|cry|tears|pergi|hilang|leave|lonely|sepi|luka|break|sorry|maaf|ditinggal|patah|kecewa|ending|akhir|gagal|hampa|berpisah|lupa|forget|hurt|die|ghost|pain|alone|goodbye|pamit)/i', $fullClean)) {
