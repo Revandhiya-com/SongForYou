@@ -999,17 +999,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </section>
 
-    <!-- ALL MESSAGES: selalu diisi dari database yang sama dengan admin -->
+    <!-- Pesan hanya ditampilkan setelah pengguna melakukan pencarian. -->
     <section class="app-container" id="messagesSection">
         <div class="section-header">
             <div>
-                <div class="section-tagline">Arsip pesan</div>
-                <h2 class="section-title">Semua pesan.</h2>
+                <div class="section-tagline">Temukan pesan</div>
+                <h2 class="section-title">Cari pesan.</h2>
             </div>
         </div>
-        <input type="search" id="messagesFilterInput" class="filter-input" placeholder="Cari penerima, isi pesan, atau lagu..." oninput="filterMessages()">
+        <input type="search" id="messagesFilterInput" class="filter-input" placeholder="Ketik nama penerima, isi pesan, atau lagu..." oninput="filterMessages()">
         <div class="feed-grid" id="messagesGrid" aria-live="polite">
-            <!-- Loaded dynamically from the messages database -->
+            <!-- Hasil pencarian dimuat di sini. -->
         </div>
     </section>
 
@@ -1418,7 +1418,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     const data = await res.json();
                     allMessages = Array.isArray(data) ? data : (data.messages || []);
                     renderCarousel(allMessages);
-                    renderMessages(allMessages);
+                    renderMessages([]);
                 }
             } catch (err) {
                 console.error("Error fetching messages:", err);
@@ -1455,12 +1455,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }).join('');
         }
 
-        function renderMessages(messages) {
+        function renderMessages(messages, isSearch = false) {
             const grid = document.getElementById('messagesGrid');
             if (!grid) return;
 
             if (messages.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">Belum ada pesan tersimpan. Jadilah yang pertama membuat kenangan!</div>';
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">${isSearch ? 'Pesan yang dicari belum ditemukan.' : 'Ketik kata kunci untuk menampilkan pesan.'}</div>`;
                 return;
             }
 
@@ -1518,6 +1518,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function filterMessages() {
             const q = document.getElementById('messagesFilterInput').value.toLowerCase();
+            if (!q.trim()) {
+                renderMessages([]);
+                return;
+            }
             const filtered = allMessages.filter(m => {
                 const rec = (m.receiver || '').toLowerCase();
                 const msg = (m.message || '').toLowerCase();
@@ -1525,7 +1529,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const art = (m.songArtist || m.song_artist || '').toLowerCase();
                 return rec.includes(q) || msg.includes(q) || sng.includes(q) || art.includes(q);
             });
-            renderMessages(filtered);
+            renderMessages(filtered, true);
         }
 
         function openFullScreenMessage(id) {
