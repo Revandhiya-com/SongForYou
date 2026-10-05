@@ -1,5 +1,5 @@
 <?php
-// api/index.php - Entry point untuk Vercel PHP runtime
+// api/index.php - Entry point untuk Vercel PHP runtime v2
 header('Content-Type: text/html; charset=utf-8');
 
 $root = dirname(__DIR__);
