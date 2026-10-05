@@ -10,7 +10,7 @@ require_once __DIR__ . '/song_meaning_helper.php';
 echo "Mengambil seluruh data lagu dari database...\n";
 
 try {
-    $res = $conn->query("SELECT id, title, artist, meaning FROM songs");
+    $res = $conn->query("SELECT id, spotify_id, title, artist, meaning FROM songs");
     $rows = $res->fetchAll();
     $updatedCount = 0;
     $skippedCount = 0;
@@ -21,14 +21,17 @@ try {
         $artist = $row['artist'];
         $storedMeaning = trim((string)($row['meaning'] ?? ''));
 
-        // Jangan menimpa makna yang sudah dikurasi. Batch ini hanya menangani
-        // template lama/kosong dan tidak pernah menyimpan hasil yang belum
-        // dapat diverifikasi.
-        if (hasUsableSongMeaning($storedMeaning)) {
+        $newMeaning = getSongMeaning($title, $artist, false, $row['spotify_id'] ?? '');
+
+        // Katalog per-track boleh mengganti ringkasan lama yang terlalu umum.
+        // Untuk lagu lain, jangan menimpa makna yang sudah dikurasi.
+        if ($newMeaning === '' && hasUsableSongMeaning($storedMeaning)) {
             $skippedCount++;
             continue;
         }
-        $newMeaning = getSongMeaning($title, $artist);
+        if ($newMeaning === '') {
+            $newMeaning = getSongMeaning($title, $artist, true, $row['spotify_id'] ?? '');
+        }
         if (!hasUsableSongMeaning($newMeaning)) {
             $skippedCount++;
             continue;

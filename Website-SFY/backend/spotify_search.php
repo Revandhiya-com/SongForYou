@@ -177,7 +177,7 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
         // Preview URL langsung dari Spotify, null jika tidak tersedia
 
         // Pencarian harus responsif; lirik lengkap diambil saat lagu benar-benar dipilih/disimpan.
-        $meaning = getSongMeaning($titleName, $artistName, false);
+        $meaning = getSongMeaning($titleName, $artistName, false, $item['id']);
 
         // Hasil pencarian tidak lagi langsung menjadi data database. Sebelumnya
         // setiap ketikan dapat membuat atau menimpa makna dengan placeholder

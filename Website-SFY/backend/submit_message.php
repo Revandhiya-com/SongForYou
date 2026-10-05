@@ -95,7 +95,7 @@ try {
     $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : ('https://open.spotify.com/track/' . $songKey);
     // Makna selalu dibuat di server dari judul dan artis. Jangan memakai teks generik
     // yang dikirim browser atau dari hasil pencarian pihak ketiga.
-    $s_meaning     = getSongMeaning($s_title, $s_artist);
+    $s_meaning     = getSongMeaning($s_title, $s_artist, true, $songKey);
     $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
     if (empty($s_preview_url)) {
         $cleanTitle = trim(preg_replace('/\s*[\(\[\-].*$/', '', $s_title));

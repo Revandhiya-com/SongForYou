@@ -117,7 +117,26 @@ function buildMeaningFromLyrics($title, $artist, $lyrics) {
     return $meaning . '. Ringkasan ini dibuat dari tema yang terdeteksi pada lirik lagu tersebut.';
 }
 
-function getSongMeaning($title, $artist, $lookUpLyrics = true) {
+function getSongMeaning($title, $artist, $lookUpLyrics = true, $spotifyId = '') {
+    // Katalog per Spotify ID diprioritaskan untuk lagu yang memang sudah
+    // dipakai di pesan publik. Ini menghindari ringkasan generik pada judul
+    // yang sama, versi live, atau versi featuring.
+    $trackCatalog = [
+        '6JNoIVtIVFTKTwEMk5uHGh' => '"Garis Terdepan" adalah janji untuk tetap hadir sebagai pelindung dan penyemangat, bahkan ketika perasaan tidak bisa dimiliki sepenuhnya. Tokohnya memilih berdiri di barisan paling depan saat orang yang ia sayangi menghadapi kesulitan, tanpa menjadikan cintanya sebagai tuntutan.',
+        '0WQiDwKJclirSYG9v5tayI' => 'Lagu ini membayangkan dua orang yang ingin kabur dari rumah dan tekanan hidup untuk mencari kebebasan bersama. Imaji perjalanan mobil dan kemungkinan mati bersama bukan romantisasi kematian, melainkan cara ekstrem untuk menyatakan bahwa kebersamaan terasa lebih berharga daripada hidup dalam keterasingan.',
+        '0BYoWATcndOBcsCfKdTKRx' => '"Akhir Tak Bahagia" memotret rindu pada seseorang yang pernah diyakini bisa menemani hari-hari sulit. Kenangan tentang mata, tawa, dan malam berbintang membuat perpisahan terasa dekat; pada akhirnya, lagu ini memilih menerima bahwa pertemuan yang berarti pun dapat berakhir tanpa menjadi milik satu sama lain.',
+        '5uPaqMMt59KGrdKIitDRqa' => 'Ditulis untuk Toy Story 5, lagu ini berbicara tentang mengenali kembali ikatan lama setelah jarak dan waktu memisahkan. Dari sudut pandang yang dapat dibaca sebagai Jessie, pertemuan itu menghidupkan lagi keyakinan bahwa hubungan yang tulus tidak benar-benar hilang meski sempat terasa selesai.',
+        '6i5sIqE4lglanzlXXl8gCj' => '"Usai Di Sini" adalah keputusan sadar untuk berhenti menunggu cinta yang sudah tidak memberi ruang. Tokohnya mengakui mimpi bersama telah direnggut, lalu memilih mengakhiri hubungan sebelum kenangan baik berubah menjadi luka yang lebih pahit.',
+        '60ENzjgcc6MpFD883FjqPS' => '"Melepasmu" tidak sekadar tentang putus cinta: tokohnya menyadari kedekatan yang dijalani lahir ketika ia masih terikat dan sedang bermasalah dengan pasangan lain. Karena tak ingin orang ketiga terus terluka, ia memilih pergi sambil mendoakan orang itu menemukan pendamping yang benar-benar bisa hadir.',
+        '1RyqmamAZTAB9WSZpX4S3f' => '"perayaan mati rasa" menggambarkan fase setelah patah hati ketika kecewa sudah begitu sering datang sampai rasa sakitnya tidak lagi meledak. Kata “perayaan” dipakai secara ironis: bukan pesta bahagia, melainkan usaha menerima kebas, sepi, dan sisa perasaan agar hidup dapat diteruskan.',
+        '1SQsMiTpXb6X8fP6tiXfLs' => '"Simpan Saja" adalah pengakuan cinta yang sengaja tidak diucapkan karena tokohnya tahu perasaan itu tidak akan membawa mereka ke hubungan yang mungkin. Ia memilih menyimpan rasa dan kenangannya sendiri, bukan memaksa jawaban atau mengganggu kehidupan orang yang dicintai.',
+        '6pOmOGrSIPy2MEdQ9riRHF' => '"Tunjuk Satu Bintang" memakai bintang sebagai penanda harapan di tengah hidup yang terasa gelap dan membingungkan. Lagu ini bukan sekadar rayuan; ia mengajak seseorang memilih satu arah kecil untuk dipercaya, lalu menjadikannya pegangan saat semua hal lain terasa jauh.',
+        '6fp5H6JgnlAnS69SktBhpg' => '"Buat Aku Tersenyum" adalah ungkapan syukur pada kehadiran sederhana seseorang yang mampu memulihkan hari buruk. Yang dicari tokohnya bukan cinta yang dramatis, melainkan kedekatan yang membuatnya merasa aman, diterima, dan punya alasan untuk tersenyum lagi.',
+        '6EOj79FjFybJsek78CIQK5' => 'Dalam "My Everything", Glenn Fredly menempatkan pasangan sebagai pusat ketenangan dan arah hidupnya. Versi live ini menegaskan pengakuan yang intim: sosok tersebut bukan pelengkap sesaat, melainkan alasan untuk percaya pada komitmen dan masa depan bersama.',
+        '2MdoXFLKNUnTdgWZisagEp' => '"You Are My Everything" adalah deklarasi cinta yang melihat pasangan sebagai rumah emosional: tempat kembali ketika hidup melelahkan sekaligus sumber keberanian untuk menatap masa depan. Kolaborasi dengan Red memperkuat nuansa dialog dua orang yang sama-sama menegaskan pilihan untuk saling menjaga.'
+    ];
+    if ($spotifyId !== '' && isset($trackCatalog[$spotifyId])) return $trackCatalog[$spotifyId];
+
     $titleKey = normalizeMeaningValue($title);
     $artistKey = getPrimaryArtistKey($artist);
 
