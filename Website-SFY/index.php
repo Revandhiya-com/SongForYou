@@ -573,6 +573,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             border: 2px solid rgba(255,255,255,0.18);
             box-shadow: 0 12px 25px rgba(0,0,0,0.28);
         }
+        .photo-upload-status {
+            display: none;
+            margin-top: 0.7rem;
+            font-size: 0.78rem;
+            color: var(--text-body);
+        }
 
         /* FEED GRID */
         .filter-input {
@@ -1062,12 +1068,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <!-- PHOTO UPLOAD -->
                     <div class="form-field">
                         <label class="form-label"><i class="fa-regular fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
-                        <div class="upload-dropzone" onclick="document.getElementById('photoInput').click()">
+                        <div class="upload-dropzone">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
                             <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, atau WEBP — otomatis dibuat landscape 16:9</p>
                             <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" onchange="handleFileSelected(event)">
                             <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
+                            <p id="photoUploadStatus" class="photo-upload-status" aria-live="polite"></p>
                         </div>
                     </div>
 
@@ -1168,27 +1175,42 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         async function handleFileSelected(e) {
             const file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
+            const status = document.getElementById('photoUploadStatus');
             if (file) {
                 if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                    showToast('Gunakan foto berformat JPG, PNG, atau WEBP.', 'error');
+                    showToast('Foto ini tidak didukung. Pilih JPG, PNG, atau WEBP.', 'error');
                     e.target.value = '';
+                    base64Photo = '';
+                    thumb.style.display = 'none';
+                    status.style.display = 'none';
                     return;
                 }
                 if (file.size > 10 * 1024 * 1024) {
                     showToast('Ukuran foto maksimal 10 MB.', 'error');
                     e.target.value = '';
+                    base64Photo = '';
+                    thumb.style.display = 'none';
+                    status.style.display = 'none';
                     return;
                 }
+
+                status.textContent = 'Memproses foto…';
+                status.style.display = 'block';
                 base64Photo = await compressImage(file);
                 if (!base64Photo) {
                     showToast('Foto tidak dapat diproses. Coba foto lain.', 'error');
+                    e.target.value = '';
+                    thumb.style.display = 'none';
+                    status.style.display = 'none';
                     return;
                 }
                 thumb.src = base64Photo;
                 thumb.style.display = 'block';
+                status.textContent = 'Foto siap dikirim.';
             } else {
                 base64Photo = '';
                 thumb.style.display = 'none';
+                status.style.display = 'none';
             }
         }
 
@@ -1368,6 +1390,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     clearSelectedSong();
                     base64Photo = '';
                     document.getElementById('photoPreviewThumb').style.display = 'none';
+                    document.getElementById('photoUploadStatus').style.display = 'none';
                     fetchMessages();
                     document.getElementById('carouselTrack').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
