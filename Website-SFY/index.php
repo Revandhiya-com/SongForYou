@@ -1528,9 +1528,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         const previewHighlightCache = new Map();
         let previewAnalysisContext = null;
         const songHighlightProfiles = {
-            // Dibuat spesifik dari permintaan: cuplikan Panasea dibuka di reff,
-            // dekat "Takkan ku berubah" / "Halang takkan pernah", bukan verse awal.
-            'panasea|rumahsakit': 0.64
+            // Dibuat spesifik dari permintaan: langsung ke reff penutup
+            // "Halang takkan pernah ... Kau Panasea bagiku", bukan reff pertama.
+            'panasea|rumahsakit': 0.82
         };
 
         function normaliseSongName(value) {
@@ -1557,7 +1557,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             return Number.isFinite(duration) && duration > 0
                 // Source preview hanya memuat potongan lagu. Mulai jauh dari detik awal
                 // dan sisakan 12 detik untuk bagian hook/reff yang utuh.
-                ? Math.max(0, Math.min(Math.round(duration * (preferredRatio ?? 0.62)), duration - 12))
+                ? Math.max(0, Math.min(Math.round(duration * (preferredRatio ?? 0.72)), duration - 12))
                 : PREVIEW_HIGHLIGHT_SECONDS;
         }
 
@@ -1597,7 +1597,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                 const segmentSeconds = Math.min(12, Math.max(6, decoded.duration - 2));
                 const segmentBlocks = Math.max(1, Math.round(segmentSeconds / windowSeconds));
-                const firstBlock = Math.min(Math.round(2 / windowSeconds), Math.max(0, energies.length - segmentBlocks));
+                // Jangan pernah memilih intro; reff/hook lazimnya muncul setelah bagian awal.
+                const firstBlock = Math.min(Math.round(decoded.duration * 0.30 / windowSeconds), Math.max(0, energies.length - segmentBlocks));
                 let strongestScore = -Infinity;
                 let strongestBlock = firstBlock;
 
@@ -1610,7 +1611,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     }
                     // Energi tinggi + perubahan ritme memberi prioritas ke hook/reff,
                     // bukan intro yang tenang atau outro yang menurun.
-                    const score = energy / segmentBlocks + (movement / Math.max(1, segmentBlocks - 1)) * 0.45;
+                    const progress = start / Math.max(1, energies.length - segmentBlocks);
+                    // Jika dua bagian sama-sama kuat, pilih hook yang lebih akhir agar
+                    // tidak jatuh lagi ke verse atau reff pertama.
+                    const score = (energy / segmentBlocks + (movement / Math.max(1, segmentBlocks - 1)) * 0.45) * (0.82 + progress * 0.18);
                     if (score > strongestScore) {
                         strongestScore = score;
                         strongestBlock = start;
