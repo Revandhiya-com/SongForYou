@@ -536,15 +536,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .btn-clear-song:hover {
             color: #f5f5f5;
         }
-        .clip-picker { display:none; margin-top:0.85rem; padding:0.9rem 1rem; border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-md); background:rgba(255,255,255,0.035); }
-        .clip-picker.is-visible { display:block; }
-        .clip-picker-head { display:flex; justify-content:space-between; gap:0.7rem; color:var(--text-heading); font-size:0.82rem; font-weight:600; }
-        .clip-time { color:var(--accent-sage); }
-        .clip-help { margin:0.4rem 0 0.7rem; color:var(--text-subtle); font-size:0.72rem; line-height:1.45; }
-        .clip-controls { display:flex; align-items:center; gap:0.7rem; }
-        .clip-preview-btn { width:38px; height:38px; flex:0 0 38px; border:0; border-radius:50%; color:#12211a; background:var(--accent-sage); cursor:pointer; }
-        .clip-range { width:100%; accent-color:var(--accent-sage); cursor:pointer; }
-
+        .song-hook-note { margin-top:0.2rem; color:var(--text-subtle); font-size:0.68rem; }
+        .song-hook-note i { color:var(--accent-sage); margin-right:0.25rem; }
         /* DROPZONE */
         .upload-dropzone {
             border: 2px dashed var(--border-subtle);
@@ -1125,14 +1118,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div>
                                     <h4 id="selectedBubbleTitle">Judul Lagu</h4>
                                     <p id="selectedBubbleArtist">Penyanyi</p>
+                                    <p class="song-hook-note"><i class="fa-solid fa-wand-magic-sparkles"></i>Reff/hook dipilih otomatis saat diputar</p>
                                 </div>
                             </div>
                             <button type="button" class="btn-clear-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <div id="clipPicker" class="clip-picker">
-                            <div class="clip-picker-head"><span><i class="fa-solid fa-wave-square"></i> Pilih bagian lagu</span><span id="clipTime" class="clip-time">0:00</span></div>
-                            <p class="clip-help">Geser ke reff atau bagian yang paling kamu suka, lalu tekan play untuk mendengarkan cuplikan 10 detik.</p>
-                            <div class="clip-controls"><button id="clipPreviewBtn" type="button" class="clip-preview-btn" onclick="previewSelectedClip()" aria-label="Dengarkan bagian yang dipilih"><i class="fa-solid fa-play"></i></button><input id="clipStartInput" class="clip-range" type="range" min="0" max="20" value="0" step="1" aria-label="Titik mulai lagu"></div>
                         </div>
                     </div>
 
@@ -1197,8 +1186,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentAudio = null;
         let currentPlayBtn = null;
         let selectedSong = null;
-        let selectedClipAudio = null;
-        let selectedClipStart = 0;
         let base64Photo = '';
         const PREVIEW_HIGHLIGHT_SECONDS = 20;
 
@@ -1401,16 +1388,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!selectedSong.previewUrl && selectedSong.title && selectedSong.artist) {
                 selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
             }
-            selectedClipStart = 0;
-            document.getElementById('clipStartInput').value = '0';
-            updateClipTime();
-
-
             document.getElementById('selectedBubbleImg').src = track.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
             document.getElementById('selectedBubbleTitle').innerText = track.title;
             document.getElementById('selectedBubbleArtist').innerText = track.artist;
             document.getElementById('selectedSongBubble').style.display = 'flex';
-            document.getElementById('clipPicker').classList.add('is-visible');
 
             songInput.value = '';
             songDropdown.style.display = 'none';
@@ -1419,46 +1400,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function clearSelectedSong() {
             selectedSong = null;
             document.getElementById('selectedSongBubble').style.display = 'none';
-            document.getElementById('clipPicker').classList.remove('is-visible');
-            if (selectedClipAudio) { selectedClipAudio.pause(); selectedClipAudio = null; }
-        }
-
-        function updateClipTime() {
-            selectedClipStart = Number(document.getElementById('clipStartInput').value) || 0;
-            document.getElementById('clipTime').textContent = `Mulai 0:${String(selectedClipStart).padStart(2, '0')}`;
-            // Saat preview masih bermain, perpindahan slider langsung mencari titik baru.
-            if (selectedClipAudio && !selectedClipAudio.paused && Number.isFinite(selectedClipAudio.duration)) {
-                selectedClipAudio.currentTime = Math.min(selectedClipStart, Math.max(0, selectedClipAudio.duration - 0.1));
-            }
-        }
-        document.getElementById('clipStartInput').addEventListener('input', updateClipTime);
-
-        async function previewSelectedClip() {
-            if (!selectedSong) return;
-            if (!selectedSong.previewUrl) selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
-            if (!selectedSong.previewUrl) { showToast('Preview audio tidak tersedia untuk lagu ini.', 'error'); return; }
-            if (selectedClipAudio && !selectedClipAudio.paused) { selectedClipAudio.pause(); return; }
-            const audio = new Audio(selectedSong.previewUrl);
-            selectedClipAudio = audio;
-            const button = document.getElementById('clipPreviewBtn');
-            let started = false;
-            const startPlayback = () => {
-                if (started) return;
-                started = true;
-                audio.play().then(() => { button.innerHTML = '<i class="fa-solid fa-pause"></i>'; })
-                    .catch(() => showToast('Preview audio tidak dapat diputar.', 'error'));
-            };
-            audio.addEventListener('loadedmetadata', () => {
-                const maxStart = Math.max(0, Math.floor(audio.duration - 10));
-                const range = document.getElementById('clipStartInput');
-                range.max = maxStart;
-                if (selectedClipStart > maxStart) { range.value = String(maxStart); updateClipTime(); }
-                audio.currentTime = selectedClipStart;
-                if (selectedClipStart === 0) startPlayback();
-            }, { once: true });
-            audio.addEventListener('seeked', startPlayback, { once: true });
-            audio.addEventListener('timeupdate', () => { if (audio.currentTime >= selectedClipStart + 10) audio.pause(); });
-            audio.addEventListener('pause', () => { if (selectedClipAudio === audio) button.innerHTML = '<i class="fa-solid fa-play"></i>'; });
         }
 
         document.addEventListener('click', function(e) {
@@ -1507,7 +1448,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     senderName: 'Anonim',
                     songKey: selectedSong.spotifyId || selectedSong.trackId || '2IVsRhKrx8hlQBOWy4qebo',
                     message: message,
-                    clipStart: selectedClipStart,
                     images: base64Photo,
                     songDetails: {
                         title: selectedSong.title,
@@ -1556,12 +1496,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function getPreviewHighlightTime(audio) {
             const duration = audio.duration;
             return Number.isFinite(duration) && duration > 0
-                ? Math.max(0, Math.min(duration * 0.7, duration - 3))
+                // Preview iTunes biasanya menyimpan bagian hook di dua pertiga akhir;
+                // sisakan 12 detik agar reff tidak terpotong di ujung file.
+                ? Math.max(0, Math.min(Math.round(duration * 0.62), duration - 12))
                 : PREVIEW_HIGHLIGHT_SECONDS;
         }
 
-        function playFromHighlight(audio, btnEl, startSeconds = null) {
-            const highlightTime = Number.isFinite(startSeconds) ? Math.max(0, startSeconds) : getPreviewHighlightTime(audio);
+        function playFromHighlight(audio, btnEl) {
+            const highlightTime = getPreviewHighlightTime(audio);
+            const highlightEnd = Number.isFinite(audio.duration) ? Math.min(highlightTime + 12, audio.duration) : null;
             let playbackStarted = false;
 
             const beginPlayback = () => {
@@ -1576,12 +1519,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             // Tunggu audio benar-benar selesai berpindah posisi sebelum play.
             audio.addEventListener('seeked', beginPlayback, { once: true });
+            audio._sfyHighlightEnd = highlightEnd;
+            audio.ontimeupdate = () => {
+                if (Number.isFinite(audio._sfyHighlightEnd) && audio.currentTime >= audio._sfyHighlightEnd) audio.pause();
+            };
             audio.currentTime = highlightTime;
             // Fallback untuk browser yang tidak memicu event seeked pada stream tertentu.
             window.setTimeout(beginPlayback, 700);
         }
 
-        async function toggleAudioPlayback(previewUrl, title, artist, btnEl, startSeconds = null) {
+        async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
             let urlToPlay = previewUrl;
 
             if (!urlToPlay && title && artist) {
@@ -1595,10 +1542,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             if (currentAudio && currentAudio.src === urlToPlay) {
                 if (currentAudio.paused) {
+                    const highlightEnd = Number.isFinite(currentAudio._sfyHighlightEnd) ? currentAudio._sfyHighlightEnd : currentAudio.duration;
                     const isFinished = currentAudio.ended ||
-                        (Number.isFinite(currentAudio.duration) && currentAudio.currentTime >= currentAudio.duration - 0.25);
+                        (Number.isFinite(highlightEnd) && currentAudio.currentTime >= highlightEnd - 0.25);
                     if (isFinished) {
-                        playFromHighlight(currentAudio, btnEl, startSeconds);
+                        playFromHighlight(currentAudio, btnEl);
                     } else {
                         currentAudio.play();
                         if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
@@ -1623,7 +1571,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 70% durasi
             // agar melewati intro dan langsung ke bagian hook/reff.
             audio.addEventListener('loadedmetadata', function onMetadataLoaded() {
-                playFromHighlight(audio, btnEl, startSeconds);
+                playFromHighlight(audio, btnEl);
             }, { once: true });
             audio.load();
 
@@ -1753,7 +1701,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const meaning = m.songMeaning || '';
                 const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
                 const lyricSection = m.lyricSection || m.lyric_section || '';
-                const clipStart = Number(m.clipStart ?? m.clip_start ?? 0);
 
                 return `
                     <article class="feed-card" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})" aria-label="Buka pesan untuk ${escapeHtml(m.receiver || 'Seseorang')}">
@@ -1787,7 +1734,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div class="audio-artist">${escapeHtml(songArtist)}</div>
                             </div>
                             <div class="audio-actions">
-                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this, ${Number.isFinite(clipStart) ? clipStart : 0})">
+                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
                                 <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify" onclick="event.stopPropagation()"><i class="fa-brands fa-spotify"></i></a>
@@ -1830,7 +1777,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const meaning = m.songMeaning || '';
             const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
             const lyricSection = m.lyricSection || m.lyric_section || '';
-            const clipStart = Number(m.clipStart ?? m.clip_start ?? 0);
 
             modalContent.innerHTML = `
                 <div style="margin-bottom:1.2rem;">
@@ -1858,7 +1804,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div class="audio-artist">${escapeHtml(songArtist)}</div>
                     </div>
                     <div class="audio-actions">
-                        <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this, ${Number.isFinite(clipStart) ? clipStart : 0})">
+                        <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                             <i class="fa-solid fa-play"></i>
                         </button>
                         <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
