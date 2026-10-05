@@ -937,15 +937,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .section-desc { font-size: 0.86rem; }
             .carousel-container { overflow-x: auto; margin-right: -2rem; padding-right: 2rem; scrollbar-width: none; scroll-snap-type: x mandatory; touch-action: pan-x; }
             .carousel-container::-webkit-scrollbar { display: none; }
-            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 215px); grid-auto-columns: min(69vw, 270px); gap: 0.8rem; width: max-content; padding: 0 0 0.35rem; }
-            .carousel-item { width: auto; min-height: 0; height: 215px; scroll-snap-align: start; }
+            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 180px); grid-auto-columns: 165px; gap: 0.7rem; width: max-content; padding: 0 0 0.35rem; }
+            .carousel-item { width: 165px; min-height: 0; height: 180px; scroll-snap-align: start; }
             .carousel-item.no-photo { min-height: 0; }
-            .item-body { padding: 1rem 1.1rem 1.05rem; }
-            .item-text { font-size: 1.18rem; line-height: 1.08; -webkit-line-clamp: 2; }
-            .carousel-item.has-photo .item-media { height: 94px; aspect-ratio: auto; flex-shrink: 0; }
-            .carousel-item.has-photo .item-body { padding-top: 0.75rem; }
-            .carousel-item.has-photo .item-to { margin-bottom: 0.35rem; }
-            .item-song-pill { padding-top: 0.65rem; margin-top: 0.75rem; }
+            .item-body { padding: 0.8rem 0.85rem; }
+            .item-to { font-size: 0.9rem; margin-bottom: 0.35rem; }
+            .item-text { font-size: 1.02rem; line-height: 1.05; -webkit-line-clamp: 2; }
+            .carousel-item.has-photo .item-media { height: 64px; aspect-ratio: auto; flex-shrink: 0; }
+            .carousel-item.has-photo .item-body { padding-top: 0.6rem; }
+            .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
+            .item-song-pill { font-size: 0.65rem; padding-top: 0.5rem; margin-top: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { height: 220px; }
             .card-message { font-size: 1.06rem; }
