@@ -1,4 +1,6 @@
-<?php
+import os
+
+content = """<?php
 /*
  * /Website-SFY/index.php
  * SongForYou — Archive Your Feelings Through Music
@@ -28,30 +30,29 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <title>SongForYou — Bisikkan Perasaanmu Lewat Lagu</title>
     <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.">
 
-    <!-- Fonts: clean interface type + handwritten notes -->
+    <!-- Fonts: Plus Jakarta Sans & Instrument Serif / Cormorant Garamond for warm human feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-main: #070707;
-            --bg-surface: #101010;
-            --bg-surface-hover: #191919;
-            --bg-input: #0d0d0d;
+            --bg-main: #0b0b0e;
+            --bg-surface: #13131a;
+            --bg-surface-hover: #191924;
+            --bg-input: #171720;
             --border-subtle: rgba(255, 255, 255, 0.07);
             --border-glow: rgba(255, 255, 255, 0.16);
-            --text-heading: #f5f5f5;
-            --text-body: #a3a3a3;
-            --text-subtle: #737373;
-            --accent-soft: #e5e5e5;
-            --accent-sage: #e5e5e5;
-            --accent-dim: rgba(255, 255, 255, 0.10);
+            --text-heading: #f8fafc;
+            --text-body: #94a3b8;
+            --text-subtle: #64748b;
+            --accent-soft: #20c997;
+            --accent-sage: #34d399;
+            --accent-dim: rgba(52, 211, 153, 0.12);
             --font-serif: 'Cormorant Garamond', Georgia, serif;
-            --font-message: 'Caveat', cursive;
             --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
             --radius-xl: 20px;
             --radius-lg: 14px;
@@ -70,10 +71,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         html, body {
             width: 100%;
             height: 100%;
-            background:
-                radial-gradient(circle at 12% 8%, rgba(255,255,255,0.08), transparent 22rem),
-                radial-gradient(circle at 90% 36%, rgba(255,255,255,0.05), transparent 28rem),
-                var(--bg-main);
+            background-color: var(--bg-main);
             color: var(--text-heading);
             font-family: var(--font-sans);
             overflow-x: hidden;
@@ -100,52 +98,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             max-width: 1120px;
             margin: 0 auto;
             padding: 0 1.5rem;
-        }
-
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            z-index: -1;
-            border-radius: 50%;
-            filter: blur(2px);
-            pointer-events: none;
-            animation: ambient-float 14s ease-in-out infinite alternate;
-        }
-        body::before {
-            width: 18rem;
-            height: 18rem;
-            top: 42%;
-            left: -10rem;
-            background: rgba(255,255,255,0.04);
-        }
-        body::after {
-            width: 20rem;
-            height: 20rem;
-            top: 10%;
-            right: -12rem;
-            background: rgba(255,255,255,0.03);
-            animation-delay: -7s;
-        }
-        body {
-            position: relative;
-        }
-        .cosmic-grain {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            pointer-events: none;
-            opacity: 0.48;
-            background-image:
-                radial-gradient(circle at 14% 21%, rgba(255,255,255,0.72) 0 1px, transparent 1.6px),
-                radial-gradient(circle at 77% 16%, rgba(255,255,255,0.5) 0 1px, transparent 1.5px),
-                radial-gradient(circle at 88% 68%, rgba(255,255,255,0.42) 0 1px, transparent 1.4px),
-                radial-gradient(circle at 28% 78%, rgba(255,255,255,0.35) 0 1px, transparent 1.4px);
-            background-size: 280px 260px, 340px 320px, 390px 360px, 430px 400px;
-            mask-image: linear-gradient(to bottom, #000, transparent 92%);
-        }
-        @keyframes ambient-float {
-            to { transform: translate3d(2rem, -1.5rem, 0) scale(1.12); }
         }
 
         /* NAVBAR */
@@ -198,36 +150,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .hero-section {
             padding: 5rem 0 3.5rem;
             text-align: center;
-            position: relative;
-            isolation: isolate;
-        }
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            z-index: -1;
-            width: min(62rem, 100%);
-            height: 23rem;
-            left: 50%;
-            top: 1.7rem;
-            transform: translateX(-50%);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 48% 52% 42% 58% / 50% 45% 55% 50%;
-            background: linear-gradient(120deg, rgba(255,255,255,0.055), rgba(255,255,255,0.005));
-            box-shadow: inset 0 0 70px rgba(255,255,255,0.025);
-        }
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            z-index: -1;
-            width: min(42rem, 88vw);
-            aspect-ratio: 2.2;
-            left: 50%;
-            top: 5.8rem;
-            transform: translateX(-50%) rotate(-8deg);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 50%;
-            box-shadow: 0 0 36px rgba(255,255,255,0.025);
-            pointer-events: none;
         }
         .hero-pill {
             display: inline-flex;
@@ -257,7 +179,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .hero-title em {
             font-style: italic;
             color: #ffffff;
-            border-bottom: 1px solid rgba(255,255,255,0.55);
+            border-bottom: 1px solid var(--accent-sage);
         }
         .hero-subtitle {
             max-width: 560px;
@@ -291,7 +213,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .btn-main:hover {
             transform: translateY(-2px);
-            background: #e5e5e5;
+            background: #f1f5f9;
             box-shadow: 0 14px 35px rgba(255,255,255,0.15);
         }
         .btn-subtle {
@@ -325,7 +247,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: #d4d4d4;
+            color: var(--accent-sage);
             margin-bottom: 0.4rem;
         }
         .section-title {
@@ -353,43 +275,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .carousel-flex {
             display: flex;
-            gap: 1.5rem;
-            padding: 0.25rem 0.15rem 1.25rem;
+            gap: 1.25rem;
         }
         .carousel-item {
-            flex: 0 0 min(74vw, 680px);
-            min-height: 390px;
+            flex: 0 0 310px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             transition: var(--transition);
             cursor: pointer;
-            overflow: hidden;
-            position: relative;
-            isolation: isolate;
-        }
-        .carousel-item::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.12), transparent 68%);
-            transform: translateX(-130%);
-            transition: transform 0.7s cubic-bezier(.2,.8,.2,1);
         }
         .carousel-item:hover {
-            border-color: rgba(255,255,255,0.42);
+            border-color: var(--border-glow);
             background: var(--bg-surface-hover);
-            transform: translateY(-8px) rotate(-0.35deg);
-            box-shadow: 0 24px 50px rgba(0,0,0,0.42);
+            transform: translateY(-4px);
         }
-        .carousel-item:hover::after { transform: translateX(130%); }
-        .item-media { width: 100%; aspect-ratio: 16 / 8; overflow: hidden; background: #1b1b1b; border-bottom: 1px solid var(--border-subtle); }
-        .item-media img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); transition: transform 0.7s cubic-bezier(.2,.8,.2,1), filter 0.5s ease; }
-        .carousel-item:hover .item-media img { transform: scale(1.05); filter: grayscale(1) contrast(1.15); }
-        .item-body { padding: 1.35rem 1.5rem 1.45rem; display: flex; flex: 1; flex-direction: column; justify-content: space-between; }
         .item-to {
             font-family: var(--font-serif);
             font-size: 1.4rem;
@@ -397,10 +301,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             margin-bottom: 0.6rem;
         }
         .item-text {
-            font-family: var(--font-message);
-            font-size: 1.16rem;
-            color: #e5e5e5;
-            line-height: 1.45;
+            font-size: 0.88rem;
+            color: var(--text-body);
+            line-height: 1.6;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -459,7 +362,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .form-input:focus, .form-textarea:focus {
             border-color: var(--accent-sage);
-            background: #181818;
+            background: #1c1c28;
             box-shadow: 0 0 0 3px var(--accent-dim);
         }
         .form-textarea {
@@ -473,7 +376,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             top: calc(100% + 6px);
             left: 0;
             right: 0;
-            background: #181818;
+            background: #181822;
             border: 1px solid var(--border-glow);
             border-radius: var(--radius-md);
             max-height: 280px;
@@ -528,8 +431,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255, 255, 255, 0.055);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid rgba(52, 211, 153, 0.25);
             border-radius: var(--radius-md);
             padding: 0.85rem 1rem;
             margin-top: 0.5rem;
@@ -565,53 +468,39 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transition: color 0.2s ease;
         }
         .btn-clear-song:hover {
-            color: #f5f5f5;
+            color: #f87171;
         }
-        .song-hook-note { margin-top:0.2rem; color:var(--text-subtle); font-size:0.68rem; }
-        .song-hook-note i { color:var(--accent-sage); margin-right:0.25rem; }
+
         /* DROPZONE */
         .upload-dropzone {
             border: 2px dashed var(--border-subtle);
             border-radius: var(--radius-md);
-            min-height: 180px;
             padding: 1.5rem;
             text-align: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015)), var(--bg-input);
+            background: var(--bg-input);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
         }
         .upload-dropzone:hover {
             border-color: var(--accent-sage);
-            background: rgba(255,255,255,0.06);
+            background: rgba(52, 211, 153, 0.03);
         }
-        .photo-input {
+        .upload-dropzone input[type="file"] {
             position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
         }
         .photo-preview {
-            width: min(100%, 320px);
-            aspect-ratio: 16 / 9;
-            height: auto;
-            border-radius: 14px;
-            margin-top: 0.9rem;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-top: 0.8rem;
             object-fit: cover;
             display: none;
-            border: 2px solid rgba(255,255,255,0.18);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.28);
-        }
-        .photo-upload-status {
-            display: none;
-            margin-top: 0.7rem;
-            font-size: 0.78rem;
-            color: var(--text-body);
         }
 
         /* FEED GRID */
@@ -634,9 +523,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         .feed-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 320px));
-            justify-content: center;
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.5rem;
         }
         @media (max-width: 480px) {
             .feed-grid {
@@ -654,7 +542,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             flex-direction: column;
             justify-content: space-between;
             transition: var(--transition);
-            cursor: pointer;
         }
         .feed-card:hover {
             border-color: var(--border-glow);
@@ -678,8 +565,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .card-img-wrap {
             width: 100%;
-            aspect-ratio: 16 / 9;
-            height: auto;
+            height: 190px;
             border-radius: var(--radius-md);
             overflow: hidden;
             margin-bottom: 1.1rem;
@@ -695,32 +581,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transform: scale(1.04);
         }
         .card-message {
-            font-family: var(--font-message);
-            font-size: 1.15rem;
-            font-style: italic;
-            color: #e5e7eb;
-            line-height: 1.6;
+            font-size: 0.92rem;
+            color: #cbd5e1;
+            line-height: 1.65;
             margin-bottom: 1.1rem;
             word-wrap: break-word;
-        }
-        .card-message::before { content: '\201C'; color: #d4d4d4; font-size: 1.35em; margin-right: 0.08em; }
-        .card-message::after { content: '\201D'; color: #d4d4d4; font-size: 1.35em; margin-left: 0.08em; }
-        .modal-message {
-            font-family: var(--font-message);
-            font-size: clamp(1.3rem, 2.4vw, 1.72rem);
-            font-weight: 500;
-            font-style: italic;
-            line-height: 1.7;
-            letter-spacing: -0.025em;
-            color: #e5e7eb;
-            margin-bottom: 1.5rem;
-            white-space: pre-wrap;
         }
 
         /* SONG MEANING BOX */
         .meaning-box {
             background: rgba(255, 255, 255, 0.025);
-            border-left: 3px solid #d4d4d4;
+            border-left: 3px solid var(--accent-sage);
             border-radius: 4px;
             padding: 0.75rem 0.95rem;
             margin-bottom: 1.1rem;
@@ -787,7 +658,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: #f5f5f5;
+            background: var(--accent-sage);
             color: #0b0b0e;
             border: none;
             display: flex;
@@ -798,7 +669,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .btn-play-audio:hover {
             transform: scale(1.06);
-            background: #ffffff;
+            background: #6ee7b7;
         }
         .spotify-btn {
             color: var(--text-subtle);
@@ -863,7 +734,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             gap: 0.75rem;
         }
         .toast-item {
-            background: #181818;
+            background: #181822;
             border: 1px solid var(--border-glow);
             border-left: 4px solid var(--accent-sage);
             color: var(--text-heading);
@@ -883,218 +754,58 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-size: 0.85rem;
         }
 
-        /* MONOCHROME INTERACTION SYSTEM */
-        html { scroll-behavior: smooth; }
-        body {
-            --cursor-x: 50%;
-            --cursor-y: 0%;
-            background-color: #090909;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
-                radial-gradient(ellipse 70% 45% at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.075), transparent 58%);
-            background-size: 42px 42px, 42px 42px, auto;
-            background-attachment: fixed;
-        }
-        body::before, body::after { display: none; }
-        .app-container { max-width: 1180px; }
-        header.navbar {
-            margin-top: 1rem;
-            padding: 1rem 0.7rem;
-            border-bottom-color: rgba(255,255,255,0.11);
-        }
-        .brand-logo {
-            font-family: var(--font-message);
-            font-size: 1.55rem;
-            font-weight: 600;
-            letter-spacing: 0.01em;
-            line-height: 1;
-            transform: rotate(-3deg);
-        }
-        .brand-logo-icon { background: #f5f5f5; color: #0b0b0b; border-radius: 9px; }
-        .btn-nav-action, .btn-subtle {
-            border-color: rgba(255,255,255,0.18);
-            background: rgba(255,255,255,0.03);
-        }
-        .btn-nav-action:hover, .btn-subtle:hover { background: #f5f5f5; color: #111; border-color: #f5f5f5; transform: translateY(-2px); }
-        .hero-section { padding: clamp(4.5rem, 10vw, 8.5rem) 0 4.5rem; text-align: left; }
-        .hero-section::before { display: none; }
-        .hero-title {
-            max-width: 850px;
-            font-family: var(--font-sans);
-            font-size: clamp(3.2rem, 8.8vw, 7.8rem);
-            font-weight: 600;
-            line-height: 0.91;
-            letter-spacing: -0.085em;
-            margin-bottom: 2.2rem;
-        }
-        .hero-title em { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.045em; border: 0; }
-        .hero-actions { justify-content: flex-start; }
-        .btn-main { border-radius: 10px; box-shadow: none; padding: 0.95rem 1.25rem; }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 0 rgba(255,255,255,0.14); }
-        .section-header { margin: 2.25rem 0 1.25rem; align-items: baseline; }
-        .section-tagline { color: #a3a3a3; font-size: 0.68rem; letter-spacing: 0.14em; }
-        .section-title { font-family: var(--font-sans); font-size: clamp(1.65rem, 3vw, 2.45rem); font-weight: 500; letter-spacing: -0.065em; }
-        .carousel-container { overflow: visible; }
-        .carousel-flex { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: 0; }
-        .carousel-item {
-            min-height: 300px;
-            width: 100%;
-            background: rgba(16,16,16,0.9);
-            border-radius: 16px;
-            border-color: rgba(255,255,255,0.13);
-            transform: none;
-        }
-        .carousel-item:hover { transform: translateY(-6px); border-color: rgba(255,255,255,0.48); box-shadow: 0 18px 35px rgba(0,0,0,0.36); }
-        .carousel-item.no-photo { min-height: 250px; }
-        .carousel-item.no-photo .item-body { padding-top: 1.75rem; }
-        .item-media { aspect-ratio: 16 / 9; border-bottom-color: rgba(255,255,255,0.1); }
-        .item-media img { filter: grayscale(1) contrast(1.1); }
-        .item-body { padding: 1.2rem 1.3rem 1.3rem; }
-        .item-to { font-family: var(--font-sans); font-size: 1rem; font-weight: 600; letter-spacing: -0.025em; margin-bottom: 0.7rem; }
-        .item-text, .card-message, .modal-message {
-            font-family: var(--font-message);
-            font-weight: 500;
-            font-style: normal;
-            letter-spacing: 0.01em;
-        }
-        .item-text { font-size: clamp(1.55rem, 2.3vw, 2.15rem); line-height: 1.05; color: #f5f5f5; -webkit-line-clamp: 3; }
-        .item-song-pill { color: #a3a3a3; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.85rem; margin-top: 1rem; }
-        .form-card { border-radius: 18px; border-color: rgba(255,255,255,0.14); background: rgba(16,16,16,0.92); box-shadow: none; margin: 6rem 0 2rem; }
-        .form-input, .form-textarea { border-radius: 8px; background: #0b0b0b; }
-        .form-input:focus, .form-textarea:focus { border-color: #e5e5e5; background: #101010; box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
-        .upload-dropzone { border-radius: 10px; background: #0b0b0b; }
-        .upload-dropzone:hover { background: #151515; transform: translateY(-2px); }
-        .modal-bg { background: rgba(0,0,0,0.9); }
-        .modal-box { max-width: 720px; border-radius: 18px; background: #111; }
-        .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
-
-        /* LIVING INTERACTIONS — keeps the editorial SongForYou layout, with a little more presence. */
-        .hero-soundscape {
-            display: inline-flex;
-            gap: 4px;
-            align-items: center;
-            height: 24px;
-            margin: 0 0 1.15rem;
-            color: rgba(255,255,255,0.72);
-        }
-        .hero-soundscape span {
-            display: block;
-            width: 2px;
-            height: var(--bar-height);
-            border-radius: 99px;
-            background: currentColor;
-            transform-origin: center;
-            animation: soundscape 1.3s ease-in-out infinite alternate;
-            animation-delay: var(--bar-delay);
-        }
-        @keyframes soundscape {
-            from { transform: scaleY(0.42); opacity: 0.42; }
-            to { transform: scaleY(1); opacity: 1; }
-        }
-        .motion-ready [data-reveal] {
-            opacity: 0;
-            transform: translateY(22px);
-            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
-        }
-        .motion-ready [data-reveal].is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .carousel-item.is-tiltable,
-        .feed-card.is-tiltable {
-            transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift, 0px));
-            transform-style: preserve-3d;
-            transition: transform 170ms ease-out, border-color 180ms ease, box-shadow 180ms ease;
-            will-change: transform;
-        }
-        .carousel-item.is-tiltable:hover,
-        .feed-card.is-tiltable:hover {
-            border-color: rgba(255,255,255,0.46);
-            box-shadow: 0 22px 42px rgba(0,0,0,0.38);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            .hero-soundscape span { animation: none; }
-            .carousel-item.is-tiltable,
-            .feed-card.is-tiltable { transform: none !important; transition: none; }
-        }
-
         @media (max-width: 600px) {
-            .app-container { padding-left: max(2rem, env(safe-area-inset-left)); padding-right: max(2rem, env(safe-area-inset-right)); }
-            header.navbar { padding: 1.15rem 0.7rem 1rem; }
-            .brand-logo { font-size: 1.4rem; }
-            .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
-            .hero-section { padding: 2.6rem 0 2.5rem; text-align: center; }
-            .hero-section::before { height: 19rem; top: 0.5rem; }
-            .hero-title { max-width: 300px; font-size: 2rem; line-height: 0.98; letter-spacing: -0.075em; margin: 0 auto 1.45rem; }
-            .hero-actions { justify-content: center; }
-            .hero-actions .btn-main { width: auto; min-width: 0; justify-content: center; padding: 0.82rem 1.05rem; }
-            .btn-subtle { width: auto; justify-content: center; }
+            .app-container { padding: 0 1rem; }
+            .hero-title { font-size: 2.3rem; }
+            .btn-main, .btn-subtle { width: 100%; justify-content: center; }
             .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
             .feed-card { padding: 1.2rem; }
-            .section-header { margin: 2.2rem 0 1rem; }
-            .section-title { font-size: 1.45rem; line-height: 1; }
-            .section-tagline { font-size: 0.62rem; margin-bottom: 0.3rem; }
-            .section-desc { font-size: 0.86rem; }
-            .carousel-container { overflow-x: auto; margin-right: -2rem; padding-right: 2rem; scrollbar-width: none; scroll-snap-type: x mandatory; touch-action: pan-x; }
-            .carousel-container::-webkit-scrollbar { display: none; }
-            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 165px); grid-auto-columns: 145px; gap: 0.7rem; width: max-content; padding: 0 0 0.35rem; }
-            .carousel-item { width: 145px; min-height: 0; height: 165px; scroll-snap-align: start; border-radius: 12px; }
-            .carousel-item.no-photo { min-height: 0; }
-            .item-body { padding: 0.72rem 0.78rem; }
-            .item-to { font-size: 0.82rem; margin-bottom: 0.28rem; }
-            .item-text { font-size: 0.95rem; line-height: 1.05; -webkit-line-clamp: 2; }
-            .carousel-item.has-photo .item-media { height: 55px; aspect-ratio: auto; flex-shrink: 0; }
-            .carousel-item.has-photo .item-body { padding-top: 0.45rem; }
-            .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
-            .item-song-pill { font-size: 0.57rem; padding-top: 0.4rem; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .upload-dropzone { min-height: 165px; padding: 1.2rem; }
-            .card-img-wrap { aspect-ratio: 16 / 9; }
-            .card-message { font-size: 1.18rem; line-height: 1.68; }
-            .modal-message { font-size: 1.24rem; }
-            .audio-bar { gap: 0.65rem; padding: 0.7rem; }
-            .audio-title, .audio-artist { max-width: 135px; }
             .toast-wrap { left: 1rem; right: 1rem; bottom: 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="cosmic-grain" aria-hidden="true"></div>
 
     <!-- NAVBAR -->
     <header class="navbar app-container">
         <a href="#" class="brand-logo">
             <div class="brand-logo-icon"><i class="fa-solid fa-music"></i></div>
-            <span>SFY</span>
+            <span>SongForYou</span>
         </a>
         <a href="#formSection" class="btn-nav-action">Kirim Pesan</a>
     </header>
 
     <!-- HERO SECTION -->
-    <section class="hero-section app-container" data-reveal>
-        <div class="hero-soundscape" aria-hidden="true">
-            <span style="--bar-height:8px;--bar-delay:-0.2s"></span><span style="--bar-height:17px;--bar-delay:-0.7s"></span><span style="--bar-height:11px;--bar-delay:-0.45s"></span><span style="--bar-height:23px;--bar-delay:-1s"></span><span style="--bar-height:14px;--bar-delay:-0.35s"></span><span style="--bar-height:19px;--bar-delay:-0.8s"></span><span style="--bar-height:9px;--bar-delay:-0.55s"></span>
+    <section class="hero-section app-container">
+        <div class="hero-pill">
+            <i class="fa-brands fa-spotify"></i>
+            <span>Arsip Musik & Perasaan</span>
         </div>
         <h1 class="hero-title">
-            Kirim rasa lewat<br><em>sebuah lagu.</em>
+            Abadikan Perasaanmu<br>Dalam <em>Alunan Musik</em>
         </h1>
+        <p class="hero-subtitle">
+            Sampaikan pesan tersirat dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.
+        </p>
         <div class="hero-actions">
             <a href="#formSection" class="btn-main">
                 <i class="fa-solid fa-paper-plane"></i>
-                Tulis pesan
+                Tulis Pesan Rahasia
+            </a>
+            <a href="#feedSection" class="btn-subtle">
+                Jelajahi Pesan
             </a>
         </div>
     </section>
 
     <!-- FEATURED CAROUSEL SECTION -->
-    <section class="app-container" data-reveal>
+    <section class="app-container">
         <div class="section-header">
             <div>
-                <div class="section-tagline">Ungkapan terpilih</div>
-                <h2 class="section-title">Untuk didengar.</h2>
+                <div class="section-tagline">Ungkapan Terpilih</div>
+                <h2 class="section-title">Cerita & Melodi Terbaru</h2>
             </div>
+            <p class="section-desc">Momen-momen indah yang diabadikan lewat alunan lagu kenangan.</p>
         </div>
         
         <div class="carousel-container">
@@ -1104,28 +815,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </section>
 
-    <!-- Pesan hanya ditampilkan setelah pengguna melakukan pencarian. -->
-    <section class="app-container" id="messagesSection" data-reveal>
-        <div class="section-header">
-            <div>
-                <div class="section-tagline">Temukan pesan</div>
-                <h2 class="section-title">Cari pesan.</h2>
-            </div>
-        </div>
-        <input type="search" id="messagesFilterInput" class="filter-input" placeholder="Ketik nama penerima, isi pesan, atau lagu..." oninput="filterMessages()">
-        <div class="feed-grid" id="messagesGrid" aria-live="polite">
-            <!-- Hasil pencarian dimuat di sini. -->
-        </div>
-    </section>
-
     <!-- FORM SECTION -->
-    <section id="formSection" class="app-container" data-reveal>
+    <section id="formSection" class="app-container">
         <div class="form-card">
             <div class="section-header" style="margin-top:0;">
                 <div>
                     <div class="section-tagline">Dedikasikan Lagu</div>
                     <h2 class="section-title">Kirim Pesan Rahasia</h2>
                 </div>
+                <p class="section-desc">Pilih lagu spesial dan tuliskan kalimat yang ingin kamu sampaikan padanya.</p>
             </div>
 
             <form id="createMessageForm" onsubmit="handleFormSubmit(event)">
@@ -1138,7 +836,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                     <!-- SONG SEARCH FIELD -->
                     <div class="form-field">
-                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify"></i> Cari Lagu</label>
+                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify" style="color:var(--accent-sage);"></i> Cari Lagu Spesial</label>
                         <input type="text" id="songSearchInput" class="form-input" placeholder="Ketik judul lagu atau nama penyanyi..." autocomplete="off">
                         
                         <div class="search-dropdown" id="songDropdown"></div>
@@ -1150,7 +848,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div>
                                     <h4 id="selectedBubbleTitle">Judul Lagu</h4>
                                     <p id="selectedBubbleArtist">Penyanyi</p>
-                                    <p class="song-hook-note"><i class="fa-solid fa-wand-magic-sparkles"></i>Reff/hook dipilih otomatis saat diputar</p>
                                 </div>
                             </div>
                             <button type="button" class="btn-clear-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
@@ -1166,14 +863,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <!-- PHOTO UPLOAD -->
                     <div class="form-field">
                         <label class="form-label"><i class="fa-regular fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
-                        <label class="upload-dropzone" for="photoInput">
-                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
+                        <div class="upload-dropzone" onclick="document.getElementById('photoInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:var(--accent-sage); margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
-                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, WEBP, atau HEIC — otomatis dibuat landscape 16:9</p>
+                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
+                            <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
                             <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
-                            <p id="photoUploadStatus" class="photo-upload-status" aria-live="polite"></p>
-                        </label>
-                        <input class="photo-input" type="file" id="photoInput" accept="image/*,.heic,.heif" onchange="handleFileSelected(event)">
+                        </div>
                     </div>
 
                     <button type="submit" id="btnSubmitForm" class="btn-main" style="justify-content:center; width:100%; margin-top:0.5rem;">
@@ -1185,8 +881,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </section>
 
+    <!-- MESSAGES FEED SECTION -->
+    <section id="feedSection" class="app-container">
+        <div class="section-header">
+            <div>
+                <div class="section-tagline">Arsip Cerita</div>
+                <h2 class="section-title">Pesan & Melodi Tersimpan</h2>
+            </div>
+            <p class="section-desc">Cari pesan berdasarkan nama penerima atau judul lagu.</p>
+        </div>
+
+        <input type="text" id="messagesFilterInput" class="filter-input" placeholder="Cari pesan atau lagu..." oninput="filterMessages()">
+
+        <div class="feed-grid" id="messagesGrid">
+            <!-- Loaded dynamically -->
+        </div>
+    </section>
+
     <!-- MODAL -->
-    <div class="modal-bg" id="messageModal" onclick="if (event.target === this) closeFullScreenMessage()">
+    <div class="modal-bg" id="messageModal">
         <div class="modal-box">
             <button class="btn-close" onclick="closeFullScreenMessage()"><i class="fa-solid fa-xmark"></i></button>
             <div id="modalContent"></div>
@@ -1199,11 +912,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <!-- FOOTER -->
     <footer>
         <div class="app-container">
-            <p>&copy; <?php echo date('Y'); ?> SongForYou</p>
+            <p>&copy; <?php echo date('Y'); ?> SongForYou. Diabadikan lewat lagu & perasaan.</p>
         </div>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <!-- SCRIPT ENGINE -->
     <script>
@@ -1219,53 +930,29 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentPlayBtn = null;
         let selectedSong = null;
         let base64Photo = '';
-        const PREVIEW_HIGHLIGHT_SECONDS = 20;
 
-        // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
-        function compressImage(file, maxWidth = 960, quality = 0.72) {
+        // Canvas Image Compression
+        function compressImage(file, maxWidth = 1000, quality = 0.75) {
             return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) { resolve(''); return; }
-                if (file.size > 10 * 1024 * 1024) { resolve(''); return; }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = () => {
-                        let targetWidth = maxWidth;
-                        let targetHeight = Math.round(targetWidth * 9 / 16);
-                        const sourceRatio = img.width / img.height;
-                        const targetRatio = targetWidth / targetHeight;
-                        let sourceWidth = img.width;
-                        let sourceHeight = img.height;
-                        let sourceX = 0;
-                        let sourceY = 0;
-
-                        // Crop dari tengah tanpa mengubah proporsi foto.
-                        if (sourceRatio > targetRatio) {
-                            sourceWidth = Math.round(img.height * targetRatio);
-                            sourceX = Math.round((img.width - sourceWidth) / 2);
-                        } else {
-                            sourceHeight = Math.round(img.width / targetRatio);
-                            sourceY = Math.round((img.height - sourceHeight) / 2);
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
                         }
                         const canvas = document.createElement('canvas');
-                        let output = '';
-                        let outputQuality = quality;
-
-                        // Batasi hasil ke sekitar 850 KB agar aman melewati request limit hosting.
-                        for (let attempt = 0; attempt < 4; attempt++) {
-                            canvas.width = targetWidth;
-                            canvas.height = targetHeight;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
-                            output = canvas.toDataURL('image/jpeg', outputQuality);
-                            if (output.length <= 850 * 1024 || targetWidth <= 480) break;
-                            targetWidth = Math.round(targetWidth * 0.8);
-                            targetHeight = Math.round(targetWidth * 9 / 16);
-                            outputQuality = Math.max(0.55, outputQuality - 0.06);
-                        }
-                        resolve(output);
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = () => resolve('');
                 };
@@ -1274,60 +961,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         async function handleFileSelected(e) {
-            let file = e.target.files[0];
+            const file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
-            const status = document.getElementById('photoUploadStatus');
             if (file) {
-                const isHeic = ['image/heic', 'image/heif'].includes(file.type) || /\.hei[cf]$/i.test(file.name);
-                if (isHeic) {
-                    status.textContent = 'Mengubah foto HEIC…';
-                    status.style.display = 'block';
-                    try {
-                        if (typeof heic2any !== 'function') throw new Error('HEIC converter unavailable');
-                        const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
-                        const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
-                        file = new File([jpegBlob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
-                    } catch (_) {
-                        showToast('Foto HEIC tidak dapat diproses. Coba pilih versi JPG dari galeri.', 'error');
-                        e.target.value = '';
-                        status.style.display = 'none';
-                        return;
-                    }
-                }
-                if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                    showToast('Foto ini tidak didukung. Pilih JPG, PNG, WEBP, atau HEIC.', 'error');
-                    e.target.value = '';
-                    base64Photo = '';
-                    thumb.style.display = 'none';
-                    status.style.display = 'none';
-                    return;
-                }
-                if (file.size > 10 * 1024 * 1024) {
-                    showToast('Ukuran foto maksimal 10 MB.', 'error');
-                    e.target.value = '';
-                    base64Photo = '';
-                    thumb.style.display = 'none';
-                    status.style.display = 'none';
-                    return;
-                }
-
-                status.textContent = 'Memproses foto…';
-                status.style.display = 'block';
-                base64Photo = await compressImage(file);
-                if (!base64Photo) {
-                    showToast('Foto tidak dapat diproses. Coba foto lain.', 'error');
-                    e.target.value = '';
-                    thumb.style.display = 'none';
-                    status.style.display = 'none';
-                    return;
-                }
+                base64Photo = await compressImage(file, 1000, 0.75);
                 thumb.src = base64Photo;
                 thumb.style.display = 'block';
-                status.textContent = 'Foto siap dikirim.';
             } else {
                 base64Photo = '';
                 thumb.style.display = 'none';
-                status.style.display = 'none';
             }
         }
 
@@ -1420,6 +1062,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!selectedSong.previewUrl && selectedSong.title && selectedSong.artist) {
                 selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
             }
+
             document.getElementById('selectedBubbleImg').src = track.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
             document.getElementById('selectedBubbleTitle').innerText = track.title;
             document.getElementById('selectedBubbleArtist').innerText = track.artist;
@@ -1497,23 +1140,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     body: JSON.stringify(payload)
                 });
 
-                const responseText = await res.text();
-                let data = {};
-                try { data = JSON.parse(responseText); } catch (_) {}
+                const data = await res.json();
                 if (data.success) {
                     showToast('Pesan rahasiamu berhasil dikirim!');
                     document.getElementById('createMessageForm').reset();
                     clearSelectedSong();
                     base64Photo = '';
                     document.getElementById('photoPreviewThumb').style.display = 'none';
-                    document.getElementById('photoUploadStatus').style.display = 'none';
                     fetchMessages();
-                    document.getElementById('carouselTrack').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    const fallback = res.status === 413
-                        ? 'Ukuran foto terlalu besar. Pilih foto lain lalu coba lagi.'
-                        : 'Terjadi kesalahan server.';
-                    showToast('Gagal mengirim: ' + (data.message || fallback), 'error');
+                    showToast('Gagal mengirim: ' + (data.message || 'Terjadi kesalahan server'), 'error');
                 }
             } catch (err) {
                 console.error("Form submit error:", err);
@@ -1525,152 +1162,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         // Audio Player Controller
-        const previewHighlightCache = new Map();
-        let previewAnalysisContext = null;
-        const songHighlightProfiles = {
-            // Dibuat spesifik dari permintaan: langsung ke reff penutup
-            // "Halang takkan pernah ... Kau Panasea bagiku", bukan reff pertama.
-            'panasea|rumahsakit': { startRatio: 0.82, minimumSecondsRemaining: 6 }
-        };
-
-        function normaliseSongName(value) {
-            return (value || '')
-                .toLocaleLowerCase('id-ID')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9]+/g, ' ')
-                .trim();
-        }
-
-        function getSongHighlightProfile(title, artist) {
-            const normalisedTitle = normaliseSongName(title);
-            const normalisedArtist = normaliseSongName(artist).replace(/\s/g, '');
-            return Object.entries(songHighlightProfiles).find(([key]) => {
-                const [expectedTitle, expectedArtist] = key.split('|');
-                // Metadata penyedia lagu kadang memakai "Rumah Sakit", tambahan versi,
-                // atau kapitalisasi berbeda. Tetap kenali lagu yang sama secara aman.
-                return normalisedTitle.includes(expectedTitle) && normalisedArtist.includes(expectedArtist);
-            })?.[1] ?? null;
-        }
-
-        function getPreviewHighlightTime(audio, title, artist) {
-            const duration = audio.duration;
-            const profile = getSongHighlightProfile(title, artist);
-            const preferredRatio = profile?.startRatio;
-            const minimumSecondsRemaining = profile?.minimumSecondsRemaining ?? 12;
-            return Number.isFinite(duration) && duration > 0
-                // Source preview hanya memuat potongan lagu. Mulai jauh dari detik awal
-                // dan sisakan 12 detik untuk bagian hook/reff yang utuh.
-                ? Math.max(0, Math.min(Math.round(duration * (preferredRatio ?? 0.72)), duration - minimumSecondsRemaining))
-                : PREVIEW_HIGHLIGHT_SECONDS;
-        }
-
-        async function findMostEnergeticPreviewMoment(audio, title, artist) {
-            const url = audio.currentSrc || audio.src;
-            if (previewHighlightCache.has(url)) return previewHighlightCache.get(url);
-
-            const fallback = getPreviewHighlightTime(audio, title, artist);
-            // Lagu yang telah diberi titik reff khusus harus konsisten di setiap perangkat.
-            if (getSongHighlightProfile(title, artist) !== null) {
-                previewHighlightCache.set(url, fallback);
-                return fallback;
-            }
-            try {
-                const response = await fetch(url, { mode: 'cors' });
-                if (!response.ok) throw new Error('Preview tidak dapat dianalisis');
-                const buffer = await response.arrayBuffer();
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContextClass) throw new Error('Web Audio tidak tersedia');
-                previewAnalysisContext ||= new AudioContextClass();
-                const decoded = await previewAnalysisContext.decodeAudioData(buffer);
-                const windowSeconds = 0.25;
-                const step = Math.max(1, Math.floor(decoded.sampleRate * windowSeconds));
-                const energies = [];
-
-                for (let frame = 0; frame < decoded.length; frame += step) {
-                    let total = 0;
-                    let samples = 0;
-                    for (let i = frame; i < Math.min(frame + step, decoded.length); i += 64) {
-                        let sample = 0;
-                        for (let channel = 0; channel < decoded.numberOfChannels; channel++) sample += decoded.getChannelData(channel)[i] || 0;
-                        total += Math.abs(sample / decoded.numberOfChannels);
-                        samples++;
-                    }
-                    energies.push(samples ? total / samples : 0);
-                }
-
-                const segmentSeconds = Math.min(12, Math.max(6, decoded.duration - 2));
-                const segmentBlocks = Math.max(1, Math.round(segmentSeconds / windowSeconds));
-                // Jangan pernah memilih intro; reff/hook lazimnya muncul setelah bagian awal.
-                const firstBlock = Math.min(Math.round(decoded.duration * 0.30 / windowSeconds), Math.max(0, energies.length - segmentBlocks));
-                let strongestScore = -Infinity;
-                let strongestBlock = firstBlock;
-
-                for (let start = firstBlock; start <= energies.length - segmentBlocks; start++) {
-                    let energy = 0;
-                    let movement = 0;
-                    for (let i = start; i < start + segmentBlocks; i++) {
-                        energy += energies[i];
-                        if (i > start) movement += Math.abs(energies[i] - energies[i - 1]);
-                    }
-                    // Energi tinggi + perubahan ritme memberi prioritas ke hook/reff,
-                    // bukan intro yang tenang atau outro yang menurun.
-                    const progress = start / Math.max(1, energies.length - segmentBlocks);
-                    // Jika dua bagian sama-sama kuat, pilih hook yang lebih akhir agar
-                    // tidak jatuh lagi ke verse atau reff pertama.
-                    const score = (energy / segmentBlocks + (movement / Math.max(1, segmentBlocks - 1)) * 0.45) * (0.82 + progress * 0.18);
-                    if (score > strongestScore) {
-                        strongestScore = score;
-                        strongestBlock = start;
-                    }
-                }
-
-                const bestMoment = Math.max(0, Math.min(strongestBlock * windowSeconds, decoded.duration - 12));
-                previewHighlightCache.set(url, bestMoment);
-                return bestMoment;
-            } catch (error) {
-                // Sebagian CDN preview tidak memberi akses CORS untuk analisis file.
-                // Posisi hook yang aman tetap dipakai agar audio tidak kembali ke intro.
-                previewHighlightCache.set(url, fallback);
-                return fallback;
-            }
-        }
-
-        async function playFromHighlight(audio, btnEl, title, artist) {
-            if (audio._sfyPreparing) return;
-            audio._sfyPreparing = true;
-            if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            const highlightTime = await findMostEnergeticPreviewMoment(audio, title, artist);
-            if (currentAudio !== audio) {
-                audio._sfyPreparing = false;
-                return;
-            }
-            const highlightEnd = Number.isFinite(audio.duration) ? Math.min(highlightTime + 12, audio.duration) : null;
-            let playbackStarted = false;
-
-            const beginPlayback = () => {
-                if (playbackStarted || currentAudio !== audio) return;
-                playbackStarted = true;
-                audio._sfyPreparing = false;
-                audio.play().then(() => {
-                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                }).catch(() => {
-                    audio._sfyPreparing = false;
-                    showToast('Gagal memutar audio preview', 'error');
-                });
-            };
-
-            // Tunggu audio benar-benar selesai berpindah posisi sebelum play.
-            audio.addEventListener('seeked', beginPlayback, { once: true });
-            audio._sfyHighlightEnd = highlightEnd;
-            audio.ontimeupdate = () => {
-                if (Number.isFinite(audio._sfyHighlightEnd) && audio.currentTime >= audio._sfyHighlightEnd) audio.pause();
-            };
-            audio.currentTime = highlightTime;
-            // Fallback untuk browser yang tidak memicu event seeked pada stream tertentu.
-            window.setTimeout(beginPlayback, 700);
-        }
-
         async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
             let urlToPlay = previewUrl;
 
@@ -1685,15 +1176,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             if (currentAudio && currentAudio.src === urlToPlay) {
                 if (currentAudio.paused) {
-                    const highlightEnd = Number.isFinite(currentAudio._sfyHighlightEnd) ? currentAudio._sfyHighlightEnd : currentAudio.duration;
-                    const isFinished = currentAudio.ended ||
-                        (Number.isFinite(highlightEnd) && currentAudio.currentTime >= highlightEnd - 0.25);
-                    if (isFinished) {
-                        playFromHighlight(currentAudio, btnEl, title, artist);
-                    } else {
-                        currentAudio.play();
-                        if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    }
+                    currentAudio.play();
+                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
                 } else {
                     currentAudio.pause();
                     if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
@@ -1706,77 +1190,21 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
             }
 
-            const audio = new Audio(urlToPlay);
-            currentAudio = audio;
-            audio.preload = 'auto';
+            currentAudio = new Audio(urlToPlay);
             currentPlayBtn = btnEl;
 
-            // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 70% durasi
-            // agar melewati intro dan langsung ke bagian hook/reff.
-            audio.addEventListener('loadedmetadata', function onMetadataLoaded() {
-                playFromHighlight(audio, btnEl, title, artist);
-            }, { once: true });
-            audio.load();
+            currentAudio.play().then(() => {
+                if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            }).catch(err => {
+                showToast('Gagal memutar audio preview', 'error');
+            });
 
-            audio.onended = function() {
+            currentAudio.onended = function() {
                 if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
             };
         }
 
         // Fetch & Render Messages
-        let revealObserver = null;
-
-        function revealWithin(root = document) {
-            const elements = root.querySelectorAll ? root.querySelectorAll('[data-reveal]') : [];
-            elements.forEach((element) => {
-                if (!document.documentElement.classList.contains('motion-ready')) return;
-                if (revealObserver) revealObserver.observe(element);
-                else element.classList.add('is-visible');
-            });
-        }
-
-        function enableCardTilt(card) {
-            if (card.dataset.tiltReady || !window.matchMedia('(pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            card.dataset.tiltReady = 'true';
-            card.classList.add('is-tiltable');
-
-            card.addEventListener('pointermove', (event) => {
-                const bounds = card.getBoundingClientRect();
-                const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-                const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-                card.style.setProperty('--tilt-x', `${-y * 4}deg`);
-                card.style.setProperty('--tilt-y', `${x * 5}deg`);
-                card.style.setProperty('--lift', '-5px');
-            }, { passive: true });
-            card.addEventListener('pointerleave', () => {
-                card.style.removeProperty('--tilt-x');
-                card.style.removeProperty('--tilt-y');
-                card.style.removeProperty('--lift');
-            });
-        }
-
-        function makeCardsInteractive(root = document) {
-            root.querySelectorAll?.('.carousel-item, .feed-card').forEach(enableCardTilt);
-        }
-
-        function initializeInterfaceMotion() {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            document.documentElement.classList.add('motion-ready');
-
-            if ('IntersectionObserver' in window) {
-                revealObserver = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        entry.target.classList.add('is-visible');
-                        revealObserver.unobserve(entry.target);
-                    });
-                }, { threshold: 0.12 });
-            }
-
-            revealWithin();
-            makeCardsInteractive();
-        }
-
         async function fetchMessages() {
             try {
                 const res = await fetch(getApiUrl('get_messages.php'));
@@ -1784,7 +1212,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     const data = await res.json();
                     allMessages = Array.isArray(data) ? data : (data.messages || []);
                     renderCarousel(allMessages);
-                    renderMessages([]);
+                    renderMessages(allMessages);
                 }
             } catch (err) {
                 console.error("Error fetching messages:", err);
@@ -1801,35 +1229,26 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 return;
             }
 
-            track.innerHTML = featured.map(m => {
-                const hasImage = m.images || m.photo_url || m.image_url;
-                return `
-                <div class="carousel-item ${hasImage ? 'has-photo' : 'no-photo'}" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
-                    ${hasImage ? `<div class="item-media"><img src="${getAppUrl(m.images || m.photo_url || m.image_url)}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>` : ''}
-                    <div class="item-body">
-                      <div>
+            track.innerHTML = featured.map(m => `
+                <div class="carousel-item" onclick="openFullScreenMessage(${m.id})">
+                    <div>
                         <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
                         <h4 class="item-to">${escapeHtml(m.receiver || 'Seseorang')}</h4>
                         <p class="item-text">"${escapeHtml(m.message || '')}"</p>
-                      </div>
+                    </div>
                     <div class="item-song-pill">
                         <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}
                     </div>
-                    </div>
                 </div>
-            `;
-            }).join('');
-            makeCardsInteractive(track);
+            `).join('');
         }
 
-        function renderMessages(messages, isSearch = false) {
+        function renderMessages(messages) {
             const grid = document.getElementById('messagesGrid');
             if (!grid) return;
 
             if (messages.length === 0) {
-                grid.innerHTML = isSearch
-                    ? '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">Pesan yang dicari belum ditemukan.</div>'
-                    : '';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">Belum ada pesan tersimpan. Jadilah yang pertama membuat kenangan!</div>';
                 return;
             }
 
@@ -1842,11 +1261,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const previewUrl = m.previewUrl || m.song_preview_url || '';
                 const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
                 const meaning = m.songMeaning || '';
-                const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
-                const lyricSection = m.lyricSection || m.lyric_section || '';
 
                 return `
-                    <article class="feed-card" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})" aria-label="Buka pesan untuk ${escapeHtml(m.receiver || 'Seseorang')}">
+                    <div class="feed-card">
                         <div>
                             <div class="card-top">
                                 <h3 class="card-recipient">Untuk ${escapeHtml(m.receiver || 'Seseorang')}</h3>
@@ -1860,7 +1277,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             ` : ''}
 
                             <p class="card-message">${escapeHtml(m.message || '')}</p>
-                            ${lyricExcerpt ? `<blockquote class="lyric-quote"><span class="lyric-quote-label">${escapeHtml(lyricSection || 'Cuplikan lirik')}</span>${escapeHtml(lyricExcerpt)}</blockquote>` : ''}
 
                             ${meaning ? `
                                 <div class="meaning-box">
@@ -1877,24 +1293,19 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div class="audio-artist">${escapeHtml(songArtist)}</div>
                             </div>
                             <div class="audio-actions">
-                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                                <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
-                                <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify" onclick="event.stopPropagation()"><i class="fa-brands fa-spotify"></i></a>
+                                <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
                             </div>
                         </div>
-                    </article>
+                    </div>
                 `;
             }).join('');
-            makeCardsInteractive(grid);
         }
 
         function filterMessages() {
             const q = document.getElementById('messagesFilterInput').value.toLowerCase();
-            if (!q.trim()) {
-                renderMessages([]);
-                return;
-            }
             const filtered = allMessages.filter(m => {
                 const rec = (m.receiver || '').toLowerCase();
                 const msg = (m.message || '').toLowerCase();
@@ -1902,7 +1313,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const art = (m.songArtist || m.song_artist || '').toLowerCase();
                 return rec.includes(q) || msg.includes(q) || sng.includes(q) || art.includes(q);
             });
-            renderMessages(filtered, true);
+            renderMessages(filtered);
         }
 
         function openFullScreenMessage(id) {
@@ -1918,8 +1329,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const previewUrl = m.previewUrl || m.song_preview_url || '';
             const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
             const meaning = m.songMeaning || '';
-            const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
-            const lyricSection = m.lyricSection || m.lyric_section || '';
 
             modalContent.innerHTML = `
                 <div style="margin-bottom:1.2rem;">
@@ -1930,8 +1339,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                 ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
 
-                <div class="modal-message">${escapeHtml(m.message || '')}</div>
-                ${lyricExcerpt ? `<blockquote class="lyric-quote"><span class="lyric-quote-label">${escapeHtml(lyricSection || 'Cuplikan lirik')}</span>${escapeHtml(lyricExcerpt)}</blockquote>` : ''}
+                <div style="font-size:0.95rem; line-height:1.7; color:#cbd5e1; margin-bottom:1.5rem; white-space:pre-wrap;">${escapeHtml(m.message || '')}</div>
 
                 ${meaning ? `
                     <div class="meaning-box" style="margin-bottom:1.5rem;">
@@ -1960,20 +1368,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function closeFullScreenMessage() {
             document.getElementById('messageModal').style.display = 'none';
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
-            if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            currentAudio = null;
-            currentPlayBtn = null;
         }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && document.getElementById('messageModal').style.display === 'flex') {
-                closeFullScreenMessage();
-            }
-        });
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -1996,8 +1391,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const toast = document.createElement('div');
             toast.className = 'toast-item';
             if (type === 'error') {
-                toast.style.borderColor = '#a3a3a3';
-                toast.style.borderLeftColor = '#a3a3a3';
+                toast.style.borderColor = '#f87171';
+                toast.style.borderLeftColor = '#f87171';
             }
             toast.innerText = msg;
             container.appendChild(toast);
@@ -2009,13 +1404,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initializeInterfaceMotion();
             fetchMessages();
-            window.addEventListener('pointermove', (event) => {
-                document.body.style.setProperty('--cursor-x', `${(event.clientX / window.innerWidth) * 100}%`);
-                document.body.style.setProperty('--cursor-y', `${(event.clientY / window.innerHeight) * 100}%`);
-            }, { passive: true });
         });
     </script>
 </body>
 </html>
+"""
+
+with open('Website-SFY/index.php', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("Successfully generated handcrafted Website-SFY/index.php! Size:", len(content))
