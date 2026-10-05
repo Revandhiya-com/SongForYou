@@ -553,14 +553,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             border-color: var(--accent-sage);
             background: rgba(255,255,255,0.06);
         }
-        .upload-dropzone input[type="file"] {
+        .photo-input {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
         .photo-preview {
             width: min(100%, 320px);
@@ -1068,14 +1070,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <!-- PHOTO UPLOAD -->
                     <div class="form-field">
                         <label class="form-label"><i class="fa-regular fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
-                        <div class="upload-dropzone">
+                        <label class="upload-dropzone" for="photoInput">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
-                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, atau WEBP — otomatis dibuat landscape 16:9</p>
-                            <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" onchange="handleFileSelected(event)">
+                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, WEBP, atau HEIC — otomatis dibuat landscape 16:9</p>
                             <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
                             <p id="photoUploadStatus" class="photo-upload-status" aria-live="polite"></p>
-                        </div>
+                        </label>
+                        <input class="photo-input" type="file" id="photoInput" accept="image/*,.heic,.heif" onchange="handleFileSelected(event)">
                     </div>
 
                     <button type="submit" id="btnSubmitForm" class="btn-main" style="justify-content:center; width:100%; margin-top:0.5rem;">
@@ -1104,6 +1106,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             <p>&copy; <?php echo date('Y'); ?> SongForYou</p>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
     <!-- SCRIPT ENGINE -->
     <script>
@@ -1173,12 +1177,28 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         async function handleFileSelected(e) {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
             const status = document.getElementById('photoUploadStatus');
             if (file) {
+                const isHeic = ['image/heic', 'image/heif'].includes(file.type) || /\.hei[cf]$/i.test(file.name);
+                if (isHeic) {
+                    status.textContent = 'Mengubah foto HEIC…';
+                    status.style.display = 'block';
+                    try {
+                        if (typeof heic2any !== 'function') throw new Error('HEIC converter unavailable');
+                        const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+                        const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
+                        file = new File([jpegBlob], file.name.replace(/\.hei[cf]$/i, '.jpg'), { type: 'image/jpeg' });
+                    } catch (_) {
+                        showToast('Foto HEIC tidak dapat diproses. Coba pilih versi JPG dari galeri.', 'error');
+                        e.target.value = '';
+                        status.style.display = 'none';
+                        return;
+                    }
+                }
                 if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                    showToast('Foto ini tidak didukung. Pilih JPG, PNG, atau WEBP.', 'error');
+                    showToast('Foto ini tidak didukung. Pilih JPG, PNG, WEBP, atau HEIC.', 'error');
                     e.target.value = '';
                     base64Photo = '';
                     thumb.style.display = 'none';
