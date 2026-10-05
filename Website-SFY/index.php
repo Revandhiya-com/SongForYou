@@ -536,18 +536,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .btn-clear-song:hover {
             color: #f5f5f5;
         }
-        .lyric-picker { display:none; margin-top:0.85rem; padding:1rem; border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-md); background:rgba(255,255,255,0.035); }
-        .lyric-picker.is-visible { display:block; }
-        .lyric-picker-head { display:flex; align-items:center; justify-content:space-between; gap:0.7rem; margin-bottom:0.65rem; }
-        .lyric-picker-title { color:var(--text-heading); font-size:0.84rem; font-weight:600; }
-        .lyric-counter { color:var(--text-subtle); font-size:0.72rem; }
-        .lyric-section-select { width:100%; margin-bottom:0.65rem; }
-        .lyric-textarea { min-height:88px; resize:vertical; }
-        .lyric-help { margin-top:0.55rem; color:var(--text-subtle); font-size:0.72rem; line-height:1.5; }
-        .lyric-preview { display:none; margin-top:0.7rem; padding:0.7rem 0.8rem; border-left:2px solid var(--accent-sage); color:var(--text-heading); font-family:var(--font-message); font-size:1.08rem; line-height:1.35; white-space:pre-line; }
-        .lyric-preview.is-visible { display:block; }
-        .lyric-quote { margin:0.8rem 0 0; padding:0.72rem 0.85rem; border-left:2px solid var(--accent-sage); color:var(--text-heading); font-family:var(--font-message); font-size:1.12rem; line-height:1.35; white-space:pre-line; background:rgba(255,255,255,0.035); }
-        .lyric-quote-label { display:block; margin-bottom:0.28rem; color:var(--accent-sage); font-family:var(--font-ui); font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; }
+        .clip-picker { display:none; margin-top:0.85rem; padding:1rem; border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-md); background:rgba(255,255,255,0.035); }
+        .clip-picker.is-visible { display:block; }
+        .clip-picker-head { display:flex; align-items:center; justify-content:space-between; gap:0.7rem; }
+        .clip-picker-title { color:var(--text-heading); font-size:0.84rem; font-weight:600; }
+        .clip-time { color:var(--accent-sage); font-size:0.76rem; font-weight:700; }
+        .clip-help { margin:0.4rem 0 0.75rem; color:var(--text-subtle); font-size:0.72rem; line-height:1.5; }
+        .clip-controls { display:flex; align-items:center; gap:0.7rem; }
+        .clip-preview-btn { width:38px; height:38px; flex:0 0 38px; border:0; border-radius:50%; color:#12211a; background:var(--accent-sage); cursor:pointer; }
+        .clip-range { width:100%; accent-color:var(--accent-sage); cursor:pointer; }
 
         /* DROPZONE */
         .upload-dropzone {
@@ -1078,12 +1075,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             </div>
                             <button type="button" class="btn-clear-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                        <div id="lyricPicker" class="lyric-picker">
-                            <div class="lyric-picker-head"><span class="lyric-picker-title"><i class="fa-solid fa-quote-left"></i> Cuplikan lirik untuk pesanmu</span><span id="lyricCounter" class="lyric-counter">0/280</span></div>
-                            <select id="lyricSectionInput" class="form-input lyric-section-select" aria-label="Bagian lagu"><option value="">Pilih bagian lagu (opsional)</option><option value="Intro">Intro</option><option value="Verse">Verse</option><option value="Pre-chorus">Pre-chorus</option><option value="Chorus">Chorus</option><option value="Bridge">Bridge</option><option value="Outro">Outro</option></select>
-                            <textarea id="lyricExcerptInput" class="form-textarea lyric-textarea" maxlength="280" placeholder="Tempel 1–2 baris lirik yang paling ingin kamu kirim…" aria-describedby="lyricHelp"></textarea>
-                            <p id="lyricHelp" class="lyric-help">Opsional. Pilih sendiri bagian liriknya; cuplikan akan tampil terpisah seperti catatan lagu.</p>
-                            <div id="lyricPreview" class="lyric-preview" aria-live="polite"></div>
+                        <div id="clipPicker" class="clip-picker">
+                            <div class="clip-picker-head"><span class="clip-picker-title"><i class="fa-solid fa-wave-square"></i> Pilih bagian lagu yang diputar</span><span id="clipTime" class="clip-time">Mulai 0:00</span></div>
+                            <p class="clip-help">Geser untuk memilih awal cuplikan 10 detik, lalu tekan putar untuk mendengarkannya sebelum mengirim.</p>
+                            <div class="clip-controls"><button id="clipPreviewBtn" type="button" class="clip-preview-btn" onclick="previewSelectedClip()"><i class="fa-solid fa-play"></i></button><input id="clipStartInput" class="clip-range" type="range" min="0" max="20" value="0" step="1"></div>
                         </div>
                     </div>
 
@@ -1148,6 +1143,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentAudio = null;
         let currentPlayBtn = null;
         let selectedSong = null;
+        let selectedClipAudio = null;
+        let selectedClipStart = 0;
         let base64Photo = '';
         const PREVIEW_HIGHLIGHT_SECONDS = 20;
 
@@ -1351,16 +1348,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
             }
 
-            // Cuplikan lirik selalu melekat pada lagu yang dipilih.
-            document.getElementById('lyricExcerptInput').value = '';
-            document.getElementById('lyricSectionInput').value = '';
-            updateLyricPreview();
+            selectedClipStart = 0;
+            document.getElementById('clipStartInput').value = '0';
+            updateClipTime();
 
             document.getElementById('selectedBubbleImg').src = track.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
             document.getElementById('selectedBubbleTitle').innerText = track.title;
             document.getElementById('selectedBubbleArtist').innerText = track.artist;
             document.getElementById('selectedSongBubble').style.display = 'flex';
-            document.getElementById('lyricPicker').classList.add('is-visible');
+            document.getElementById('clipPicker').classList.add('is-visible');
 
             songInput.value = '';
             songDropdown.style.display = 'none';
@@ -1369,23 +1365,29 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function clearSelectedSong() {
             selectedSong = null;
             document.getElementById('selectedSongBubble').style.display = 'none';
-            document.getElementById('lyricPicker').classList.remove('is-visible');
-            document.getElementById('lyricExcerptInput').value = '';
-            document.getElementById('lyricSectionInput').value = '';
-            updateLyricPreview();
+            document.getElementById('clipPicker').classList.remove('is-visible');
+            if (selectedClipAudio) { selectedClipAudio.pause(); selectedClipAudio = null; }
         }
 
-        function updateLyricPreview() {
-            const input = document.getElementById('lyricExcerptInput');
-            const preview = document.getElementById('lyricPreview');
-            const text = input.value.trim();
-            const section = document.getElementById('lyricSectionInput').value;
-            document.getElementById('lyricCounter').textContent = `${input.value.length}/280`;
-            preview.textContent = text ? `${section ? section + ' · ' : ''}“${text}”` : '';
-            preview.classList.toggle('is-visible', Boolean(text));
+        function updateClipTime() {
+            selectedClipStart = Number(document.getElementById('clipStartInput').value) || 0;
+            document.getElementById('clipTime').textContent = `Mulai 0:${String(selectedClipStart).padStart(2, '0')}`;
         }
-        document.getElementById('lyricExcerptInput').addEventListener('input', updateLyricPreview);
-        document.getElementById('lyricSectionInput').addEventListener('change', updateLyricPreview);
+        document.getElementById('clipStartInput').addEventListener('input', updateClipTime);
+
+        async function previewSelectedClip() {
+            if (!selectedSong) return;
+            if (!selectedSong.previewUrl) selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
+            if (!selectedSong.previewUrl) { showToast('Preview audio tidak tersedia untuk lagu ini.', 'error'); return; }
+            if (selectedClipAudio) selectedClipAudio.pause();
+            const audio = new Audio(selectedSong.previewUrl);
+            selectedClipAudio = audio;
+            const button = document.getElementById('clipPreviewBtn');
+            const start = () => { audio.currentTime = selectedClipStart; audio.play(); button.innerHTML = '<i class="fa-solid fa-pause"></i>'; };
+            audio.addEventListener('loadedmetadata', () => { document.getElementById('clipStartInput').max = Math.max(0, Math.floor(audio.duration - 10)); start(); }, { once: true });
+            audio.addEventListener('timeupdate', () => { if (audio.currentTime >= selectedClipStart + 10) audio.pause(); });
+            audio.addEventListener('pause', () => { if (selectedClipAudio === audio) button.innerHTML = '<i class="fa-solid fa-play"></i>'; });
+        }
 
         document.addEventListener('click', function(e) {
             if (songDropdown && !songInput.contains(e.target) && !songDropdown.contains(e.target)) {
@@ -1419,8 +1421,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             const receiver = document.getElementById('recipientInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
-            const lyricExcerpt = document.getElementById('lyricExcerptInput').value.trim();
-            const lyricSection = document.getElementById('lyricSectionInput').value;
 
             if (!receiver) { showToast('Harap isi nama penerima pesan.', 'error'); return; }
             if (!selectedSong) { showToast('Silakan cari dan pilih lagu terlebih dahulu.', 'error'); return; }
@@ -1435,8 +1435,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     senderName: 'Anonim',
                     songKey: selectedSong.spotifyId || selectedSong.trackId || '2IVsRhKrx8hlQBOWy4qebo',
                     message: message,
-                    lyricExcerpt: lyricExcerpt,
-                    lyricSection: lyricSection,
+                    clipStart: selectedClipStart,
                     images: base64Photo,
                     songDetails: {
                         title: selectedSong.title,
@@ -1489,8 +1488,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 : PREVIEW_HIGHLIGHT_SECONDS;
         }
 
-        function playFromHighlight(audio, btnEl) {
-            const highlightTime = getPreviewHighlightTime(audio);
+        function playFromHighlight(audio, btnEl, startSeconds = null) {
+            const highlightTime = Number.isFinite(startSeconds) ? Math.max(0, startSeconds) : getPreviewHighlightTime(audio);
             let playbackStarted = false;
 
             const beginPlayback = () => {
@@ -1510,7 +1509,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             window.setTimeout(beginPlayback, 700);
         }
 
-        async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
+        async function toggleAudioPlayback(previewUrl, title, artist, btnEl, startSeconds = null) {
             let urlToPlay = previewUrl;
 
             if (!urlToPlay && title && artist) {
@@ -1527,7 +1526,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     const isFinished = currentAudio.ended ||
                         (Number.isFinite(currentAudio.duration) && currentAudio.currentTime >= currentAudio.duration - 0.25);
                     if (isFinished) {
-                        playFromHighlight(currentAudio, btnEl);
+                        playFromHighlight(currentAudio, btnEl, startSeconds);
                     } else {
                         currentAudio.play();
                         if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
@@ -1552,7 +1551,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 70% durasi
             // agar melewati intro dan langsung ke bagian hook/reff.
             audio.addEventListener('loadedmetadata', function onMetadataLoaded() {
-                playFromHighlight(audio, btnEl);
+                playFromHighlight(audio, btnEl, startSeconds);
             }, { once: true });
             audio.load();
 
@@ -1628,6 +1627,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const meaning = m.songMeaning || '';
                 const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
                 const lyricSection = m.lyricSection || m.lyric_section || '';
+                const clipStart = Number(m.clipStart ?? m.clip_start ?? 0);
 
                 return `
                     <article class="feed-card" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})" aria-label="Buka pesan untuk ${escapeHtml(m.receiver || 'Seseorang')}">
@@ -1661,7 +1661,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div class="audio-artist">${escapeHtml(songArtist)}</div>
                             </div>
                             <div class="audio-actions">
-                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this, ${Number.isFinite(clipStart) ? clipStart : 0})">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
                                 <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify" onclick="event.stopPropagation()"><i class="fa-brands fa-spotify"></i></a>
@@ -1703,6 +1703,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const meaning = m.songMeaning || '';
             const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
             const lyricSection = m.lyricSection || m.lyric_section || '';
+            const clipStart = Number(m.clipStart ?? m.clip_start ?? 0);
 
             modalContent.innerHTML = `
                 <div style="margin-bottom:1.2rem;">
@@ -1730,7 +1731,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div class="audio-artist">${escapeHtml(songArtist)}</div>
                     </div>
                     <div class="audio-actions">
-                        <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                        <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this, ${Number.isFinite(clipStart) ? clipStart : 0})">
                             <i class="fa-solid fa-play"></i>
                         </button>
                         <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>

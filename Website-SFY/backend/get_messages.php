@@ -33,6 +33,7 @@ try {
                 m.message,
                 m.lyric_excerpt,
                 m.lyric_section,
+                m.clip_start,
                 m.images,
                 m.slug,
                 m.created_at,
@@ -58,6 +59,7 @@ try {
                 m.message,
                 m.lyric_excerpt,
                 m.lyric_section,
+                m.clip_start,
                 m.images,
                 m.slug,
                 m.created_at,
@@ -102,6 +104,7 @@ try {
             'message'        => $row['message'],
             'lyricExcerpt'   => $row['lyric_excerpt'] ?? '',
             'lyricSection'   => $row['lyric_section'] ?? '',
+            'clipStart'      => (int)($row['clip_start'] ?? 0),
             'images'         => $img,
             'slug'           => $row['slug'],
             'timestamp'      => strtotime($row['created_at']) * 1000

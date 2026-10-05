@@ -46,6 +46,7 @@ CREATE TABLE `messages` (
   `message` TEXT NOT NULL,
   `lyric_excerpt` VARCHAR(280) DEFAULT NULL,
   `lyric_section` VARCHAR(30) DEFAULT NULL,
+  `clip_start` INT DEFAULT 0,
   `images` TEXT DEFAULT NULL,
   `slug` VARCHAR(255) NOT NULL UNIQUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
