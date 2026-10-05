@@ -91,6 +91,14 @@ try {
             $pUrl = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/77/59/2b77594c-8cc6-c252-9f90-d4be3af9d30d/mzaf_11665507368448228605.plus.aac.p.m4a';
         }
 
+        $storedMeaning = trim((string)($row['song_meaning'] ?? ''));
+        $isOldTemplate = $storedMeaning === '' ||
+            str_starts_with($storedMeaning, 'Karya "') ||
+            str_contains($storedMeaning, 'melukiskan perasaan mendalam tentang bisikan emosi');
+        $meaning = $isOldTemplate
+            ? getSongMeaning($row['song_title'] ?? '', $row['song_artist'] ?? '')
+            : $storedMeaning;
+
         $messages[] = [
             'id'             => (int)$row['id'],
             'receiver'       => $row['recipient_name'],
@@ -99,9 +107,7 @@ try {
             'songTitle'      => $row['song_title'],
             'songArtist'     => $row['song_artist'],
             'songCover'      => $row['song_cover'],
-            // Gunakan katalog makna terbaru saat membaca pesan lama sehingga teks
-            // template yang pernah tersimpan tidak lagi tampil di kartu pesan.
-            'songMeaning'    => getSongMeaning($row['song_title'] ?? '', $row['song_artist'] ?? ''),
+            'songMeaning'    => $meaning,
             'songSpotifyUrl' => $row['song_spotify_url'],
             'previewUrl'     => $pUrl,
             'message'        => $row['message'],

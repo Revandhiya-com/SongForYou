@@ -154,6 +154,7 @@ function getSongMeaning($title, $artist, $lookUpLyrics = true) {
         'all too well' => 'Nostalgia dan detail ingatan yang sangat tajam tentang kisah cinta masa lalu yang indah namun membekaskan luka.',
         'cruel summer' => 'Dinamika cinta musim panas yang intens, rahasia, penuh tekanan emosi namun tak tertahankan.',
         'die for you' => 'Komitmen dan pengorbanan cinta tanpa batas di mana keselamatan dan kebahagiaan pasangan berada di atas segalanya.',
+        'bimbang' => 'Bimbang menggambarkan pergulatan batin ketika cinta membuat seseorang rindu sekaligus tersiksa. Ia berada di persimpangan: ingin mempertahankan rasa yang indah, tetapi juga lelah menghadapi ketidakpastian dan kehilangan yang terasa seperti separuh diri.',
         'panasea' => 'Lagu ini memaknai cinta sebagai panasea—obat yang menguatkan. Janji untuk tidak berubah, melintasi ruang dan waktu, hingga tekad bahwa rintangan tidak membuatnya menyerah menggambarkan kesetiaan yang tetap bergerak maju meski terpisah.'
     ];
 
