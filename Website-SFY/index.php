@@ -1130,7 +1130,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentPlayBtn = null;
         let selectedSong = null;
         let base64Photo = '';
-        const PREVIEW_HIGHLIGHT_SECONDS = 17;
+        const PREVIEW_HIGHLIGHT_SECONDS = 20;
 
         // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
         function compressImage(file, maxWidth = 960, quality = 0.72) {
@@ -1465,25 +1465,35 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
             }
 
-            currentAudio = new Audio(urlToPlay);
+            const audio = new Audio(urlToPlay);
+            currentAudio = audio;
+            audio.preload = 'auto';
             currentPlayBtn = btnEl;
 
-            // Preview iTunes umumnya 30 detik dan dimulai dari intro. Mulai dari
-            // bagian tengah agar untuk semua lagu terasa lebih dekat ke hook/reff.
-            currentAudio.addEventListener('loadedmetadata', function playFromHighlight() {
-                const duration = currentAudio.duration;
-                if (Number.isFinite(duration) && duration > PREVIEW_HIGHLIGHT_SECONDS + 8) {
-                    currentAudio.currentTime = Math.min(PREVIEW_HIGHLIGHT_SECONDS, duration - 8);
-                }
-                currentAudio.play().then(() => {
+            // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 65% durasi
+            // agar melewati intro dan langsung ke bagian hook/reff.
+            audio.addEventListener('loadedmetadata', function playFromHighlight() {
+                const duration = audio.duration;
+                const highlightTime = Number.isFinite(duration) && duration > 0
+                    ? Math.min(duration * 0.65, duration - 4)
+                    : PREVIEW_HIGHLIGHT_SECONDS;
+                audio.currentTime = Math.max(0, highlightTime);
+                audio.play().then(() => {
                     if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    // Beberapa browser memulai stream dari 0 terlebih dahulu.
+                    // Terapkan ulang seek setelah playback aktif agar konsisten.
+                    window.setTimeout(() => {
+                        if (currentAudio === audio && !audio.paused) {
+                            audio.currentTime = Math.max(0, highlightTime);
+                        }
+                    }, 350);
                 }).catch(() => {
                     showToast('Gagal memutar audio preview', 'error');
                 });
             }, { once: true });
-            currentAudio.load();
+            audio.load();
 
-            currentAudio.onended = function() {
+            audio.onended = function() {
                 if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
             };
         }
