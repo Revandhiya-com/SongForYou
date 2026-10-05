@@ -594,8 +594,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         .feed-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 320px));
+            justify-content: center;
+            gap: 1rem;
         }
         @media (max-width: 480px) {
             .feed-grid {
@@ -613,6 +614,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             flex-direction: column;
             justify-content: space-between;
             transition: var(--transition);
+            cursor: pointer;
         }
         .feed-card:hover {
             border-color: var(--border-glow);
@@ -1460,7 +1462,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!grid) return;
 
             if (messages.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">${isSearch ? 'Pesan yang dicari belum ditemukan.' : 'Ketik kata kunci untuk menampilkan pesan.'}</div>`;
+                grid.innerHTML = isSearch
+                    ? '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">Pesan yang dicari belum ditemukan.</div>'
+                    : '';
                 return;
             }
 
@@ -1475,7 +1479,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const meaning = m.songMeaning || '';
 
                 return `
-                    <div class="feed-card">
+                    <article class="feed-card" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})" aria-label="Buka pesan untuk ${escapeHtml(m.receiver || 'Seseorang')}">
                         <div>
                             <div class="card-top">
                                 <h3 class="card-recipient">Untuk ${escapeHtml(m.receiver || 'Seseorang')}</h3>
@@ -1505,13 +1509,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                                 <div class="audio-artist">${escapeHtml(songArtist)}</div>
                             </div>
                             <div class="audio-actions">
-                                <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                                <button class="btn-play-audio" onclick="event.stopPropagation(); toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
-                                <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
+                                <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify" onclick="event.stopPropagation()"><i class="fa-brands fa-spotify"></i></a>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 `;
             }).join('');
         }
