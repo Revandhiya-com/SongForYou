@@ -28,10 +28,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <title>SongForYou — Bisikkan Perasaanmu Lewat Lagu</title>
     <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.">
 
-    <!-- Fonts: Plus Jakarta Sans & expressive Playfair Display for messages -->
+    <!-- Fonts: clean interface type + handwritten notes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             --accent-sage: #e5e5e5;
             --accent-dim: rgba(255, 255, 255, 0.10);
             --font-serif: 'Cormorant Garamond', Georgia, serif;
-            --font-message: 'Playfair Display', Georgia, serif;
+            --font-message: 'Caveat', cursive;
             --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
             --radius-xl: 20px;
             --radius-lg: 14px;
@@ -839,6 +839,85 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-size: 0.85rem;
         }
 
+        /* MONOCHROME INTERACTION SYSTEM */
+        html { scroll-behavior: smooth; }
+        body {
+            --cursor-x: 50%;
+            --cursor-y: 0%;
+            background-color: #090909;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
+                radial-gradient(ellipse 70% 45% at var(--cursor-x) var(--cursor-y), rgba(255,255,255,0.075), transparent 58%);
+            background-size: 42px 42px, 42px 42px, auto;
+            background-attachment: fixed;
+        }
+        body::before, body::after { display: none; }
+        .app-container { max-width: 1180px; }
+        header.navbar {
+            margin-top: 1rem;
+            padding: 1rem 0;
+            border-bottom-color: rgba(255,255,255,0.11);
+        }
+        .brand-logo { letter-spacing: -0.65px; }
+        .brand-logo-icon { background: #f5f5f5; color: #0b0b0b; border-radius: 9px; }
+        .btn-nav-action, .btn-subtle {
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.03);
+        }
+        .btn-nav-action:hover, .btn-subtle:hover { background: #f5f5f5; color: #111; border-color: #f5f5f5; transform: translateY(-2px); }
+        .hero-section { padding: clamp(4.5rem, 10vw, 8.5rem) 0 4.5rem; text-align: left; }
+        .hero-section::before { display: none; }
+        .hero-title {
+            max-width: 850px;
+            font-family: var(--font-sans);
+            font-size: clamp(3.2rem, 8.8vw, 7.8rem);
+            font-weight: 600;
+            line-height: 0.91;
+            letter-spacing: -0.085em;
+            margin-bottom: 2.2rem;
+        }
+        .hero-title em { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.045em; border: 0; }
+        .hero-actions { justify-content: flex-start; }
+        .btn-main { border-radius: 10px; box-shadow: none; padding: 0.95rem 1.25rem; }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 0 rgba(255,255,255,0.14); }
+        .section-header { margin: 2.25rem 0 1.25rem; align-items: baseline; }
+        .section-tagline { color: #a3a3a3; font-size: 0.68rem; letter-spacing: 0.14em; }
+        .section-title { font-family: var(--font-sans); font-size: clamp(1.65rem, 3vw, 2.45rem); font-weight: 500; letter-spacing: -0.065em; }
+        .carousel-container { overflow: visible; }
+        .carousel-flex { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: 0; }
+        .carousel-item {
+            min-height: 300px;
+            width: 100%;
+            background: rgba(16,16,16,0.9);
+            border-radius: 16px;
+            border-color: rgba(255,255,255,0.13);
+            transform: none;
+        }
+        .carousel-item:hover { transform: translateY(-6px); border-color: rgba(255,255,255,0.48); box-shadow: 0 18px 35px rgba(0,0,0,0.36); }
+        .carousel-item.no-photo { min-height: 250px; }
+        .carousel-item.no-photo .item-body { padding-top: 1.75rem; }
+        .item-media { aspect-ratio: 16 / 9; border-bottom-color: rgba(255,255,255,0.1); }
+        .item-media img { filter: grayscale(1) contrast(1.1); }
+        .item-body { padding: 1.2rem 1.3rem 1.3rem; }
+        .item-to { font-family: var(--font-sans); font-size: 1rem; font-weight: 600; letter-spacing: -0.025em; margin-bottom: 0.7rem; }
+        .item-text, .card-message, .modal-message {
+            font-family: var(--font-message);
+            font-weight: 500;
+            font-style: normal;
+            letter-spacing: 0.01em;
+        }
+        .item-text { font-size: clamp(1.55rem, 2.3vw, 2.15rem); line-height: 1.05; color: #f5f5f5; -webkit-line-clamp: 3; }
+        .item-song-pill { color: #a3a3a3; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.85rem; margin-top: 1rem; }
+        .form-card { border-radius: 18px; border-color: rgba(255,255,255,0.14); background: rgba(16,16,16,0.92); box-shadow: none; margin: 6rem 0 2rem; }
+        .form-input, .form-textarea { border-radius: 8px; background: #0b0b0b; }
+        .form-input:focus, .form-textarea:focus { border-color: #e5e5e5; background: #101010; box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
+        .upload-dropzone { border-radius: 10px; background: #0b0b0b; }
+        .upload-dropzone:hover { background: #151515; transform: translateY(-2px); }
+        .modal-bg { background: rgba(0,0,0,0.9); }
+        .modal-box { max-width: 720px; border-radius: 18px; background: #111; }
+        .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
+
         @media (max-width: 600px) {
             .app-container { padding: 0 1rem; }
             header.navbar { padding: 1.15rem 0 1rem; }
@@ -852,7 +931,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .feed-card { padding: 1.2rem; }
             .section-header { margin: 3.2rem 0 1.35rem; }
             .section-desc { font-size: 0.86rem; }
-            .carousel-item { flex-basis: 88vw; min-height: 350px; }
+            .carousel-flex { display: flex; overflow-x: auto; padding: 0 0 0.4rem; scroll-snap-type: x mandatory; }
+            .carousel-item { flex: 0 0 86vw; min-height: 330px; scroll-snap-align: start; }
             .item-body { padding: 1.15rem 1.2rem 1.25rem; }
             .item-text { font-size: 1.06rem; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
@@ -1303,10 +1383,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             track.innerHTML = featured.map(m => {
                 const hasImage = m.images || m.photo_url || m.image_url;
-                const image = hasImage ? getAppUrl(m.images || m.photo_url || m.image_url) : (m.songCover || m.song_cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=900');
                 return `
-                <div class="carousel-item" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
-                    <div class="item-media"><img src="${image}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>
+                <div class="carousel-item ${hasImage ? 'has-photo' : 'no-photo'}" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
+                    ${hasImage ? `<div class="item-media"><img src="${getAppUrl(m.images || m.photo_url || m.image_url)}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>` : ''}
                     <div class="item-body">
                       <div>
                         <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
@@ -1496,6 +1575,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchMessages();
+            window.addEventListener('pointermove', (event) => {
+                document.body.style.setProperty('--cursor-x', `${(event.clientX / window.innerWidth) * 100}%`);
+                document.body.style.setProperty('--cursor-y', `${(event.clientY / window.innerHeight) * 100}%`);
+            }, { passive: true });
         });
     </script>
 </body>
