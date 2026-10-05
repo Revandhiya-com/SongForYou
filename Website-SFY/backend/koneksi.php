@@ -221,13 +221,11 @@ try {
         $conn->exec("ALTER TABLE messages ADD COLUMN IF NOT EXISTS lyric_excerpt VARCHAR(280) DEFAULT NULL");
         $conn->exec("ALTER TABLE messages ADD COLUMN IF NOT EXISTS lyric_section VARCHAR(30) DEFAULT NULL");
         $conn->exec("ALTER TABLE messages ADD COLUMN IF NOT EXISTS clip_start INT DEFAULT 0");
-        $conn->exec("ALTER TABLE messages ADD COLUMN IF NOT EXISTS clip_end INT DEFAULT NULL");
     } else {
         // MySQL lama belum selalu mendukung IF NOT EXISTS untuk ADD COLUMN.
         try { $conn->exec("ALTER TABLE messages ADD COLUMN lyric_excerpt VARCHAR(280) DEFAULT NULL"); } catch (Exception $e) {}
         try { $conn->exec("ALTER TABLE messages ADD COLUMN lyric_section VARCHAR(30) DEFAULT NULL"); } catch (Exception $e) {}
         try { $conn->exec("ALTER TABLE messages ADD COLUMN clip_start INT DEFAULT 0"); } catch (Exception $e) {}
-        try { $conn->exec("ALTER TABLE messages ADD COLUMN clip_end INT DEFAULT NULL"); } catch (Exception $e) {}
     }
 
     $checkSongs = $conn->query("SELECT COUNT(*) AS cnt FROM songs")->fetch();

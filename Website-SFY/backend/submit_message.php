@@ -53,7 +53,6 @@ $message     = isset($data['message'])     ? trim($data['message'])     : '';
 $lyricExcerpt = isset($data['lyricExcerpt']) ? trim($data['lyricExcerpt']) : '';
 $lyricSection = isset($data['lyricSection']) ? trim($data['lyricSection']) : '';
 $clipStart = isset($data['clipStart']) ? max(0, min(30, (int)$data['clipStart'])) : 0;
-$clipEnd = isset($data['clipEnd']) ? max($clipStart + 1, min(30, (int)$data['clipEnd'])) : null;
 $images      = isset($data['images'])      ? trim($data['images'])      : '';
 $songDetails = isset($data['songDetails']) ? $data['songDetails']       : null;
 
@@ -229,8 +228,8 @@ try {
     // ─── INSERT ke tabel messages ────────────────────────────
     if (($dbDriver ?? 'mysql') === 'pgsql') {
         $stmt = $conn->prepare(
-            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, clip_start, clip_end, images, slug)
-             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :clip_start, :clip_end, :images, :slug)
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, clip_start, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :clip_start, :images, :slug)
              RETURNING id"
         );
         $stmt->execute([
@@ -242,7 +241,6 @@ try {
             ':lyric_excerpt'  => $lyricExcerpt,
             ':lyric_section'  => $lyricSection,
             ':clip_start'     => $clipStart,
-            ':clip_end'       => $clipEnd,
             ':images'         => $imagesVal,
             ':slug'           => $slug,
         ]);
@@ -250,8 +248,8 @@ try {
         $newId  = $newRow ? (int)$newRow['id'] : 0;
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, clip_start, clip_end, images, slug)
-             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :clip_start, :clip_end, :images, :slug)"
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, clip_start, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :clip_start, :images, :slug)"
         );
         $stmt->execute([
             ':user_id'        => $userId,
@@ -262,7 +260,6 @@ try {
             ':lyric_excerpt'  => $lyricExcerpt,
             ':lyric_section'  => $lyricSection,
             ':clip_start'     => $clipStart,
-            ':clip_end'       => $clipEnd,
             ':images'         => $imagesVal,
             ':slug'           => $slug,
         ]);
