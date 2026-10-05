@@ -1123,6 +1123,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentPlayBtn = null;
         let selectedSong = null;
         let base64Photo = '';
+        const PREVIEW_HIGHLIGHT_SECONDS = 12;
 
         // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
         function compressImage(file, maxWidth = 960, quality = 0.72) {
@@ -1460,11 +1461,20 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             currentAudio = new Audio(urlToPlay);
             currentPlayBtn = btnEl;
 
-            currentAudio.play().then(() => {
-                if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
-            }).catch(err => {
-                showToast('Gagal memutar audio preview', 'error');
-            });
+            // Preview iTunes umumnya 30 detik dan dimulai dari intro. Mulai dari
+            // bagian tengah agar untuk semua lagu terasa lebih dekat ke hook/reff.
+            currentAudio.addEventListener('loadedmetadata', function playFromHighlight() {
+                const duration = currentAudio.duration;
+                if (Number.isFinite(duration) && duration > PREVIEW_HIGHLIGHT_SECONDS + 8) {
+                    currentAudio.currentTime = Math.min(PREVIEW_HIGHLIGHT_SECONDS, duration - 8);
+                }
+                currentAudio.play().then(() => {
+                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                }).catch(() => {
+                    showToast('Gagal memutar audio preview', 'error');
+                });
+            }, { once: true });
+            currentAudio.load();
 
             currentAudio.onended = function() {
                 if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
@@ -1652,6 +1662,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 currentAudio.currentTime = 0;
             }
             if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            currentAudio = null;
             currentPlayBtn = null;
         }
 
