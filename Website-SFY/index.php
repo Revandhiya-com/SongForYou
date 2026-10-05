@@ -2,20 +2,19 @@
 /*
  * /Website-SFY/index.php
  * SongForYou — Archive Your Feelings Through Music
+ * Redesigned with Jesper Landberg visual aesthetic: dark mode, bold typography, smooth interactions & flawless mobile layout.
  */
 header('Content-Type: text/html; charset=utf-8');
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $parsedPath = parse_url($requestUri, PHP_URL_PATH);
 
-// Pastikan jika diakses sebagai folder tanpa trailing slash, redirect ke trailing slash
 if (substr($parsedPath, -1) !== '/' && !str_ends_with($parsedPath, '.php')) {
     $queryString = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== '' ? '?' . $_SERVER['QUERY_STRING'] : '';
     header('Location: ' . $parsedPath . '/' . $queryString, true, 301);
     exit;
 }
 
-// Redirect /admin ke admin/index.php jika diperlukan
 if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     header('Location: /admin/index.php');
     exit;
@@ -25,1910 +24,1448 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>SONGFORYOU.PROJECT — Digital Sound Archive</title>
-    <meta name="description" content="Archive your feelings through music. Ungkapkan perasaanmu secara rahasia dan lampirkan lagu yang mewakilinya.">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SongForYou — Bisikkan Perasaanmu Lewat Lagu</title>
+    <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu spesial untuk seseorang yang berarti dalam hidupmu.">
+
+    <!-- Fonts: DM Serif Display, Syne, Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,600;1,700&family=Syne:wght@700;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome Icons -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
-            --bg-body: #070709;
-            --bg-card: #111114;
-            --bg-card-hover: #16161a;
+            --bg-dark: #08080a;
+            --bg-card: #121216;
+            --bg-card-hover: #181820;
+            --bg-input: #1a1a22;
             --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(255, 255, 255, 0.18);
-            --text-main: #f4f4f6;
-            --text-muted: #71717a;
-            --text-sub: #a1a1aa;
-            --spotify-green: #1db954;
-            --radius-card: 16px;
-            --radius-btn: 30px;
-            --font-mono: 'Space Mono', monospace;
-            --font-serif: 'Playfair Display', serif;
-            --font-sans: 'Inter', sans-serif;
+            --border-highlight: rgba(255, 255, 255, 0.2);
+            --text-main: #f3f3f6;
+            --text-muted: #8e8e9e;
+            --accent-green: #1db954;
+            --accent-glow: rgba(29, 185, 84, 0.15);
+            --accent-warm: #e5c07b;
+            --font-serif: 'DM Serif Display', Georgia, serif;
             --font-heading: 'Syne', sans-serif;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * {
+        /* RESET & BASE */
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg-body);
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            line-height: 1.5;
-            min-height: 100vh;
+            font-family: var(--font-body);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Top Announcement Bar */
-        .top-bar {
-            text-align: center;
-            background: #000000;
-            border-bottom: 1px solid var(--border-color);
-            padding: 8px 16px;
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            letter-spacing: 1.5px;
-            color: var(--text-sub);
-            text-transform: uppercase;
-        }
-
-        /* Navbar */
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(7, 7, 9, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 18px 40px;
-        }
-
-        .nav-container {
-            max-width: 1300px;
+        /* CONTAINER & LAYOUT */
+        .app-container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* HEADER / NAVBAR */
+        header.navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 1.75rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
-
         .brand-logo {
             font-family: var(--font-heading);
             font-weight: 800;
-            font-size: 1.15rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .brand-logo span {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .nav-buttons {
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 0.6rem;
+        }
+        .brand-logo i {
+            color: var(--accent-green);
+            font-size: 1.1rem;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-nav {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 100px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .btn-nav:hover {
+            border-color: var(--text-main);
+            background: var(--text-main);
+            color: var(--bg-dark);
         }
 
-        .btn-nav-dashboard {
-            padding: 10px 22px;
-            border-radius: var(--radius-btn);
-            border: 1px solid var(--border-highlight);
-            background: transparent;
-            color: var(--text-main);
-            font-size: 0.78rem;
+        /* HERO SECTION */
+        .hero-section {
+            padding: 4rem 0 3rem;
+            text-align: center;
+            position: relative;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            background: var(--accent-glow);
+            border: 1px solid rgba(29, 185, 84, 0.3);
+            color: var(--accent-green);
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            margin-bottom: 1.5rem;
         }
-
-        .btn-nav-dashboard:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--text-main);
-        }
-
-        .btn-nav-create {
-            padding: 10px 24px;
-            border-radius: var(--radius-btn);
-            border: none;
-            background: #ffffff;
-            color: #000000;
-            font-size: 0.78rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-nav-create:hover {
-            background: #e2e2e8;
-            transform: translateY(-1px);
-        }
-
-        /* Container */
-        .main-wrapper {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            text-align: center;
-            padding: 60px 20px 80px;
-        }
-
-        .hero-tag {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 24px;
-            display: block;
-        }
-
         .hero-title {
-            font-family: var(--font-heading);
-            font-size: 4rem;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-        }
-
-        .hero-title i {
             font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 4.8rem);
+            line-height: 1.1;
             font-weight: 400;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+        }
+        .hero-title em {
             font-style: italic;
-            color: #e4e4e7;
-        }
-
-        .hero-sub {
-            font-size: 1.05rem;
-            color: var(--text-sub);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            color: var(--accent-green);
             font-weight: 400;
         }
-
-        /* Search Bar */
-        .search-container {
-            max-width: 540px;
-            margin: 0 auto 70px;
-            position: relative;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 16px 20px 16px 50px;
-            background: #0d0d10;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-main);
-            font-size: 0.85rem;
-            font-family: var(--font-mono);
-            letter-spacing: 1px;
-            transition: all 0.2s ease;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--border-highlight);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-        }
-
-        .search-input::placeholder {
-            color: #4a4a52;
-            text-transform: uppercase;
-        }
-
-        /* Features Columns */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 50px;
-            margin-bottom: 80px;
-            text-align: left;
-        }
-
-        .feature-item {
-            padding-right: 20px;
-        }
-
-        .feature-num {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: block;
-        }
-
-        .feature-title {
-            font-family: var(--font-heading);
+        .hero-desc {
+            max-width: 580px;
+            margin: 0 auto 2.5rem;
             font-size: 1.05rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .feature-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
             line-height: 1.6;
-        }
-
-        /* Message Creation Section / Modal Component */
-        .form-section {
-            background: #0d0d10;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);
-            padding: 40px;
-            max-width: 680px;
-            margin: 0 auto 90px;
-            scroll-margin-top: 120px;
-        }
-
-        .form-tech-tag {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
             color: var(--text-muted);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
+            font-weight: 400;
         }
-
-        .form-title {
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .form-subtitle {
-            font-size: 0.95rem;
-            color: var(--text-sub);
-            margin-bottom: 32px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 28px;
-        }
-
-        .form-label {
-            display: block;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--text-sub);
-            margin-bottom: 10px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 18px;
-            background: #141418;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            font-family: var(--font-sans);
-            transition: all 0.2s ease;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--border-highlight);
-            background: #18181d;
-        }
-
-        .form-helper {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 8px;
-            display: block;
-        }
-
-        textarea.form-control {
-            min-height: 140px;
-            resize: vertical;
-        }
-
-        /* Custom File Upload */
-        .file-upload-box {
-            border: 1px dashed var(--border-highlight);
-            background: #141418;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .file-upload-box:hover {
-            border-color: var(--text-main);
-            background: #18181d;
-        }
-
-        .file-upload-box i {
-            color: var(--text-muted);
-            margin-right: 8px;
-        }
-
-        .file-upload-box span {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-        }
-
-        /* Song Selector Options */
-        .song-select-custom {
-            position: relative;
-        }
-
-        .song-results-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #16161b;
-            border: 1px solid var(--border-highlight);
-            border-radius: 8px;
-            margin-top: 6px;
-            max-height: 280px;
-            overflow-y: auto;
-            z-index: 50;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-        }
-
-        .song-result-item {
+        .hero-cta-group {
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: background 0.2s ease;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
-
-        .song-result-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .song-result-item img {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .song-result-item .song-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .song-result-item .song-artist {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .btn-submit-form {
-            width: 100%;
-            padding: 16px;
-            border-radius: 8px;
-            border: none;
-            background: #ffffff;
-            color: #000000;
+        .btn-primary {
             font-family: var(--font-heading);
-            font-size: 0.9rem;
-            font-weight: 800;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
             letter-spacing: 1.5px;
-            text-transform: uppercase;
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            background: var(--text-main);
+            color: var(--bg-dark);
+            border: 1px solid var(--text-main);
+            text-decoration: none;
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 10px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
         }
-
-        .btn-submit-form:hover {
-            background: #e2e2e8;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #ffffff;
+            box-shadow: 0 14px 40px rgba(255,255,255,0.2);
         }
-
-        /* Horizontal Cards Carousel & Auto-Slider */
-        .archive-carousel-section {
-            margin-bottom: 90px;
-            position: relative;
-        }
-
-        .archive-section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 24px;
-            padding: 0 4px;
-        }
-
-        .archive-tag {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .archive-title {
+        .btn-secondary {
             font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .carousel-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-carousel-prev, .btn-carousel-next {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            background: transparent;
             color: var(--text-main);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-secondary:hover {
+            border-color: var(--border-highlight);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* STATS / PILLARS */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 3.5rem 0;
+        }
+        .pillar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: var(--transition);
+        }
+        .pillar-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-3px);
+        }
+        .pillar-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.85rem;
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .pillar-title {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .pillar-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
-        .btn-carousel-prev:hover, .btn-carousel-next:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--text-main);
-            transform: scale(1.05);
+        /* SECTION HEADERS */
+        .section-header {
+            margin: 4rem 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-tag {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 400;
+            line-height: 1.15;
+        }
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 500px;
+            line-height: 1.5;
         }
 
+        /* CAROUSEL / FEATURED SECTION */
         .carousel-wrapper {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+        .carousel-track-container {
             overflow-x: auto;
             scroll-behavior: smooth;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            padding: 10px 4px 24px;
-            margin: 0 -4px;
             scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0.5rem 0;
         }
-
-        .carousel-wrapper::-webkit-scrollbar {
+        .carousel-track-container::-webkit-scrollbar {
             display: none;
         }
-
-        .cards-carousel-track {
-            display: grid;
-            grid-template-rows: repeat(2, auto);
-            grid-auto-flow: column;
-            grid-auto-columns: 310px;
-            gap: 20px;
-            width: max-content;
+        .carousel-track {
+            display: flex;
+            gap: 1.5rem;
         }
-
-        .cards-carousel-track .msg-card {
-            scroll-snap-align: start;
-            min-height: 270px;
-            width: 310px;
-        }
-
-        .msg-card {
+        .carousel-card {
+            flex: 0 0 320px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);
-            padding: 24px;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
+            transition: var(--transition);
         }
-
-        .msg-card:hover {
-            background: var(--bg-card-hover);
+        .carousel-card:hover {
             border-color: var(--border-highlight);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            transform: translateY(-4px);
         }
-
-        .msg-card-tag {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            letter-spacing: 1px;
-            color: var(--text-sub);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px 10px;
-            border-radius: 4px;
-            display: inline-block;
-            align-self: flex-start;
-            margin-bottom: 18px;
+        .card-tag {
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            font-weight: 700;
             text-transform: uppercase;
-        }
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
 
-        .msg-card-quote {
+        }
+        .card-recipient {
             font-family: var(--font-serif);
-            font-style: italic;
             font-size: 1.35rem;
-            color: #ffffff;
-            margin-bottom: 20px;
-            line-height: 1.4;
+            margin: 0.4rem 0 0.8rem;
+            color: var(--text-main);
+
+        }
+        .card-message-snippet {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #b0b0c0;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            margin-bottom: 1.25rem;
+            font-style: italic;
+
         }
 
-        .msg-card-image {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 16px;
+        /* FORM SECTION */
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: clamp(1.75rem, 4vw, 3.5rem);
+            margin: 4rem 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
         }
-
-        .msg-card-audiobar {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 10px 12px;
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+        }
+        @media (min-width: 768px) {
+            .form-grid-2col {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            position: relative;
+        }
+        .form-label {
+            font-family: var(--font-heading);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-top: auto;
+            gap: 0.4rem;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.2rem;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--accent-green);
+            background: #1e1e28;
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
         }
 
-        .msg-card-audiobar img {
-            width: 38px;
-            height: 38px;
+        /* SONG SEARCH DROPDOWN */
+        .song-search-container {
+            position: relative;
+        }
+        .song-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #16161e;
+            border: 1px solid var(--border-highlight);
+            border-radius: var(--radius-md);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            display: none;
+        }
+        .song-option {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.2s ease;
+        }
+        .song-option:last-child {
+            border-bottom: none;
+        }
+        .song-option:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .song-option img {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        .song-option-info h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .song-option-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* SELECTED SONG PREVIEW BUBBLE */
+        .selected-song-bubble {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(29, 185, 84, 0.08);
+            border: 1px solid rgba(29, 185, 84, 0.3);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1rem;
+            margin-top: 0.5rem;
+        }
+        .song-preview-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .song-preview-meta img {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .song-preview-meta h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .song-preview-meta p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .btn-remove-song {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.4rem;
+            transition: color 0.2s ease;
+        }
+        .btn-remove-song:hover {
+            color: #ff5555;
+        }
+
+        /* FILE UPLOAD DROPZONE */
+        .file-dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            background: var(--bg-input);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        .file-dropzone:hover {
+            border-color: var(--accent-green);
+            background: rgba(29, 185, 84, 0.04);
+        }
+        .file-dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-preview-thumb {
+            max-height: 140px;
+            border-radius: 8px;
+            margin-top: 0.8rem;
+            object-fit: cover;
+            display: none;
+        }
+
+        /* MESSAGES FEED GRID */
+        .messages-search-bar {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .messages-search-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 100px;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .messages-search-input:focus {
+            border-color: var(--border-highlight);
+            background: var(--bg-card-hover);
+        }
+
+        .messages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.75rem;
+        }
+        @media (max-width: 480px) {
+            .messages-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .message-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .message-card:hover {
+            border-color: var(--border-highlight);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+        }
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .card-to {
+            font-family: var(--font-serif);
+            font-size: 1.3rem;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+        .card-from {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+            margin-top: 0.2rem;
+        }
+        .card-date {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .card-image-wrap {
+            width: 100%;
+            height: 180px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .card-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .card-image-wrap:hover img {
+            transform: scale(1.05);
+        }
+        .card-body-text {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: #d0d0dc;
+            margin-bottom: 1.4rem;
+            word-wrap: break-word;
+        }
+
+        /* CUSTOM SPOTIFY AUDIO PLAYER ROW */
+        .player-bar {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .player-cover {
+            width: 42px;
+            height: 42px;
             border-radius: 6px;
             object-fit: cover;
             flex-shrink: 0;
         }
-
-        .msg-card-audiobar .song-meta {
+        .player-meta {
             flex: 1;
-            overflow: hidden;
+            min-width: 0;
         }
-
-        .msg-card-audiobar .song-meta .title {
+        .player-title {
             font-size: 0.85rem;
             font-weight: 600;
+            color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .msg-card-audiobar .song-meta .artist {
+        .player-artist {
             font-size: 0.75rem;
             color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .msg-card-audiobar i.fa-spotify {
-            color: var(--spotify-green);
-            font-size: 1.1rem;
+        .btn-play-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .btn-play-icon:hover {
+            transform: scale(1.08);
+            background: #1ed760;
         }
 
-        /* Empty State */
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 80px 20px;
-            border: 1px dashed var(--border-color);
-            border-radius: var(--radius-card);
-            background: rgba(17, 17, 20, 0.5);
-        }
-
-        .empty-state i {
-            font-size: 2.5rem;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .empty-state h3 {
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-sub);
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            max-width: 450px;
-            margin: 0 auto 24px;
-        }
-
-        /* FULL SCREEN MESSAGE VIEW PAGE */
-        .fullscreen-message-page {
+        /* MODAL */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #070709;
-            z-index: 999;
-            overflow-y: auto;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: scale(0.97);
-            display: flex;
-            flex-direction: column;
-            padding: 50px 20px;
-        }
-
-        .fullscreen-message-page.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-        }
-
-        .fullscreen-content-container {
-            max-width: 650px;
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .btn-fullscreen-back {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 10px 22px;
-            border-radius: 30px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-            margin-bottom: 40px;
-        }
-
-        .btn-fullscreen-back:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--text-main);
-            transform: translateX(-2px);
-        }
-
-        .modal-tech-tag {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            text-align: center;
-            display: block;
-            margin-bottom: 14px;
-        }
-
-        .modal-header-title {
-            font-size: 2.8rem;
-            font-weight: 400;
-            text-align: center;
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
-
-        .modal-header-title i {
-            font-family: var(--font-serif);
-            font-style: italic;
-            color: #ffffff;
-        }
-
-        .modal-header-sub {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto 35px;
-            line-height: 1.6;
-        }
-
-        /* SINGLE SLEEK SPOTIFY CARD BUBBLE WITH ROTATING VINYL DISC */
-        .spotify-single-bubble {
-            background: #121216;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            padding: 22px 24px;
-            display: flex;
-            align-items: center;
-            gap: 22px;
-            margin: 0 auto 35px;
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
-            position: relative;
-        }
-
-        /* Vinyl Disc Rotation Container */
-        .vinyl-disc-container {
-            position: relative;
-            width: 94px;
-            height: 94px;
-            flex-shrink: 0;
-        }
-
-        .vinyl-disc-container img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #1a1a20;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
-            animation: spinVinyl 8s linear infinite;
-            animation-play-state: paused;
-            transition: animation-play-state 0.3s ease;
-        }
-
-        /* Center Hole on Vinyl */
-        .vinyl-disc-container::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            background: #070709;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
-        }
-
-        /* Playing state for Vinyl Disc */
-        .vinyl-disc-container.is-playing img {
-            animation-play-state: running;
-        }
-
-        @keyframes spinVinyl {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .spotify-player-info {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .spotify-player-info h4 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .spotify-player-info p {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            margin-bottom: 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .btn-spotify-save {
-            background: none;
-            border: none;
-            color: var(--text-sub);
-            font-size: 0.78rem;
-            font-family: var(--font-sans);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .spotify-audio-controls {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-top: 8px;
-            width: 100%;
-        }
-
-        .progress-bar-fake {
-            flex: 1;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 2px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .progress-bar-fake-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--spotify-green);
-            border-radius: 2px;
-            transition: width 0.1s linear;
-        }
-
-        .spotify-play-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            display: flex;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-            flex-shrink: 0;
-            padding: 0;
-            line-height: 1;
+            padding: 1.5rem;
         }
-
-        .spotify-play-btn:hover {
-            transform: scale(1.08);
-            background: var(--spotify-green);
-            color: #000000;
-        }
-
-        .modal-divider {
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            text-align: center;
-            margin: 40px 0 20px;
-        }
-
-        .modal-message-text {
-            font-family: var(--font-serif);
-            font-style: italic;
-            font-size: 1.8rem;
-            text-align: center;
-            line-height: 1.5;
-            color: #ffffff;
-            margin-bottom: 40px;
-            white-space: pre-line;
-            padding: 0 10px;
-        }
-
-        .modal-attachment-container {
-            width: 100%;
-            margin: 25px 0 35px;
-            border-radius: 16px;
-            overflow: hidden;
-            background: #121216;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
-            padding: 10px;
-            text-align: center;
-        }
-
-        .modal-attachment-container img {
-            width: 100%;
-            max-height: 520px;
-            object-fit: contain;
-            border-radius: 12px;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .modal-meaning-box {
-            background: rgba(29, 185, 84, 0.08);
-            border-left: 3px solid var(--spotify-green);
-            padding: 16px 20px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            margin-top: 30px;
-        }
-
-        .modal-meaning-box strong {
-            font-family: var(--font-mono);
-            font-size: 0.78rem;
-            color: var(--spotify-green);
-            display: block;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #18181c;
+        .modal-card {
+            background: var(--bg-card);
             border: 1px solid var(--border-highlight);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+        .btn-close-modal {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
             color: var(--text-main);
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            z-index: 1200;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+        .btn-close-modal:hover {
+            background: rgba(255,255,255,0.25);
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+        /* TOAST NOTIFICATION */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .toast {
+            background: #1e1e28;
+            border: 1px solid var(--border-highlight);
+            border-left: 4px solid var(--accent-green);
+            color: var(--text-main);
+            padding: 1rem 1.4rem;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Universal Responsive Layout System for Laptop, Tablet, and Mobile HP */
-        @media (min-width: 1200px) {
-            .features-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; }
-            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-            .hero-title { font-size: 4rem; }
-            .spotify-single-bubble { padding: 24px 28px; gap: 24px; }
-            .vinyl-disc-container { width: 94px; height: 94px; }
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 0;
+            margin-top: 6rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
 
-        @media (max-width: 1199px) and (min-width: 769px) {
-            .features-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
-            .cards-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-            .hero-title { font-size: 3.2rem; }
-            .navbar { padding: 16px 30px; }
-            .form-section { padding: 32px 30px; }
-            .spotify-single-bubble { padding: 20px 22px; gap: 20px; }
-            .vinyl-disc-container { width: 80px; height: 80px; }
-        }
-
-        @media (max-width: 768px) and (min-width: 641px) {
-            .features-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-            .hero-title { font-size: 2.5rem; }
-            .navbar { padding: 14px 20px; }
-            .form-section { padding: 26px 20px; }
-            .spotify-single-bubble { padding: 18px 20px; gap: 16px; }
-            .vinyl-disc-container { width: 70px; height: 70px; }
-            .archive-section-header { flex-direction: row; align-items: center; }
-            .archive-title { font-size: 1.5rem; }
-            .cards-carousel-track { grid-auto-columns: 280px; }
-            .cards-carousel-track .msg-card { width: 280px; }
-        }
-
-        @media (max-width: 640px) {
-            html, body {
-                touch-action: manipulation;
-                -webkit-text-size-adjust: 100%;
-                overflow-x: hidden;
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 0 1rem;
             }
-
-            .top-bar { font-size: 0.58rem; padding: 6px 10px; letter-spacing: 0.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .navbar { padding: 12px 14px; }
-            .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-            .brand-logo { font-size: 0.82rem; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 55%; }
-            .brand-logo span { color: var(--text-muted); font-weight: 400; }
-            .btn-nav-create { padding: 7px 14px; font-size: 0.65rem; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; border-radius: 20px; }
-
-            .hero-section { padding: 20px 14px 28px; }
-            .hero-tag { font-size: 0.62rem; letter-spacing: 2px; margin-bottom: 12px; }
-            .hero-title { font-size: 1.7rem; letter-spacing: -0.5px; line-height: 1.25; margin-bottom: 12px; }
-            .hero-sub { font-size: 0.8rem; padding: 0; line-height: 1.5; margin-bottom: 22px; max-width: 95%; margin-left: auto; margin-right: auto; }
-
-            .search-container { max-width: 100%; margin-bottom: 30px; }
-            .search-input { padding: 12px 14px 12px 40px; font-size: 0.8rem; letter-spacing: 0.5px; border-radius: 10px; }
-            .search-input::placeholder { font-size: 0.72rem; letter-spacing: 0.5px; }
-            .search-container i { left: 14px; font-size: 0.82rem; }
-
-            .main-wrapper { padding: 12px 14px 50px; overflow-x: hidden; }
-            .features-grid { grid-template-columns: 1fr; gap: 18px; padding-top: 24px; margin-bottom: 36px; }
-            .feature-item { padding-right: 0; }
-            .feature-num { font-size: 0.75rem; margin-bottom: 6px; }
-            .feature-title { font-size: 0.88rem; margin-bottom: 6px; letter-spacing: 1px; }
-            .feature-desc { font-size: 0.8rem; line-height: 1.45; }
-
-            /* Archive Carousel - Mobile Single Row Clean Design */
-            .archive-carousel-section { margin-bottom: 40px; }
-            .archive-section-header { flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 14px; gap: 8px; }
-            .archive-title { font-size: 1.15rem; letter-spacing: 0.5px; }
-            .archive-tag { font-size: 0.6rem; margin-bottom: 3px; }
-            .carousel-controls { gap: 6px; }
-            .btn-carousel-prev, .btn-carousel-next { width: 30px; height: 30px; font-size: 0.7rem; }
-            .carousel-wrapper { padding: 6px 0 16px; margin: 0; }
-
-            .cards-carousel-track {
-                grid-template-rows: 1fr;
-                grid-auto-columns: 270px;
-                gap: 14px;
+            .hero-title {
+                font-size: 2.2rem;
             }
-            .cards-carousel-track .msg-card {
-                width: 270px;
-                min-height: 220px;
-                padding: 16px;
-                border-radius: 14px;
+            .hero-desc {
+                font-size: 0.92rem;
             }
-            .msg-card-tag { font-size: 0.62rem; padding: 3px 8px; margin-bottom: 10px; }
-            .msg-card-quote {
-                font-size: 0.98rem;
-                margin-bottom: 12px;
-                line-height: 1.45;
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                text-overflow: ellipsis;
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
             }
-            .msg-card-image { height: 110px; margin-bottom: 10px; border-radius: 6px; object-fit: cover; width: 100%; }
-            .msg-card-audiobar { padding: 8px 10px; gap: 8px; border-radius: 8px; }
-            .msg-card-audiobar img { width: 30px; height: 30px; border-radius: 4px; }
-            .msg-card-audiobar .song-meta .title { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-            .msg-card-audiobar .song-meta .artist { font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-
-            .form-section { padding: 20px 14px; margin-bottom: 40px; border-radius: 14px; scroll-margin-top: 70px; }
-            .form-title { font-size: 1.2rem; }
-            .form-subtitle { font-size: 0.82rem; margin-bottom: 18px; padding-bottom: 12px; }
-            .form-group { margin-bottom: 16px; }
-            .form-label { font-size: 0.68rem; margin-bottom: 6px; }
-            .form-control { padding: 11px 12px; font-size: 0.84rem; border-radius: 8px; }
-            textarea.form-control { min-height: 110px; }
-            .file-upload-box { padding: 14px 10px; }
-            .file-upload-box span { font-size: 0.78rem; }
-            .song-results-dropdown { max-height: 200px; }
-            .btn-submit-form { padding: 13px; font-size: 0.8rem; letter-spacing: 0.8px; border-radius: 8px; }
-
-            /* Modal / Fullscreen view on Mobile HP */
-            .fullscreen-message-page { padding: 16px 12px 30px; }
-            .btn-fullscreen-back { margin-bottom: 14px; padding: 7px 14px; font-size: 0.68rem; }
-            .modal-header-title { font-size: 1.35rem; margin-bottom: 4px; line-height: 1.2; }
-            .modal-header-sub { font-size: 0.78rem; margin-bottom: 16px; line-height: 1.4; }
-
-            .spotify-single-bubble {
-                padding: 12px 14px;
-                gap: 10px;
-                border-radius: 12px;
-                margin-bottom: 16px;
-                background: #111115;
-                border: 1px solid rgba(255, 255, 255, 0.15);
+            .form-section {
+                padding: 1.5rem 1.2rem;
+                border-radius: 16px;
             }
-            .vinyl-disc-container { width: 50px; height: 50px; }
-            .vinyl-disc-container::after { width: 10px; height: 10px; }
-            .spotify-player-info h4 { font-size: 0.88rem; line-height: 1.2; margin-bottom: 2px; }
-            .spotify-player-info p { font-size: 0.72rem; margin-bottom: 3px; }
-            .spotify-audio-controls { gap: 6px; }
-            .spotify-play-btn { width: 34px; height: 34px; font-size: 0.8rem; }
-            .modal-message-text { font-size: 1.05rem; line-height: 1.45; margin-bottom: 16px; padding: 0; }
-            .modal-meaning-box { padding: 10px 12px; font-size: 0.78rem; }
-            #fullAttachmentImg { max-height: 220px !important; }
-            .toast { bottom: 14px; right: 12px; left: 12px; text-align: center; font-size: 0.7rem; }
+            .message-card {
+                padding: 1.25rem;
+            }
+            .toast-container {
+                left: 1rem;
+                right: 1rem;
+                bottom: 1rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Announcement Bar -->
-    <div class="top-bar">
-        SONGFORYOU — ARCHIVE YOUR FEELINGS THROUGH MUSIC. 🎵
-    </div>
+    <!-- NAVBAR -->
+    <header class="navbar app-container">
+        <a href="#" class="brand-logo">
+            <i class="fa-solid fa-music"></i>
+            <span>SongForYou</span>
+        </a>
+        <div class="nav-actions">
+            <a href="#formSection" class="btn-nav">Kirim Pesan</a>
+        </div>
+    </header>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="brand-logo">SONGFORYOU<span>.PROJECT</span></a>
-            <div class="nav-buttons">
-                <button onclick="scrollToForm()" class="btn-nav-create">CREATE MESSAGE</button>
+    <!-- HERO SECTION -->
+    <section class="hero-section app-container">
+        <div class="hero-badge">
+            <i class="fa-brands fa-spotify"></i>
+            <span>Music & Emotion Archive</span>
+        </div>
+        <h1 class="hero-title">
+            Bisikkan Perasaanmu<br>Lewat <em>Lagu Spesial</em>
+        </h1>
+        <p class="hero-desc">
+            Sampaikan kata-kata yang tersimpan di hati bersama melodi favoritmu. Kirimkan pesan anonim atau pribadi untuk seseorang yang berharga.
+        </p>
+        <div class="hero-cta-group">
+            <a href="#formSection" class="btn-primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                Tulis Pesan Sekarang
+            </a>
+            <a href="#feedSection" class="btn-secondary">
+                Jelajahi Pesan
+            </a>
+        </div>
+    </section>
+
+    <!-- PILLARS / HIGHLIGHTS -->
+    <div class="app-container">
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <div class="pillar-icon"><i class="fa-solid fa-user-secret"></i></div>
+                <h3 class="pillar-title">100% Rahasia & Anonim</h3>
+                <p class="pillar-text">Kamu bebas menyembunyikan identitasmu atau menuliskan inisial nama yang hanya kalian berdua yang paham.</p>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-icon"><i class="fa-brands fa-spotify"></i></div>
+                <h3 class="pillar-title">Integrasi Musik Spotify</h3>
+                <p class="pillar-text">Pilih lagu favorit langsung dari katalog Spotify untuk memperkuat setiap bait kata yang kamu tulis.</p>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-icon"><i class="fa-solid fa-heart"></i></div>
+                <h3 class="pillar-title">Kenangan Yang Abadi</h3>
+                <p class="pillar-text">Pesan dan pilihan lagumu terarsip indah, menjadi melodi kenangan manis yang dapat diputar kapan saja.</p>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Wrapper -->
-    <div class="main-wrapper">
+    <!-- FEATURED CAROUSEL SECTION -->
+    <section class="app-container">
+        <div class="section-header">
+            <div>
+                <div class="section-tag">Pesan Terpilih</div>
+                <h2 class="section-title">Ungkapan Hati Terbaru</h2>
+            </div>
+            <p class="section-desc">Momen-momen indah yang dibagikan oleh mereka yang berani mengungkapkan isi hatinya.</p>
+        </div>
         
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <span class="hero-tag">DIGITAL SOUND ARCHIVE</span>
-            <h1 class="hero-title">Curating the <i>intangible.</i></h1>
-            <p class="hero-sub">Cari nama seseorang untuk melihat apakah ada lagu & pesan rahasia yang dikirimkan untuknya.</p>
-            
-            <!-- Search Bar -->
-            <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="SEARCH A NAME..." autocomplete="off">
-            </div>
-
-            <!-- 3 Features Columns -->
-            <div class="features-grid">
-                <div class="feature-item">
-                    <span class="feature-num">01 /</span>
-                    <h3 class="feature-title">MONOLITHIC AUDIO</h3>
-                    <p class="feature-desc">Pilih lagu yang paling mewakili perasaanmu dan abadikan momen tersebut selamanya.</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-num">02 /</span>
-                    <h3 class="feature-title">STATIC TIME CAPSULES</h3>
-                    <p class="feature-desc">Kunci kenangan dengan lagu. Hanya sang penerima yang bisa menemukan dan membukanya.</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-num">03 /</span>
-                    <h3 class="feature-title">ANONYMOUS VAULT</h3>
-                    <p class="feature-desc">Sepenuhnya anonim. Kirim perasaanmu tanpa perlu mengungkapkan siapa dirimu.</p>
+        <div class="carousel-wrapper">
+            <div class="carousel-track-container" id="carouselTrackContainer">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Carousel items will be loaded dynamically -->
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Archived Messages Section with Horizontal Auto-Slider -->
-        <section id="archiveSection" class="archive-carousel-section">
-            <div class="archive-section-header">
+    <!-- FORM SECTION -->
+    <section id="formSection" class="app-container">
+        <div class="form-section">
+            <div class="section-header" style="margin-top:0;">
                 <div>
-                    <span class="archive-tag">ARCHIVED MEMORIES</span>
-                    <h2 class="archive-title">SOUND CAPSULES</h2>
+                    <div class="section-tag">Kirim Pesan</div>
+                    <h2 class="section-title">Bagikan Melodimu</h2>
                 </div>
-                <div class="carousel-controls">
-                    <button class="btn-carousel-prev" onclick="scrollCarousel(-1)" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="btn-carousel-next" onclick="scrollCarousel(1)" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
+                <p class="section-desc">Isi formulir di bawah untuk mengirim pesan berserta lagu pilihanmu.</p>
             </div>
-            
-            <div class="carousel-wrapper" id="carouselWrapper">
-                <div id="messagesGrid" class="cards-carousel-track">
-                    <!-- Cards render dynamically via JS -->
-                </div>
-            </div>
-        </section>
 
-        <!-- Form Section: SELECT SOUNDSCAPE -->
-        <section id="createFormSection" class="form-section">
-            <span class="form-tech-tag">CORE_INTERFACE // V2.020</span>
-            <h2 class="form-title">SELECT SOUNDSCAPE</h2>
-            <p class="form-subtitle">Ungkapkan perasaanmu secara rahasia dan lampirkan lagu yang mewakilinya.</p>
-
-            <form id="createMessageForm">
-                <div class="form-group">
-                    <label class="form-label" for="receiver">TO: (NAMA PENERIMA)</label>
-                    <input type="text" id="receiver" class="form-control" placeholder="Contoh: zahra, louis" required maxlength="100">
-                    <span class="form-helper">Ketikkan nama panggilan yang sering digunakan agar mudah dicari.</span>
-                </div>
-
-                <div class="form-group song-select-custom">
-                    <label class="form-label" for="songSearchInput">PILIH LAGU (LIVE SPOTIFY SEARCH)</label>
-                    <input type="text" id="songSearchInput" class="form-control" placeholder="Ketik judul lagu atau nama penyanyi di Spotify..." autocomplete="off" required>
-                    
-                    <div id="songDropdown" class="song-results-dropdown"></div>
-                    <input type="hidden" id="selectedSongKey" value="">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">LAMPIRKAN FOTO KENANGAN (OPSIONAL)</label>
-                    <div class="file-upload-box" onclick="document.getElementById('fileInput').click()">
-                        <i class="fa-solid fa-camera"></i>
-                        <span id="fileNameDisplay">Pilih Foto (Klik atau seret)</span>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(this)">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="messageText">PESAN / SURAT RAHASIA</label>
-                    <textarea id="messageText" class="form-control" placeholder="Tuliskan isi hatimu disini..." required maxlength="5000"></textarea>
-                </div>
-
-                <button type="submit" id="btnSubmitForm" class="btn-submit-form">KIRIM PESAN RAHASIA</button>
-            </form>
-        </section>
-
-    </div>
-
-    <!-- FULL SCREEN MESSAGE VIEW PAGE -->
-    <div id="fullScreenMessagePage" class="fullscreen-message-page">
-        <div class="fullscreen-content-container">
-            <button class="btn-fullscreen-back" onclick="closeFullScreenMessage()"><i class="fa-solid fa-arrow-left"></i> KEMBALI KE ARCHIVE</button>
-            
-            <span class="modal-tech-tag">NOW ENCODING // FROM SECRETS</span>
-            <h2 class="modal-header-title">Hello, <i id="fullReceiverName">fiwa</i></h2>
-            <p class="modal-header-sub">There's someone sending you a song, they want you to hear this song that maybe you'll like :)</p>
-
-            <!-- SINGLE SLEEK SPOTIFY CARD BUBBLE WITH ROTATING VINYL DISC -->
-            <div class="spotify-single-bubble">
-                <div class="vinyl-disc-container" id="fullVinylContainer">
-                    <img id="fullCover" src="https://i.scdn.co/image/ab67616d0000b27341ad37380f2d8e05a81a7b44" alt="Album Cover">
-                </div>
-                <div class="spotify-player-info">
-                    <h4 id="fullTitle">Perfect</h4>
-                    <p id="fullArtist">Ed Sheeran</p>
-                    <span class="btn-spotify-save"><i class="fa-brands fa-spotify" style="color: var(--spotify-green);"></i> SongForYou In-Browser Audio Player</span>
-                    
-                    <div class="spotify-audio-controls">
-                        <button class="spotify-play-btn" id="btnFullPlayAudio" onclick="toggleAudioPlayback()"><i class="fa-solid fa-play" style="margin-left: 2px;"></i></button>
-                        <div class="progress-bar-fake" onclick="seekAudio(event)">
-                            <div id="fullProgressBarFill" class="progress-bar-fake-fill"></div>
+            <form id="createMessageForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-grid-2col" style="display:grid; gap:1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="recipientInput"><i class="fa-solid fa-user"></i> Untuk (Penerima)</label>
+                            <input type="text" id="recipientInput" name="recipient" class="form-input" placeholder="Nama atau Inisial (mis. Adinda)" required>
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text-muted);" id="fullAudioTime">00:00</span>
+                        <div class="form-group">
+                            <label class="form-label" for="senderInput"><i class="fa-solid fa-user-ninja"></i> Dari (Pengirim)</label>
+                            <input type="text" id="senderInput" name="sender" class="form-input" placeholder="Nama / Rahasia / Inisial" required>
+                        </div>
                     </div>
+
+                    <!-- SONG SEARCH INPUT -->
+                    <div class="form-group song-search-container">
+                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify" style="color:var(--accent-green);"></i> Cari Lagu Spesial</label>
+                        <input type="text" id="songSearchInput" class="form-input" placeholder="Ketik judul lagu atau nama penyanyi..." autocomplete="off">
+                        
+                        <div class="song-dropdown" id="songDropdown"></div>
+                        
+                        <!-- HIDDEN METADATA INPUTS -->
+                        <input type="hidden" id="selectedSongTitle" name="song_title">
+                        <input type="hidden" id="selectedSongArtist" name="song_artist">
+                        <input type="hidden" id="selectedSongCover" name="song_cover">
+                        <input type="hidden" id="selectedSongPreview" name="song_preview">
+                        <input type="hidden" id="selectedSongKey" name="song_key">
+
+                        <!-- SELECTED SONG DISPLAY -->
+                        <div id="selectedSongBubble" class="selected-song-bubble" style="display:none;">
+                            <div class="song-preview-meta">
+                                <img id="selectedBubbleImg" src="" alt="Album Cover">
+                                <div>
+                                    <h4 id="selectedBubbleTitle">Judul Lagu</h4>
+                                    <p id="selectedBubbleArtist">Penyanyi</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-remove-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="messageInput"><i class="fa-solid fa-pen-nib"></i> Isi Pesan Rahasia</label>
+                        <textarea id="messageInput" name="message" class="form-textarea" placeholder="Tuliskan cerita, perasaan, atau pesan hangatmu di sini..." required></textarea>
+                    </div>
+
+                    <!-- PHOTO UPLOAD -->
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
+                        <div class="file-dropzone" onclick="document.getElementById('photoInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem; color:var(--accent-green); margin-bottom:0.5rem;"></i>
+                            <p style="font-size:0.88rem; color:var(--text-main);">Klik untuk memilih foto dari galeri HP / Komputer</p>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">Format JPG, PNG, WEBP (Otomatis Dioptimalkan)</p>
+                            <input type="file" id="photoInput" name="photo" accept="image/*" onchange="handleFileSelected(event)">
+                            <img id="photoPreviewThumb" class="file-preview-thumb" alt="Preview Photo">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmitForm" class="btn-primary" style="justify-content:center; width:100%; margin-top:1rem;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Kirim Pesan Rahasia
+                    </button>
                 </div>
-            </div>
+            </form>
+        </div>
+    </section>
 
-            <div class="modal-divider">— ALSO, HERE'S A MESSAGE FROM THE SENDER:</div>
-            <div class="modal-message-text" id="fullMessageText">"test"</div>
-
-            <div id="fullAttachmentBox" class="modal-attachment-container" style="display: none;">
-                <img id="fullAttachmentImg" src="" alt="Attachment">
+    <!-- MESSAGES FEED SECTION -->
+    <section id="feedSection" class="app-container">
+        <div class="section-header">
+            <div>
+                <div class="section-tag">Arsip Pesan</div>
+                <h2 class="section-title">Semua Pesan & Melodi</h2>
             </div>
+            <p class="section-desc">Cari pesan berdasarkan nama penerima atau pengirim.</p>
+        </div>
 
-            <div id="fullMeaningBox" class="modal-meaning-box" style="display: none;">
-                <strong>♫ MAKNA LAGU</strong>
-                <span id="fullMeaningText">-</span>
-            </div>
+        <div class="messages-search-bar">
+            <input type="text" id="messagesFilterInput" class="messages-search-input" placeholder="Cari nama penerima / pengirim / lagu..." oninput="filterMessages()">
+        </div>
+
+        <div class="messages-grid" id="messagesGrid">
+            <!-- Dynamic Message Cards will load here -->
+        </div>
+    </section>
+
+    <!-- MODAL POPUP FOR EXPANDED MESSAGE / PHOTO -->
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal-card">
+            <button class="btn-close-modal" onclick="closeFullScreenMessage()"><i class="fa-solid fa-xmark"></i></button>
+            <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="toast">Pesan berhasil dikirim!</div>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
 
+    <!-- FOOTER -->
+    <footer>
+        <div class="app-container">
+            <p>&copy; <?php echo date('Y'); ?> SongForYou. Dibuat dengan perasaan & melodi.</p>
+        </div>
+    </footer>
+
+    <!-- AUDIO PLAYER STATE & JS LOGIC -->
     <script>
+        // API Base helper
+        function getApiUrl(path) {
+            return `/backend/${path}`;
+        }
+
+        // Global State
         let allMessages = [];
+        let currentAudio = null;
+        let currentPlayBtn = null;
         let selectedSong = null;
-        
-        // In-Browser Audio Player
-        const audioInstance = new Audio();
-        let isAudioPlaying = false;
-        let currentMessageObj = null;
-        let currentCardHasPlayed = false;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchMessages();
-            setupSongSearch();
-
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                const q = e.target.value.trim().toLowerCase();
-                renderMessages(allMessages.filter(m => 
-                    (m.receiver && m.receiver.toLowerCase().includes(q)) || 
-                    (m.songTitle && m.songTitle.toLowerCase().includes(q)) || 
-                    (m.songArtist && m.songArtist.toLowerCase().includes(q))
-                ));
-            });
-
-            document.getElementById('createMessageForm').addEventListener('submit', handleFormSubmit);
-
-            // Handle direct URL query param
-            const urlParams = new URLSearchParams(window.location.search);
-            const slugParam = urlParams.get('slug') || urlParams.get('msg');
-            if (slugParam) {
-                setTimeout(() => openFullScreenMessage(slugParam), 500);
-            }
-        });
-
-        // Audio progress events
-        audioInstance.addEventListener('timeupdate', () => {
-            if (audioInstance.duration) {
-                const pct = (audioInstance.currentTime / audioInstance.duration) * 100;
-                document.getElementById('fullProgressBarFill').style.width = pct + '%';
-                
-                const curMins = Math.floor(audioInstance.currentTime / 60);
-                const curSecs = Math.floor(audioInstance.currentTime % 60).toString().padStart(2, '0');
-                const durMins = Math.floor(audioInstance.duration / 60);
-                const durSecs = Math.floor(audioInstance.duration % 60).toString().padStart(2, '0');
-                
-                document.getElementById('fullAudioTime').textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
-            }
-        });
-
-        audioInstance.addEventListener('ended', () => {
-            stopPlaybackState();
-        });
-
-        function scrollToForm() {
-            document.getElementById('createFormSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        const getApiUrl = (endpoint) => {
-            // On Vercel: /backend/xxx -> routes to /api/backend.php?endpoint=xxx
-            // On local: ./backend/xxx -> serves file directly
-            const isVercel = window.location.hostname.includes('vercel.app') || 
-                             window.location.hostname.includes('vercel.com') ||
-                             (!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1'));
-            if (isVercel) {
-                return '/backend/' + endpoint;
-            }
-            let base = window.location.pathname;
-            if (!base.endsWith('/')) {
-                if (!base.endsWith('.php')) {
-                    base += '/';
-                } else {
-                    base = base.substring(0, base.lastIndexOf('/') + 1);
+        // Image compression helper (Canvas-based)
+        function compressImage(file, maxWidth = 1000, quality = 0.75) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    resolve(file);
+                    return;
                 }
-            }
-            return base + 'backend/' + endpoint;
-        };
-
-        // Helper: resolve path relatif (mis: uploads/foto.jpg) ke URL absolut app
-        const getAppUrl = (path) => {
-            if (!path) return '';
-            if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('data:')) return path;
-            let base = window.location.pathname;
-            if (!base.endsWith('/')) {
-                base = base.substring(0, base.lastIndexOf('/') + 1);
-            }
-            return base + path;
-        };
-
-        // Helper: Ambil preview URL dari iTunes Search API (country=ID)
-        const getItunesPreview = async (title, artist) => {
-            const cleanTitle = (title || '').replace(/\(feat\.[^)]+\)/gi, '').replace(/\([^)]+\)/g, '').replace(/\[[^\]]+\]/g, '').replace(/-\s*.*$/, '').trim();
-            const cleanArtist = (artist || '').split(',')[0].split('&')[0].trim();
-            const q = encodeURIComponent(`${cleanTitle} ${cleanArtist}`);
-
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${q}&country=ID&media=music&entity=song&limit=10`, { signal: AbortSignal.timeout(3500) });
-                const data = await res.json();
-
-                if (data.results && data.results.length > 0) {
-                    const targetTitle = cleanTitle.toLowerCase();
-                    const targetArtist = cleanArtist.toLowerCase();
-
-                    // Priority 1: Match judul dan penyanyi secara akurat
-                    for (const track of data.results) {
-                        if (!track.previewUrl) continue;
-                        const trTitle = (track.trackName || '').toLowerCase();
-                        const trArtist = (track.artistName || '').toLowerCase();
-                        if ((trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) &&
-                            (trArtist.includes(targetArtist) || targetArtist.includes(trArtist))) {
-                            return track.previewUrl;
-                        }
-                    }
-
-                    // Priority 2: Substring match untuk penyanyi & judul
-                    for (const track of data.results) {
-                        if (!track.previewUrl) continue;
-                        const trTitle = (track.trackName || '').toLowerCase();
-                        const trArtist = (track.artistName || '').toLowerCase();
-                        if ((trTitle.includes(targetTitle) || targetTitle.includes(trTitle)) &&
-                            (trArtist.includes(targetArtist) || targetArtist.includes(trArtist))) {
-                            return track.previewUrl;
-                        }
-                    }
-                }
-            } catch(e) {}
-
-            return null;
-        };
-
-
-        let carouselAutoScrollTimer = null;
-        let isCarouselHovered = false;
-
-        function startCarouselAutoScroll() {
-            if (carouselAutoScrollTimer) clearInterval(carouselAutoScrollTimer);
-            
-            carouselAutoScrollTimer = setInterval(() => {
-                const wrapper = document.getElementById('carouselWrapper');
-                if (!wrapper || isCarouselHovered) return;
-
-                if (wrapper.scrollLeft >= (wrapper.scrollWidth - wrapper.clientWidth - 4)) {
-                    wrapper.scrollLeft = 0;
-                } else {
-                    wrapper.scrollLeft += 1.2;
-                }
-            }, 30);
-        }
-
-        function scrollCarousel(dir) {
-            const wrapper = document.getElementById('carouselWrapper');
-            if (!wrapper) return;
-            const amount = 300 * dir;
-            wrapper.scrollBy({ left: amount, behavior: 'smooth' });
-        }
-
-        // Fetch Messages from DB
-        async function fetchMessages() {
-            try {
-                const res = await fetch(getApiUrl('get_messages.php'));
-                const data = await res.json();
-                if (data.success) {
-                    allMessages = data.messages;
-                    renderMessages(allMessages);
-                    startCarouselAutoScroll();
-                }
-            } catch (err) {
-                console.error('Fetch messages error:', err);
-                renderMessages([]);
-            }
-        }
-
-        // Render Cards Grid
-        function renderMessages(messages) {
-            const grid = document.getElementById('messagesGrid');
-            if (!messages || messages.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-regular fa-folder-open"></i>
-                        <h3>BELUM ADA PESAN RAHASIA</h3>
-                        <p>Jadilah yang pertama untuk membuat dan mengabadikan pesan rahasia lewat lagu pilihanmu.</p>
-                        <button onclick="scrollToForm()" class="btn-nav-create">CREATE MESSAGE</button>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = messages.map(msg => {
-                const cover = msg.songCover || 'https://via.placeholder.com/60';
-                const title = escapeHtml(msg.songTitle || 'Lagu Pilihan');
-                const artist = escapeHtml(msg.songArtist || 'Artist');
-                const receiver = escapeHtml(msg.receiver.toUpperCase());
-                const quote = escapeHtml(msg.message);
-
-                return `
-                    <div class="msg-card" onclick="openFullScreenMessage('${msg.slug}')">
-                        <div>
-                            <span class="msg-card-tag">TO: ${receiver}</span>
-                            <div class="msg-card-quote">${quote}</div>
-                            ${msg.images ? `<img src="${getAppUrl(msg.images)}" class="msg-card-image" alt="Attachment">` : ''}
-                        </div>
-                        <div class="msg-card-audiobar">
-                            <img src="${escapeHtml(cover)}" alt="Cover">
-                            <div class="song-meta">
-                                <div class="title">${title}</div>
-                                <div class="artist">${artist}</div>
-                            </div>
-                            <i class="fa-brands fa-spotify"></i>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Setup Real-time Live Spotify Search Selector
-        function setupSongSearch() {
-            const input = document.getElementById('songSearchInput');
-            const dropdown = document.getElementById('songDropdown');
-            let debounceTimer;
-
-            const performSearch = async (query) => {
-                dropdown.innerHTML = `<div style="padding: 12px; text-align: center; color: #71717a; font-size: 0.8rem; font-family: var(--font-mono);"><i class="fa-solid fa-spinner fa-spin"></i> SEARCHING...</div>`;
-                dropdown.style.display = 'block';
-
-                try {
-                    const res = await fetch(getApiUrl(`spotify_search.php?q=${encodeURIComponent(query)}`));
-                    const data = await res.json();
-                    if (data.success && data.tracks && data.tracks.length > 0) {
-                        renderSongDropdown(data.tracks);
-                    } else {
-                        dropdown.innerHTML = `<div style="padding: 12px; text-align: center; color: #71717a; font-size: 0.8rem; font-family: var(--font-mono);">LAGU TIDAK DITEMUKAN</div>`;
-                    }
-                } catch (err) {
-                    console.error('Spotify Search Error:', err);
-                    dropdown.style.display = 'none';
-                }
-            };
-
-            const triggerSearch = () => {
-                const q = input.value.trim();
-                performSearch(q || 'viral indonesia');
-            };
-
-            input.addEventListener('focus', triggerSearch);
-            input.addEventListener('click', triggerSearch);
-
-            input.addEventListener('input', (e) => {
-                clearTimeout(debounceTimer);
-                const q = e.target.value.trim();
-                debounceTimer = setTimeout(() => {
-                    performSearch(q || 'viral indonesia');
-                }, 80);
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.song-select-custom')) {
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
-
-        let _dropdownTracks = [];
-        function renderSongDropdown(tracks) {
-            const dropdown = document.getElementById('songDropdown');
-            if (!tracks || tracks.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
-            _dropdownTracks = tracks;
-
-            dropdown.innerHTML = tracks.map((t, i) => `
-                <div class="song-result-item" data-track-idx="${i}">
-                    <img src="${escapeHtml(t.coverUrl || 'https://via.placeholder.com/42')}" alt="Cover">
-                    <div>
-                        <div class="song-title">${escapeHtml(t.title)}</div>
-                        <div class="song-artist">${escapeHtml(t.artist)}</div>
-                    </div>
-                </div>
-            `).join('');
-            dropdown.style.display = 'block';
-
-            dropdown.querySelectorAll('.song-result-item').forEach(el => {
-                el.addEventListener('click', () => {
-                    const idx = parseInt(el.getAttribute('data-track-idx'));
-                    selectSong(_dropdownTracks[idx]);
-                });
-            });
-        }
-
-        async function selectSong(t) {
-            selectedSong = t;
-            document.getElementById('selectedSongKey').value = t.spotifyId;
-            document.getElementById('songSearchInput').value = t.title + ' — ' + t.artist;
-            document.getElementById('songDropdown').style.display = 'none';
-
-            // Jika previewUrl kosong, ambil dari iTunes secara langsung (cepat)
-            if (!selectedSong.previewUrl) {
-                const preview = await getItunesPreview(t.title, t.artist);
-                if (preview) selectedSong.previewUrl = preview;
-            }
-        }
-
-        function handleFileSelected(input) {
-            const display = document.getElementById('fileNameDisplay');
-            if (input.files && input.files[0]) {
-                display.textContent = 'Foto dipilih: ' + input.files[0].name;
-            } else {
-                display.textContent = 'Pilih Foto (Klik atau seret)';
-            }
-        }
-
-        // Form Submit Handler
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmitForm');
-            const receiver = document.getElementById('receiver').value.trim();
-            const message = document.getElementById('messageText').value.trim();
-            const songKey = document.getElementById('selectedSongKey').value;
-            const fileInput = document.getElementById('fileInput');
-
-            if (!receiver) {
-                alert('Silakan isi nama penerima terlebih dahulu!');
-                document.getElementById('receiver').focus();
-                return;
-            }
-
-            if (!selectedSong) {
-                alert('Silakan pilih lagu dari hasil pencarian Spotify terlebih dahulu!');
-                document.getElementById('songSearchInput').focus();
-                return;
-            }
-
-            if (!message) {
-                alert('Silakan tulis pesan rahasiamu terlebih dahulu!');
-                document.getElementById('messageText').focus();
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'MEMPROSES PESAN...';
-
-            let base64Img = '';
-            if (fileInput.files && fileInput.files[0]) {
-                try {
-                    base64Img = await fileToBase64(fileInput.files[0]);
-                } catch(e) {
-                    console.warn('Image process error:', e);
-                }
-            }
-
-            const payload = {
-                receiver: receiver,
-                senderName: 'Anonim',
-                songKey: selectedSong.spotifyId || songKey,
-                message: message,
-                images: base64Img,
-                songDetails: {
-                    title: selectedSong.title,
-                    artist: selectedSong.artist,
-                    coverUrl: selectedSong.coverUrl,
-                    meaning: selectedSong.meaning || 'Lagu ini melambangkan perasaan mendalam.',
-                    spotifyUrl: selectedSong.spotifyUrl || '',
-                    previewUrl: selectedSong.previewUrl || null
-                }
-            };
-
-            try {
-                const res = await fetch(getApiUrl('submit_message.php'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-
-                if (res.ok && data.success) {
-                    showToast('PESAN RAHASIA BERHASIL DISIMPAN!');
-                    document.getElementById('createMessageForm').reset();
-                    document.getElementById('fileNameDisplay').textContent = 'Pilih Foto (Klik atau seret)';
-                    selectedSong = null;
-                    fetchMessages();
-                    
-                    if (data.slug) {
-                        setTimeout(() => openFullScreenMessage(data.slug), 400);
-                    } else {
-                        document.getElementById('archiveSection').scrollIntoView({ behavior: 'smooth' });
-                    }
-                } else {
-                    alert('Gagal mengirim pesan: ' + (data.message || data.error || 'Terjadi kesalahan server'));
-                }
-            } catch (err) {
-                console.error('Submit error:', err);
-                alert('Gagal mengirim pesan: Terjadi kesalahan jaringan. Coba periksa koneksi atau ukuran foto.');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'KIRIM PESAN RAHASIA';
-            }
-        }
-
-        // OPEN FULL SCREEN MESSAGE VIEW WITH EXACT SPOTIFY AUDIO
-        async function openFullScreenMessage(slug) {
-            const msg = allMessages.find(m => m.slug === slug);
-            if (!msg) return;
-
-            currentMessageObj = msg;
-            currentCardHasPlayed = false;
-
-            document.getElementById('fullReceiverName').textContent = msg.receiver;
-            document.getElementById('fullCover').src = msg.songCover || 'https://via.placeholder.com/100';
-            document.getElementById('fullTitle').textContent = msg.songTitle || 'Lagu Pilihan';
-            document.getElementById('fullArtist').textContent = msg.songArtist || 'Artist';
-            document.getElementById('fullMessageText').textContent = msg.message;
-
-            const meaningBox = document.getElementById('fullMeaningBox');
-            if (msg.songMeaning) {
-                document.getElementById('fullMeaningText').textContent = msg.songMeaning;
-                meaningBox.style.display = 'block';
-            } else {
-                meaningBox.style.display = 'none';
-            }
-
-            // Tampilkan gambar dengan path yang benar menggunakan getAppUrl helper
-            const imgBox = document.getElementById('fullAttachmentBox');
-            if (msg.images) {
-                document.getElementById('fullAttachmentImg').src = getAppUrl(msg.images);
-                imgBox.style.display = 'block';
-            } else {
-                imgBox.style.display = 'none';
-            }
-
-            // Reset Audio State & Vinyl Disc Rotation
-            stopPlaybackState();
-
-            // Gunakan previewUrl dari DB terlebih dahulu (100% verified & accurate). Jika kosong baru cari via getItunesPreview
-            let audioUrl = msg.previewUrl;
-            if (!audioUrl && msg.songTitle && msg.songArtist) {
-                audioUrl = await getItunesPreview(msg.songTitle, msg.songArtist);
-            }
-
-            if (audioUrl) {
-                try {
-                    audioInstance.pause();
-                    audioInstance.removeAttribute('src');
-                    audioInstance.load();
-                } catch(e) {}
-
-                audioInstance.src = audioUrl;
-                audioInstance.load();
-                
-                audioInstance.onloadedmetadata = () => {
-                    if (audioInstance.duration && !isNaN(audioInstance.duration)) {
-                        const durMins = Math.floor(audioInstance.duration / 60);
-                        const durSecs = Math.floor(audioInstance.duration % 60).toString().padStart(2, '0');
-                        document.getElementById('fullAudioTime').textContent = `00:00 / ${durMins}:${durSecs}`;
-                        document.getElementById('fullProgressBarFill').style.width = '0%';
-                        try {
-                            audioInstance.currentTime = 0;
-                        } catch(e) {}
-                    }
-                };
-            } else {
-                audioInstance.removeAttribute('src');
-            }
-
-            // Lock body scroll dan tampilkan full screen page
-            document.body.style.overflow = 'hidden';
-            document.getElementById('fullScreenMessagePage').classList.add('active');
-        }
-
-        // TOGGLE IN-BROWSER AUDIO PLAYBACK FOR THE EXACT SPOTIFY SONG (MENUNGGU KLIK USER)
-        function toggleAudioPlayback() {
-            const playBtn = document.getElementById('btnFullPlayAudio');
-            const vinyl = document.getElementById('fullVinylContainer');
-
-            if (!audioInstance.src || audioInstance.src === '' || audioInstance.src === window.location.href) {
-                showToast('Audio preview sedang dimuat atau tidak tersedia untuk lagu ini...');
-                return;
-            }
-
-            if (isAudioPlaying) {
-                audioInstance.pause();
-                isAudioPlaying = false;
-                playBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-left: 2px;"></i>';
-                vinyl.classList.remove('is-playing');
-            } else {
-                const isReStart = !currentCardHasPlayed || audioInstance.ended || (audioInstance.duration && audioInstance.currentTime >= audioInstance.duration - 0.3);
-
-                if (isReStart) {
-                    try {
-                        audioInstance.currentTime = 0;
-                    } catch(e) {}
-                    currentCardHasPlayed = true;
-                }
-
-                audioInstance.play().then(() => {
-                    isAudioPlaying = true;
-                    playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    vinyl.classList.add('is-playing');
-                }).catch(err => {
-                    console.error('Audio play error:', err);
-                    showToast('Klik sekali lagi untuk memutar lagu.');
-                });
-            }
-        }
-
-        function stopPlaybackState() {
-            try {
-                audioInstance.pause();
-                audioInstance.currentTime = 0;
-            } catch(e) {}
-            
-            isAudioPlaying = false;
-            currentCardHasPlayed = false;
-            const playBtn = document.getElementById('btnFullPlayAudio');
-            const vinyl = document.getElementById('fullVinylContainer');
-            if (playBtn) playBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-left: 2px;"></i>';
-            if (vinyl) vinyl.classList.remove('is-playing');
-            document.getElementById('fullProgressBarFill').style.width = '0%';
-            document.getElementById('fullAudioTime').textContent = '00:00';
-        }
-
-        function seekAudio(e) {
-            if (!audioInstance.duration || !audioInstance.src) return;
-            const bar = e.currentTarget;
-            const rect = bar.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const pct = clickX / rect.width;
-            audioInstance.currentTime = pct * audioInstance.duration;
-        }
-
-        function closeFullScreenMessage() {
-            stopPlaybackState();
-            document.body.style.overflow = 'auto';
-            document.getElementById('fullScreenMessagePage').classList.remove('active');
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const maxDim = 1400;
-
-                        if (width > maxDim || height > maxDim) {
-                            if (width > height) {
-                                height = Math.round((height * maxDim) / width);
-                                width = maxDim;
-                            } else {
-                                width = Math.round((width * maxDim) / height);
-                                height = maxDim;
-                            }
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
                         }
-
+                        const canvas = document.createElement('canvas');
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-
-                        // Kompresi foto berkualitas tinggi HD (~250KB - 400KB) agar tetap tajam dan jauh di bawah batas 4.5MB Vercel
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                        resolve(dataUrl);
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                resolve(file);
+                                return;
+                            }
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(compressedFile);
+                        }, 'image/jpeg', quality);
                     };
-                    img.onerror = () => resolve(e.target.result);
+                    img.onerror = (err) => resolve(file);
                 };
-                reader.onerror = () => resolve('');
+                reader.onerror = (err) => resolve(file);
             });
         }
 
-        function showToast(text) {
-            const toast = document.getElementById('toast');
-            toast.textContent = text;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
+        // Handle File Selection Preview
+        function handleFileSelected(e) {
+            const file = e.target.files[0];
+            const thumb = document.getElementById('photoPreviewThumb');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    thumb.src = evt.target.result;
+                    thumb.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                thumb.style.display = 'none';
+            }
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+        // Song Search Logic
+        const songInput = document.getElementById('songSearchInput');
+        const songDropdown = document.getElementById('songDropdown');
+        let searchTimer = null;
+
+        if (songInput) {
+            songInput.addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    songDropdown.style.display = 'none';
+                    return;
+                }
+                searchTimer = setTimeout(() => searchSongs(query), 300);
+            });
         }
 
-        // Close fullscreen view with ESC key on laptop
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeFullScreenMessage();
+        async function searchSongs(query) {
+            try {
+                // First try Spotify search backend, fallback to iTunes Search API
+                let results = [];
+                try {
+                    const res = await fetch(getApiUrl(`spotify_search.php?q=${encodeURIComponent(query)}`));
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.tracks && data.tracks.length > 0) {
+                            results = data.tracks;
+                        }
+                    }
+                } catch(e) {}
+
+                if (results.length === 0) {
+                    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&country=ID&media=music&entity=song&limit=8`);
+                    if (itunesRes.ok) {
+                        const itunesData = await itunesRes.json();
+                        results = (itunesData.results || []).map(item => ({
+                            title: item.trackName,
+                            artist: item.artistName,
+                            cover: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '300x300bb') : '',
+                            preview: item.previewUrl || '',
+                            spotifyId: item.trackId ? String(item.trackId) : ''
+                        }));
+                    }
+                }
+
+                renderSongDropdown(results);
+            } catch (err) {
+                console.error("Song search error:", err);
+            }
+        }
+
+        function renderSongDropdown(tracks) {
+            if (!tracks || tracks.length === 0) {
+                songDropdown.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:0.85rem;">Tidak ada lagu ditemukan</div>';
+                songDropdown.style.display = 'block';
+                return;
+            }
+
+            songDropdown.innerHTML = tracks.map((t, idx) => `
+                <div class="song-option" onclick="selectSong(${idx})">
+                    <img src="${t.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" alt="Cover">
+                    <div class="song-option-info">
+                        <h5>${escapeHtml(t.title)}</h5>
+                        <p>${escapeHtml(t.artist)}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            window._searchResults = tracks;
+            songDropdown.style.display = 'block';
+        }
+
+        function selectSong(index) {
+            const track = window._searchResults[index];
+            if (!track) return;
+
+            selectedSong = track;
+            document.getElementById('selectedSongTitle').value = track.title || '';
+            document.getElementById('selectedSongArtist').value = track.artist || '';
+            document.getElementById('selectedSongCover').value = track.cover || '';
+            document.getElementById('selectedSongPreview').value = track.preview || '';
+            document.getElementById('selectedSongKey').value = track.spotifyId || '';
+
+            document.getElementById('selectedBubbleImg').src = track.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
+            document.getElementById('selectedBubbleTitle').innerText = track.title;
+            document.getElementById('selectedBubbleArtist').innerText = track.artist;
+            document.getElementById('selectedSongBubble').style.display = 'flex';
+
+            songInput.value = '';
+            songDropdown.style.display = 'none';
+        }
+
+        function clearSelectedSong() {
+            selectedSong = null;
+            document.getElementById('selectedSongTitle').value = '';
+            document.getElementById('selectedSongArtist').value = '';
+            document.getElementById('selectedSongCover').value = '';
+            document.getElementById('selectedSongPreview').value = '';
+            document.getElementById('selectedSongKey').value = '';
+            document.getElementById('selectedSongBubble').style.display = 'none';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (songDropdown && !songInput.contains(e.target) && !songDropdown.contains(e.target)) {
+                songDropdown.style.display = 'none';
+            }
         });
 
-        // Setup Carousel Mouse & Touch Listeners & Prevent Zoom Out
-        window.addEventListener('DOMContentLoaded', () => {
-            document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
-            document.addEventListener('touchmove', function (event) {
-                if (event.scale !== undefined && event.scale !== 1) {
-                    event.preventDefault();
-                }
-            }, { passive: false });
+        // Submit Form Handler with Compression
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmitForm');
+            const originalBtnText = btn.innerHTML;
 
-            const wrapper = document.getElementById('carouselWrapper');
-            if (wrapper) {
-                wrapper.addEventListener('mouseenter', () => { isCarouselHovered = true; });
-                wrapper.addEventListener('mouseleave', () => { isCarouselHovered = false; });
-                wrapper.addEventListener('touchstart', () => { isCarouselHovered = true; }, { passive: true });
-                wrapper.addEventListener('touchend', () => {
-                    setTimeout(() => { isCarouselHovered = false; }, 3000);
-                }, { passive: true });
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengompres & Mengirim...';
+
+                const form = document.getElementById('createMessageForm');
+                const formData = new FormData(form);
+
+                // Compress Photo if attached
+                const fileInput = document.getElementById('photoInput');
+                if (fileInput && fileInput.files.length > 0) {
+                    const originalFile = fileInput.files[0];
+                    const compressed = await compressImage(originalFile, 1000, 0.75);
+                    formData.set('photo', compressed);
+                }
+
+                const res = await fetch(getApiUrl('submit_message.php'), {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (data.status === 'success' || data.success) {
+                    showToast('Pesan rahasiamu berhasil dikirim!');
+                    form.reset();
+                    clearSelectedSong();
+                    document.getElementById('photoPreviewThumb').style.display = 'none';
+                    fetchMessages();
+                    document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showToast('Gagal mengirim pesan: ' + (data.message || 'Terjadi kesalahan server'), 'error');
+                }
+            } catch (err) {
+                console.error("Form submit error:", err);
+                showToast('Koneksi terganggu. Silakan coba lagi.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
             }
+        }
+
+        // Audio Player Controller
+        function toggleAudioPlayback(previewUrl, btnEl) {
+            if (!previewUrl) {
+                showToast('Pratinjau audio tidak tersedia untuk lagu ini', 'error');
+                return;
+            }
+
+            if (currentAudio && currentAudio.src === previewUrl) {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                } else {
+                    currentAudio.pause();
+                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
+                }
+                return;
+            }
+
+            if (currentAudio) {
+                currentAudio.pause();
+                if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            }
+
+            currentAudio = new Audio(previewUrl);
+            currentPlayBtn = btnEl;
+
+            currentAudio.play().then(() => {
+                if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            }).catch(err => {
+                showToast('Gagal memutar audio preview', 'error');
+            });
+
+            currentAudio.onended = function() {
+                if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
+            };
+        }
+
+        // Fetch & Render Messages
+        async function fetchMessages() {
+            try {
+                const res = await fetch(getApiUrl('get_messages.php'));
+                if (res.ok) {
+                    const data = await res.json();
+                    allMessages = Array.isArray(data) ? data : (data.messages || []);
+                    renderCarousel(allMessages);
+                    renderMessages(allMessages);
+                }
+            } catch (err) {
+                console.error("Error fetching messages:", err);
+            }
+        }
+
+        function renderCarousel(messages) {
+            const track = document.getElementById('carouselTrack');
+            if (!track) return;
+
+            const featured = messages.slice(0, 6);
+            if (featured.length === 0) {
+                track.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Belum ada pesan unggulan.</div>';
+                return;
+            }
+
+            track.innerHTML = featured.map(m => `
+                <div class="carousel-card" onclick="openFullScreenMessage(${m.id})">
+                    <div>
+                        <div class="card-tag">Untuk:</div>
+                        <h4 class="card-recipient">${escapeHtml(m.recipient || 'Seseorang')}</h4>
+                        <p class="card-message-snippet">"${escapeHtml(m.message || '')}"</p>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--accent-green); font-family:var(--font-heading); font-weight:700;">
+                        — ${escapeHtml(m.sender || 'Anonim')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMessages(messages) {
+            const grid = document.getElementById('messagesGrid');
+            if (!grid) return;
+
+            if (messages.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Belum ada pesan yang tersimpan. Jadilah yang pertama mengirim pesan!</div>';
+                return;
+            }
+
+            grid.innerHTML = messages.map(m => {
+                const hasImage = m.photo_url || m.image_url;
+                const imgSrc = m.photo_url || m.image_url;
+                const hasSong = m.song_title || m.song_name;
+                const songTitle = m.song_title || m.song_name || '';
+                const songArtist = m.song_artist || m.artist || '';
+                const songCover = m.song_cover || m.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
+                const songPreview = m.song_preview || m.preview_url || '';
+
+                return `
+                    <div class="message-card">
+                        <div>
+                            <div class="card-header-row">
+                                <div>
+                                    <h3 class="card-to">Untuk ${escapeHtml(m.recipient || 'Seseorang')}</h3>
+                                    <div class="card-from">Dari: ${escapeHtml(m.sender || 'Anonim')}</div>
+                                </div>
+                                <span class="card-date">${formatDate(m.created_at)}</span>
+                            </div>
+
+                            ${hasImage ? `
+                                <div class="card-image-wrap" onclick="openFullScreenMessage(${m.id})">
+                                    <img src="${imgSrc}" alt="Photo">
+                                </div>
+                            ` : ''}
+
+                            <p class="card-body-text">${escapeHtml(m.message || '')}</p>
+                        </div>
+
+                        ${hasSong ? `
+                            <div class="player-bar">
+                                <img src="${songCover}" class="player-cover" alt="Cover">
+                                <div class="player-meta">
+                                    <div class="player-title">${escapeHtml(songTitle)}</div>
+                                    <div class="player-artist">${escapeHtml(songArtist)}</div>
+                                </div>
+                                <button class="btn-play-icon" onclick="toggleAudioPlayback('${songPreview}', this)">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterMessages() {
+            const query = document.getElementById('messagesFilterInput').value.toLowerCase();
+            const filtered = allMessages.filter(m => {
+                const rec = (m.recipient || '').toLowerCase();
+                const snd = (m.sender || '').toLowerCase();
+                const msg = (m.message || '').toLowerCase();
+                const sng = (m.song_title || m.song_name || '').toLowerCase();
+                return rec.includes(query) || snd.includes(query) || msg.includes(query) || sng.includes(query);
+            });
+            renderMessages(filtered);
+        }
+
+        function openFullScreenMessage(id) {
+            const m = allMessages.find(item => item.id == id);
+            if (!m) return;
+
+            const modalContent = document.getElementById('modalContent');
+            const hasImage = m.photo_url || m.image_url;
+            const imgSrc = m.photo_url || m.image_url;
+
+            modalContent.innerHTML = `
+                <div style="margin-bottom:1rem;">
+                    <span style="font-family:var(--font-heading); font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent-green);">Untuk:</span>
+                    <h2 style="font-family:var(--font-serif); font-size:1.8rem; margin:0.2rem 0;">${escapeHtml(m.recipient || 'Seseorang')}</h2>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">Dari: ${escapeHtml(m.sender || 'Anonim')} — ${formatDate(m.created_at)}</p>
+                </div>
+                ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:cover; border-radius:12px; margin-bottom:1.2rem;">` : ''}
+                <p style="font-size:1rem; line-height:1.7; color:#e0e0ec; margin-bottom:1.5rem;">${escapeHtml(m.message || '')}</p>
+                ${(m.song_title || m.song_name) ? `
+                    <div class="player-bar">
+                        <img src="${m.song_cover || m.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" class="player-cover">
+                        <div class="player-meta">
+                            <div class="player-title">${escapeHtml(m.song_title || m.song_name)}</div>
+                            <div class="player-artist">${escapeHtml(m.song_artist || m.artist || '')}</div>
+                        </div>
+                        <button class="btn-play-icon" onclick="toggleAudioPlayback('${m.song_preview || m.preview_url || ''}', this)">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('messageModal').style.display = 'flex';
+        }
+
+        function closeFullScreenMessage() {
+            document.getElementById('messageModal').style.display = 'none';
+        }
+
+        // Helpers
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch(e) {
+                return dateStr;
+            }
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if (type === 'error') {
+                toast.style.borderColor = '#ff5555';
+                toast.style.borderLeftColor = '#ff5555';
+            }
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMessages();
         });
     </script>
 </body>
