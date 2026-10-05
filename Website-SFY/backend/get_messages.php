@@ -34,6 +34,7 @@ try {
                 m.lyric_excerpt,
                 m.lyric_section,
                 m.clip_start,
+                m.clip_end,
                 m.images,
                 m.slug,
                 m.created_at,
@@ -60,6 +61,7 @@ try {
                 m.lyric_excerpt,
                 m.lyric_section,
                 m.clip_start,
+                m.clip_end,
                 m.images,
                 m.slug,
                 m.created_at,
@@ -105,6 +107,7 @@ try {
             'lyricExcerpt'   => $row['lyric_excerpt'] ?? '',
             'lyricSection'   => $row['lyric_section'] ?? '',
             'clipStart'      => (int)($row['clip_start'] ?? 0),
+            'clipEnd'        => isset($row['clip_end']) ? (int)$row['clip_end'] : null,
             'images'         => $img,
             'slug'           => $row['slug'],
             'timestamp'      => strtotime($row['created_at']) * 1000
