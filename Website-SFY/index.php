@@ -937,16 +937,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .section-desc { font-size: 0.86rem; }
             .carousel-container { overflow-x: auto; margin-right: -2rem; padding-right: 2rem; scrollbar-width: none; scroll-snap-type: x mandatory; touch-action: pan-x; }
             .carousel-container::-webkit-scrollbar { display: none; }
-            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 180px); grid-auto-columns: 165px; gap: 0.7rem; width: max-content; padding: 0 0 0.35rem; }
-            .carousel-item { width: 165px; min-height: 0; height: 180px; scroll-snap-align: start; }
+            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 150px); grid-auto-columns: 128px; gap: 0.65rem; width: max-content; padding: 0 0 0.35rem; }
+            .carousel-item { width: 128px; min-height: 0; height: 150px; scroll-snap-align: start; border-radius: 12px; }
             .carousel-item.no-photo { min-height: 0; }
-            .item-body { padding: 0.8rem 0.85rem; }
-            .item-to { font-size: 0.9rem; margin-bottom: 0.35rem; }
-            .item-text { font-size: 1.02rem; line-height: 1.05; -webkit-line-clamp: 2; }
-            .carousel-item.has-photo .item-media { height: 64px; aspect-ratio: auto; flex-shrink: 0; }
-            .carousel-item.has-photo .item-body { padding-top: 0.6rem; }
+            .item-body { padding: 0.65rem 0.7rem; }
+            .item-to { font-size: 0.78rem; margin-bottom: 0.25rem; }
+            .item-text { font-size: 0.88rem; line-height: 1.03; -webkit-line-clamp: 2; }
+            .carousel-item.has-photo .item-media { height: 48px; aspect-ratio: auto; flex-shrink: 0; }
+            .carousel-item.has-photo .item-body { padding-top: 0.45rem; }
             .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
-            .item-song-pill { font-size: 0.65rem; padding-top: 0.5rem; margin-top: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .item-song-pill { font-size: 0.57rem; padding-top: 0.4rem; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { height: 220px; }
             .card-message { font-size: 1.06rem; }
