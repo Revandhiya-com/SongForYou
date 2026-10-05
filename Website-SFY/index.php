@@ -919,13 +919,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
 
         @media (max-width: 600px) {
-            .app-container { padding: 0 1.45rem; }
+            .app-container { padding-left: max(2rem, env(safe-area-inset-left)); padding-right: max(2rem, env(safe-area-inset-right)); }
             header.navbar { padding: 1.15rem 0 1rem; }
             .brand-logo { font-size: 1rem; }
             .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
             .hero-section { padding: 2.6rem 0 2.5rem; text-align: center; }
             .hero-section::before { height: 19rem; top: 0.5rem; }
-            .hero-title { font-size: 2rem; line-height: 0.98; letter-spacing: -0.075em; margin-bottom: 1.45rem; }
+            .hero-title { max-width: 300px; font-size: 2rem; line-height: 0.98; letter-spacing: -0.075em; margin: 0 auto 1.45rem; }
             .hero-actions { justify-content: center; }
             .hero-actions .btn-main { width: auto; min-width: 0; justify-content: center; padding: 0.82rem 1.05rem; }
             .btn-subtle { width: auto; justify-content: center; }
@@ -935,14 +935,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .section-title { font-size: 1.45rem; line-height: 1; }
             .section-tagline { font-size: 0.62rem; margin-bottom: 0.3rem; }
             .section-desc { font-size: 0.86rem; }
-            .carousel-container { overflow-x: auto; margin-right: -1.45rem; padding-right: 1.45rem; scrollbar-width: none; }
+            .carousel-container { overflow-x: auto; margin-right: -2rem; padding-right: 2rem; scrollbar-width: none; scroll-snap-type: x mandatory; touch-action: pan-x; }
             .carousel-container::-webkit-scrollbar { display: none; }
-            .carousel-flex { display: flex; gap: 0.8rem; padding: 0 0 0.35rem; scroll-snap-type: x mandatory; }
-            .carousel-item { flex: 0 0 min(76vw, 300px); min-height: 0; scroll-snap-align: start; }
-            .carousel-item.no-photo { min-height: 205px; }
+            .carousel-flex { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, 215px); grid-auto-columns: min(69vw, 270px); gap: 0.8rem; width: max-content; padding: 0 0 0.35rem; }
+            .carousel-item { width: auto; min-height: 0; height: 215px; scroll-snap-align: start; }
+            .carousel-item.no-photo { min-height: 0; }
             .item-body { padding: 1rem 1.1rem 1.05rem; }
-            .item-text { font-size: 1.28rem; line-height: 1.12; -webkit-line-clamp: 2; }
-            .item-media { aspect-ratio: 16 / 8; }
+            .item-text { font-size: 1.18rem; line-height: 1.08; -webkit-line-clamp: 2; }
+            .carousel-item.has-photo .item-media { height: 94px; aspect-ratio: auto; flex-shrink: 0; }
+            .carousel-item.has-photo .item-body { padding-top: 0.75rem; }
+            .carousel-item.has-photo .item-to { margin-bottom: 0.35rem; }
             .item-song-pill { padding-top: 0.65rem; margin-top: 0.75rem; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { height: 220px; }
