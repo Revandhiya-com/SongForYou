@@ -1379,7 +1379,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             coverUrl: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '300x300bb') : '',
                             spotifyUrl: item.trackViewUrl || '',
                             previewUrl: item.previewUrl || '',
-                            meaning: `Lagu "${item.trackName}" oleh ${item.artistName} mengalunkan perasaan mendalam dan makna cerita yang menyentuh.`
+                            meaning: ''
                         }));
                     }
                 }

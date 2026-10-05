@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once __DIR__ . '/koneksi.php';
+require_once __DIR__ . '/song_meaning_helper.php';
 
 $search = isset($_GET['search']) ? trim(strtolower($_GET['search'])) : '';
 
@@ -98,7 +99,9 @@ try {
             'songTitle'      => $row['song_title'],
             'songArtist'     => $row['song_artist'],
             'songCover'      => $row['song_cover'],
-            'songMeaning'    => $row['song_meaning'],
+            // Gunakan katalog makna terbaru saat membaca pesan lama sehingga teks
+            // template yang pernah tersimpan tidak lagi tampil di kartu pesan.
+            'songMeaning'    => getSongMeaning($row['song_title'] ?? '', $row['song_artist'] ?? ''),
             'songSpotifyUrl' => $row['song_spotify_url'],
             'previewUrl'     => $pUrl,
             'message'        => $row['message'],

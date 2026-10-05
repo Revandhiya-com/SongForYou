@@ -8,6 +8,7 @@ function getSongMeaning($title, $artist) {
     $titleClean = strtolower(trim($title));
     $artistClean = strtolower(trim($artist));
     $fullClean = $titleClean . ' ' . $artistClean;
+    $titleKey = trim(preg_replace('/\s+/', ' ', preg_replace('/[^a-z0-9]+/i', ' ', $titleClean)));
 
     // ─── 1. Kamus Makna Lagu Spesifik (Akurat & Puitis) ───────────
     $dictionary = [
@@ -110,15 +111,22 @@ function getSongMeaning($title, $artist) {
         'lover' => 'Perayaan romantisme abadi dan keinginan untuk menghabiskan seluruh sisa musim dan hidup bersama.',
         'all too well' => 'Nostalgia dan detail ingatan yang sangat tajam tentang kisah cinta masa lalu yang indah namun membekaskan luka.',
         'cruel summer' => 'Dinamika cinta musim panas yang intens, rahasia, penuh tekanan emosi namun tak tertahankan.',
-        'die for you' => 'Komitmen dan pengorbanan cinta tanpa batas di mana keselamatan dan kebahagiaan pasangan berada di atas segalanya.'
+        'die for you' => 'Komitmen dan pengorbanan cinta tanpa batas di mana keselamatan dan kebahagiaan pasangan berada di atas segalanya.',
+        'panasea' => 'Lagu ini memaknai cinta sebagai panasea—obat yang menguatkan. Janji untuk tidak berubah, melintasi ruang dan waktu, hingga tekad bahwa rintangan tidak membuatnya menyerah menggambarkan kesetiaan yang tetap bergerak maju meski terpisah.'
     ];
 
-    // Cek match langsung dari kamus
+    // Cek judul secara utuh agar satu kata pendek tidak mengambil makna lagu lain.
+    uksort($dictionary, fn($a, $b) => strlen($b) <=> strlen($a));
     foreach ($dictionary as $key => $meaning) {
-        if (strpos($fullClean, $key) !== false || strpos($key, $titleClean) !== false) {
+        $keyClean = trim(preg_replace('/\s+/', ' ', preg_replace('/[^a-z0-9]+/i', ' ', $key)));
+        if ($titleKey === $keyClean) {
             return $meaning;
         }
     }
+
+    // Jangan menebak makna dari satu-dua kata pada judul. Jika belum dikurasi,
+    // tampilkan status yang jujur daripada deskripsi cinta/sedih yang generik.
+    return 'Makna spesifik untuk "' . $title . '" oleh ' . $artist . ' belum tersedia di katalog terverifikasi. Sistem tidak akan menggantinya dengan makna umum yang berisiko keliru.';
 
     // ─── 2. Deteksi Kata Kunci Kesedihan / Perpisahan ───────────────
     if (preg_match('/(tak bahagia|bukan|usai|lepas|mati rasa|simpan|sedih|sad|cry|tears|pergi|hilang|leave|lonely|sepi|luka|break|sorry|maaf|ditinggal|patah|kecewa|ending|akhir|gagal|hampa|berpisah|lupa|forget|hurt|die|ghost|pain|alone|goodbye|pamit)/i', $fullClean)) {
@@ -141,6 +149,5 @@ function getSongMeaning($title, $artist) {
     }
 
     // ─── 6. Generator Puitis Kontekstual Berdasarkan Judul & Penyanyi ─
-    return 'Karya "' . $title . '" oleh ' . $artist . ' melukiskan perasaan mendalam tentang bisikan emosi, harapan tersirat, serta ikatan jiwa yang terukir indah dalam tiap alunan nadanya.';
+    return 'Makna spesifik untuk "' . $title . '" oleh ' . $artist . ' belum tersedia di katalog terverifikasi. Sistem tidak akan menggantinya dengan makna umum yang berisiko keliru.';
 }
-

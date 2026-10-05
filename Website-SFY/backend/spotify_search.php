@@ -189,6 +189,7 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
                             title = :title, 
                             artist = :artist, 
                             cover_url = COALESCE(NULLIF(:cover, ''), cover_url), 
+                            meaning = :meaning,
                             spotify_url = COALESCE(NULLIF(:surl, ''), spotify_url), 
                             preview_url = COALESCE(NULLIF(:purl, ''), preview_url)
                          WHERE spotify_id = :id"
@@ -197,6 +198,7 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
                         ':title'  => $titleName,
                         ':artist' => $artistName,
                         ':cover'  => $cover,
+                        ':meaning'=> $meaning,
                         ':surl'   => $spotifyUrl,
                         ':purl'   => $previewUrl ?? '',
                         ':id'     => $spotifyId,

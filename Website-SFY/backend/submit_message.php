@@ -93,9 +93,9 @@ try {
     $s_artist      = isset($songDetails['artist'])     ? trim($songDetails['artist'])     : 'Spotify Artist';
     $s_cover       = isset($songDetails['coverUrl'])   ? trim($songDetails['coverUrl'])   : '';
     $s_spotify_url = isset($songDetails['spotifyUrl']) ? trim($songDetails['spotifyUrl']) : ('https://open.spotify.com/track/' . $songKey);
-    $s_meaning     = (!empty($songDetails['meaning']) && strpos($songDetails['meaning'], 'mewakili perasaan mendalam') === false)
-        ? trim($songDetails['meaning'])
-        : getSongMeaning($s_title, $s_artist);
+    // Makna selalu dibuat di server dari judul dan artis. Jangan memakai teks generik
+    // yang dikirim browser atau dari hasil pencarian pihak ketiga.
+    $s_meaning     = getSongMeaning($s_title, $s_artist);
     $s_preview_url = isset($songDetails['previewUrl']) ? trim($songDetails['previewUrl']) : null;
     if (empty($s_preview_url)) {
         $cleanTitle = trim(preg_replace('/\s*[\(\[\-].*$/', '', $s_title));
@@ -131,6 +131,7 @@ try {
                 title = :title,
                 artist = :artist,
                 cover_url = COALESCE(NULLIF(:cover, ''), cover_url),
+                meaning = :meaning,
                 spotify_url = COALESCE(NULLIF(:surl, ''), spotify_url),
                 preview_url = COALESCE(NULLIF(:purl, ''), preview_url)
              WHERE id = :id"
@@ -139,6 +140,7 @@ try {
             ':title'  => $s_title,
             ':artist' => $s_artist,
             ':cover'  => $s_cover,
+            ':meaning'=> $s_meaning,
             ':surl'   => $s_spotify_url,
             ':purl'   => $s_preview_url ?? '',
             ':id'     => $songId,
