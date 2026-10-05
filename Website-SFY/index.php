@@ -416,21 +416,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             gap: 0.4rem;
             font-weight: 500;
         }
-        .item-meaning {
-            margin-top: 0.85rem;
-            color: var(--text-body);
-            font-size: 0.8rem;
-            line-height: 1.45;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .item-meaning-label {
-            color: var(--accent-sage);
-            font-weight: 600;
-        }
-
         /* FORM SECTION */
         .form-card {
             background: var(--bg-surface);
@@ -749,7 +734,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             gap: 0.4rem;
         }
         .meaning-txt {
-            font-size: 0.82rem;
+            /* Makna hanya muncul di detail pesan dan selalu lebih kecil dari pesannya. */
+            font-size: clamp(0.82rem, 1.8vw, 1rem);
             color: var(--text-body);
             line-height: 1.5;
             font-style: italic;
@@ -1065,7 +1051,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
             .item-song-pill { font-size: 0.57rem; padding-top: 0.4rem; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .item-text { font-size: 0.72rem; -webkit-line-clamp: 1; }
-            .item-meaning { margin-top: 0.3rem; font-size: 0.62rem; line-height: 1.3; -webkit-line-clamp: 2; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { aspect-ratio: 16 / 9; }
             .card-message { font-size: 1.18rem; line-height: 1.68; }
@@ -1675,7 +1660,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             track.innerHTML = featured.map(m => {
                 const hasImage = m.images || m.photo_url || m.image_url;
-                const meaning = m.songMeaning || m.song_meaning || '';
                 return `
                 <div class="carousel-item ${hasImage ? 'has-photo' : 'no-photo'}" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
                     ${hasImage ? `<div class="item-media"><img src="${getAppUrl(m.images || m.photo_url || m.image_url)}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>` : ''}
@@ -1684,7 +1668,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
                         <h4 class="item-to">${escapeHtml(m.receiver || 'Seseorang')}</h4>
                         <p class="item-text">"${escapeHtml(m.message || '')}"</p>
-                        ${meaning ? `<p class="item-meaning"><span class="item-meaning-label">Makna lagu:</span> ${escapeHtml(meaning)}</p>` : ''}
                       </div>
                     <div class="item-song-pill">
                         <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}
@@ -1715,7 +1698,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const songCover = m.songCover || m.song_cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
                 const previewUrl = m.previewUrl || m.song_preview_url || '';
                 const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
-                const meaning = m.songMeaning || '';
                 const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
                 const lyricSection = m.lyricSection || m.lyric_section || '';
 
@@ -1736,12 +1718,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             <p class="card-message">${escapeHtml(m.message || '')}</p>
                             ${lyricExcerpt ? `<blockquote class="lyric-quote"><span class="lyric-quote-label">${escapeHtml(lyricSection || 'Cuplikan lirik')}</span>${escapeHtml(lyricExcerpt)}</blockquote>` : ''}
 
-                            ${meaning ? `
-                                <div class="meaning-box">
-                                    <div class="meaning-lbl"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
-                                    <p class="meaning-txt">${escapeHtml(meaning)}</p>
-                                </div>
-                            ` : ''}
                         </div>
 
                         <div class="audio-bar">
