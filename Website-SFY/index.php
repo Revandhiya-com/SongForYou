@@ -1636,7 +1636,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         async function fetchMessages() {
             try {
-                const res = await fetch(getApiUrl('get_messages.php'));
+                const res = await fetch(getApiUrl('get_messages.php'), { cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     allMessages = Array.isArray(data) ? data : (data.messages || []);

@@ -10,6 +10,9 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -91,52 +94,13 @@ try {
             $pUrl = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/77/59/2b77594c-8cc6-c252-9f90-d4be3af9d30d/mzaf_11665507368448228605.plus.aac.p.m4a';
         }
 
-        $storedMeaning = trim((string)($row['song_meaning'] ?? ''));
         $title = $row['song_title'] ?? '';
         $artist = $row['song_artist'] ?? '';
         $catalogMeaning = getSongMeaning($title, $artist, false, $row['song_key'] ?? '');
-        $isLegacyCopy = preg_match(
-            '/^Lagu ini menggambarkan rasa takut akan kehilangan orang tersayang.*hati merasa kesepian\.$/u',
-            $storedMeaning
-        ) && $catalogMeaning === '';
-        $needsRefresh = !hasUsableSongMeaning($storedMeaning) || $isLegacyCopy;
-        $meaning = $catalogMeaning !== '' ? $catalogMeaning : $storedMeaning;
-
-        // Pesan lama yang masih memakai template diperbarui saat dibaca. Makna
-        // yang lolos verifikasi juga disimpan kembali agar request berikutnya
-        // tidak perlu menghitung ulang.
-        if ($needsRefresh) {
-            $refreshedMeaning = getSongMeaning($title, $artist, true, $row['song_key'] ?? '');
-            $meaning = $refreshedMeaning;
-            if (hasUsableSongMeaning($refreshedMeaning) && !empty($row['song_key'])) {
-                try {
-                    $stmtMeaning = $conn->prepare('UPDATE songs SET meaning = :meaning WHERE spotify_id = :spotify_id');
-                    $stmtMeaning->execute([
-                        ':meaning' => $refreshedMeaning,
-                        ':spotify_id' => $row['song_key'],
-                    ]);
-                } catch (Throwable $ignored) {
-                    // Pesan tetap dapat ditampilkan meski sinkronisasi gagal.
-                }
-            }
-        } elseif ($catalogMeaning !== '' && $catalogMeaning !== $storedMeaning && !empty($row['song_key'])) {
-            // Perbaiki data lama yang sudah terlanjur berisi makna umum.
-            try {
-                $stmtMeaning = $conn->prepare('UPDATE songs SET meaning = :meaning WHERE spotify_id = :spotify_id');
-                $stmtMeaning->execute([
-                    ':meaning' => $catalogMeaning,
-                    ':spotify_id' => $row['song_key'],
-                ]);
-            } catch (Throwable $ignored) {
-                // Pesan tetap dapat ditampilkan meski sinkronisasi gagal.
-            }
-        }
-
-        // Jangan menampilkan teks template atau hasil yang belum benar-benar
-        // spesifik. Makna akan muncul setelah entri tersebut dikurasi.
-        if (!hasUsableSongMeaning($meaning)) {
-            $meaning = '';
-        }
+        // Jangan memakai nilai lama dari database sebagai fallback, karena
+        // sebagian besar berisi template. Hanya katalog yang telah cocok
+        // dengan judul dan artis yang boleh tampil di pesan.
+        $meaning = hasUsableSongMeaning($catalogMeaning) ? $catalogMeaning : '';
 
         $messages[] = [
             'id'             => (int)$row['id'],
