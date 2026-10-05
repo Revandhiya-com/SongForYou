@@ -92,12 +92,34 @@ try {
         }
 
         $storedMeaning = trim((string)($row['song_meaning'] ?? ''));
-        $isOldTemplate = $storedMeaning === '' ||
-            str_starts_with($storedMeaning, 'Karya "') ||
-            str_contains($storedMeaning, 'melukiskan perasaan mendalam tentang bisikan emosi');
-        $meaning = $isOldTemplate
-            ? getSongMeaning($row['song_title'] ?? '', $row['song_artist'] ?? '')
-            : $storedMeaning;
+        $title = $row['song_title'] ?? '';
+        $artist = $row['song_artist'] ?? '';
+        $catalogMeaning = getSongMeaning($title, $artist, false);
+        $isLegacyCopy = preg_match(
+            '/^Lagu ini menggambarkan rasa takut akan kehilangan orang tersayang.*hati merasa kesepian\.$/u',
+            $storedMeaning
+        ) && $catalogMeaning === '';
+        $needsRefresh = !hasUsableSongMeaning($storedMeaning) || $isLegacyCopy;
+        $meaning = $storedMeaning;
+
+        // Pesan lama yang masih memakai template diperbarui saat dibaca. Makna
+        // yang lolos verifikasi juga disimpan kembali agar request berikutnya
+        // tidak perlu menghitung ulang.
+        if ($needsRefresh) {
+            $refreshedMeaning = getSongMeaning($title, $artist, true);
+            $meaning = $refreshedMeaning;
+            if (hasUsableSongMeaning($refreshedMeaning) && !empty($row['song_key'])) {
+                try {
+                    $stmtMeaning = $conn->prepare('UPDATE songs SET meaning = :meaning WHERE spotify_id = :spotify_id');
+                    $stmtMeaning->execute([
+                        ':meaning' => $refreshedMeaning,
+                        ':spotify_id' => $row['song_key'],
+                    ]);
+                } catch (Throwable $ignored) {
+                    // Pesan tetap dapat ditampilkan meski sinkronisasi gagal.
+                }
+            }
+        }
 
         $messages[] = [
             'id'             => (int)$row['id'],

@@ -416,6 +416,20 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             gap: 0.4rem;
             font-weight: 500;
         }
+        .item-meaning {
+            margin-top: 0.85rem;
+            color: var(--text-body);
+            font-size: 0.8rem;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .item-meaning-label {
+            color: var(--accent-sage);
+            font-weight: 600;
+        }
 
         /* FORM SECTION */
         .form-card {
@@ -1050,6 +1064,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .carousel-item.has-photo .item-body { padding-top: 0.45rem; }
             .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
             .item-song-pill { font-size: 0.57rem; padding-top: 0.4rem; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .item-text { font-size: 0.72rem; -webkit-line-clamp: 1; }
+            .item-meaning { margin-top: 0.3rem; font-size: 0.62rem; line-height: 1.3; -webkit-line-clamp: 2; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { aspect-ratio: 16 / 9; }
             .card-message { font-size: 1.18rem; line-height: 1.68; }
@@ -1659,6 +1675,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             track.innerHTML = featured.map(m => {
                 const hasImage = m.images || m.photo_url || m.image_url;
+                const meaning = m.songMeaning || m.song_meaning || '';
                 return `
                 <div class="carousel-item ${hasImage ? 'has-photo' : 'no-photo'}" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
                     ${hasImage ? `<div class="item-media"><img src="${getAppUrl(m.images || m.photo_url || m.image_url)}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>` : ''}
@@ -1667,6 +1684,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
                         <h4 class="item-to">${escapeHtml(m.receiver || 'Seseorang')}</h4>
                         <p class="item-text">"${escapeHtml(m.message || '')}"</p>
+                        ${meaning ? `<p class="item-meaning"><span class="item-meaning-label">Makna lagu:</span> ${escapeHtml(meaning)}</p>` : ''}
                       </div>
                     <div class="item-song-pill">
                         <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}

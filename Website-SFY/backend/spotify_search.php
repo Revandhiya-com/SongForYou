@@ -179,50 +179,10 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
         // Pencarian harus responsif; lirik lengkap diambil saat lagu benar-benar dipilih/disimpan.
         $meaning = getSongMeaning($titleName, $artistName, false);
 
-        if (isset($conn) && $conn) {
-            $spotifyId = $item['id'];
-            try {
-                $stmtCheck = $conn->prepare("SELECT id FROM songs WHERE spotify_id = :id LIMIT 1");
-                $stmtCheck->execute([':id' => $spotifyId]);
-                if ($stmtCheck->fetch()) {
-                    $stmtSync = $conn->prepare(
-                        "UPDATE songs SET 
-                            title = :title, 
-                            artist = :artist, 
-                            cover_url = COALESCE(NULLIF(:cover, ''), cover_url), 
-                            meaning = :meaning,
-                            spotify_url = COALESCE(NULLIF(:surl, ''), spotify_url), 
-                            preview_url = COALESCE(NULLIF(:purl, ''), preview_url)
-                         WHERE spotify_id = :id"
-                    );
-                    $stmtSync->execute([
-                        ':title'  => $titleName,
-                        ':artist' => $artistName,
-                        ':cover'  => $cover,
-                        ':meaning'=> $meaning,
-                        ':surl'   => $spotifyUrl,
-                        ':purl'   => $previewUrl ?? '',
-                        ':id'     => $spotifyId,
-                    ]);
-                } else {
-                    $stmtSync = $conn->prepare(
-                        "INSERT INTO songs (spotify_id, title, artist, cover_url, meaning, spotify_url, preview_url)
-                         VALUES (:spotify_id, :title, :artist, :cover_url, :meaning, :spotify_url, :preview_url)"
-                    );
-                    $stmtSync->execute([
-                        ':spotify_id'  => $spotifyId,
-                        ':title'       => $titleName,
-                        ':artist'      => $artistName,
-                        ':cover_url'   => $cover,
-                        ':meaning'     => $meaning,
-                        ':spotify_url' => $spotifyUrl,
-                        ':preview_url' => $previewUrl,
-                    ]);
-                }
-            } catch (Exception $eSync) {
-                // Ignore sync error if DB is unreachable
-            }
-        }
+        // Hasil pencarian tidak lagi langsung menjadi data database. Sebelumnya
+        // setiap ketikan dapat membuat atau menimpa makna dengan placeholder
+        // (atau makna lagu lain yang judulnya sama). Lagu hanya di-upsert di
+        // submit_message.php setelah pengguna benar-benar memilihnya.
 
         $tracks[] = [
             'spotifyId'  => $item['id'],

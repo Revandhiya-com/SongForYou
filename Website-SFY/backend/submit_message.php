@@ -274,6 +274,13 @@ try {
         'message'   => 'Pesan berhasil dikirim!',
         'id'        => $newId,
         'slug'      => $slug,
+        'songMeaning' => $s_meaning,
+        'song' => [
+            'key' => $songKey,
+            'title' => $s_title,
+            'artist' => $s_artist,
+            'meaning' => $s_meaning,
+        ],
         'images'    => $imagesVal,
         'timestamp' => time() * 1000
     ]);

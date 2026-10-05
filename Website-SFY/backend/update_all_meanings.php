@@ -13,13 +13,26 @@ try {
     $res = $conn->query("SELECT id, title, artist, meaning FROM songs");
     $rows = $res->fetchAll();
     $updatedCount = 0;
+    $skippedCount = 0;
 
     foreach ($rows as $row) {
         $id     = (int)$row['id'];
         $title  = $row['title'];
         $artist = $row['artist'];
+        $storedMeaning = trim((string)($row['meaning'] ?? ''));
 
+        // Jangan menimpa makna yang sudah dikurasi. Batch ini hanya menangani
+        // template lama/kosong dan tidak pernah menyimpan hasil yang belum
+        // dapat diverifikasi.
+        if (hasUsableSongMeaning($storedMeaning)) {
+            $skippedCount++;
+            continue;
+        }
         $newMeaning = getSongMeaning($title, $artist);
+        if (!hasUsableSongMeaning($newMeaning)) {
+            $skippedCount++;
+            continue;
+        }
 
         $stmt = $conn->prepare("UPDATE songs SET meaning = :meaning WHERE id = :id");
         if ($stmt->execute([':meaning' => $newMeaning, ':id' => $id])) {
@@ -27,7 +40,7 @@ try {
         }
     }
 
-    echo "BERHASIL memperbarui $updatedCount lagu dengan makna lagu yang akurat dan puitis!\n";
+    echo "BERHASIL memperbarui $updatedCount makna terverifikasi. $skippedCount lagu dipertahankan karena maknanya sudah dikurasi atau belum dapat diverifikasi.\n";
 } catch (PDOException $e) {
     echo "ERROR: " . $e->getMessage() . "\n";
 }

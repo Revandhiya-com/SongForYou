@@ -26,6 +26,42 @@ function fetchLyricsForMeaning($title, $artist) {
     return $cache[$cacheKey] = ($status === 200 && !empty($payload['lyrics'])) ? $payload['lyrics'] : '';
 }
 
+/**
+ * Normalisasi dilakukan terpisah untuk judul dan artis.  Keduanya wajib
+ * dibandingkan ketika memakai katalog agar lagu lain yang kebetulan memiliki
+ * judul sama tidak mewarisi makna lagu yang salah.
+ */
+function normalizeMeaningValue($value) {
+    $value = mb_strtolower(trim((string)$value), 'UTF-8');
+    $value = str_replace(['&', '’', "`"], [' and ', "'", "'"], $value);
+    $value = preg_replace('/\s*\((?:feat\.?|featuring|with)\b[^)]*\)/iu', '', $value);
+    $value = preg_replace('~\s*[-–]\s*(?:acoustic|live|remaster(?:ed)?|radio edit|sped up|slowed|version|taylor[’\']s version)\b.*$~iu', '', $value);
+    $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value);
+    return trim(preg_replace('/\s+/u', ' ', $value));
+}
+
+function getPrimaryArtistKey($artist) {
+    $artist = mb_strtolower(trim((string)$artist), 'UTF-8');
+    $artist = preg_split('/\s*(?:,|&| feat\.? | featuring | x )\s*/iu', $artist)[0] ?? $artist;
+    return normalizeMeaningValue($artist);
+}
+
+function hasUsableSongMeaning($meaning) {
+    $meaning = trim((string)$meaning);
+    if ($meaning === '') return false;
+
+    $legacyMarkers = [
+        'melukiskan perasaan mendalam tentang bisikan emosi',
+        'sedang disiapkan dari sumber lirik lagu',
+        'makna tematiknya belum dapat diverifikasi',
+        'makna spesifik untuk'
+    ];
+    foreach ($legacyMarkers as $marker) {
+        if (mb_stripos($meaning, $marker, 0, 'UTF-8') !== false) return false;
+    }
+    return !str_starts_with($meaning, 'Karya "');
+}
+
 function buildMeaningFromLyrics($title, $artist, $lyrics) {
     $text = mb_strtolower($lyrics, 'UTF-8');
     $themes = [
@@ -33,24 +69,28 @@ function buildMeaningFromLyrics($title, $artist, $lyrics) {
         'kerinduan pada sosok yang tidak hadir' => '/\b(rindu|merindu|kenangan|bayang|jauh|jarak|miss|memory|remember|home)\b/ui',
         'kesetiaan dan keinginan untuk bertahan' => '/\b(setia|selamanya|tetap|bersama|janji|takkan|forever|always|stay|promise)\b/ui',
         'pemulihan dan keberanian untuk melangkah' => '/\b(sembuh|bangkit|kuat|melangkah|harapan|cahaya|heal|strong|hope|rise)\b/ui',
-        'cinta yang rapuh dan penuh keraguan' => '/\b(takut|ragu|salah|luka|kecewa|cry|afraid|hurt|sorry|pain)\b/ui'
+        'cinta yang rapuh dan penuh keraguan' => '/\b(takut|ragu|salah|luka|kecewa|cry|afraid|hurt|sorry|pain)\b/ui',
+        'hubungan yang tidak sehat atau melelahkan' => '/\b(toxic|control|manipul|bohong|lie|cheat|selingkuh|abuse|guilt|blame)\b/ui',
+        'penerimaan diri dan identitas pribadi' => '/\b(diriku|diri sendiri|aku yang baru|be myself|who i am|self love|percaya diri|beautiful)\b/ui',
+        'rasa syukur atas kehadiran seseorang' => '/\b(terima kasih|bersyukur|anugerah|thank you|grateful|blessed)\b/ui'
     ];
     $found = [];
     foreach ($themes as $theme => $pattern) {
-        if (preg_match($pattern, $text)) $found[] = $theme;
+        $count = preg_match_all($pattern, $text, $matches);
+        if ($count) $found[$theme] = $count;
     }
-    $primary = $found[0] ?? 'perjalanan emosi personal';
-    $secondary = $found[1] ?? null;
-    $meaning = '"' . $title . '" oleh ' . $artist . ' berpusat pada ' . $primary;
-    if ($secondary) $meaning .= ', dengan lapisan ' . $secondary;
-    return $meaning . '. Makna ini disusun dari tema yang muncul dalam lirik lagu, bukan dari template judul.';
+    arsort($found);
+    $themesFound = array_keys($found);
+    $primary = $themesFound[0] ?? 'perjalanan emosi personal';
+    $secondary = $themesFound[1] ?? null;
+    $meaning = '"' . $title . '" oleh ' . $artist . ' menyoroti ' . $primary;
+    if ($secondary) $meaning .= ' sekaligus ' . $secondary;
+    return $meaning . '. Ringkasan ini dibuat dari tema yang terdeteksi pada lirik lagu tersebut.';
 }
 
 function getSongMeaning($title, $artist, $lookUpLyrics = true) {
-    $titleClean = strtolower(trim($title));
-    $artistClean = strtolower(trim($artist));
-    $fullClean = $titleClean . ' ' . $artistClean;
-    $titleKey = trim(preg_replace('/\s+/', ' ', preg_replace('/[^a-z0-9]+/i', ' ', $titleClean)));
+    $titleKey = normalizeMeaningValue($title);
+    $artistKey = getPrimaryArtistKey($artist);
 
     // ─── 1. Kamus Makna Lagu Spesifik (Akurat & Puitis) ───────────
     $dictionary = [
@@ -158,11 +198,56 @@ function getSongMeaning($title, $artist, $lookUpLyrics = true) {
         'panasea' => 'Lagu ini memaknai cinta sebagai panasea—obat yang menguatkan. Janji untuk tidak berubah, melintasi ruang dan waktu, hingga tekad bahwa rintangan tidak membuatnya menyerah menggambarkan kesetiaan yang tetap bergerak maju meski terpisah.'
     ];
 
-    // Cek judul secara utuh agar satu kata pendek tidak mengambil makna lagu lain.
+    // Daftar ini sengaja memakai artis utama. Katalog lama hanya mencocokkan judul;
+    // akibatnya "Mr. Loverman" versi artis lain, "My Everything", dan judul umum
+    // lain dapat mendapat makna lagu yang salah.
+    $catalogArtists = [
+        'there is a light that never goes out' => ['the smiths'],
+        'about you' => ['the 1975'],
+        'teh hijau' => ['tulus'],
+        'my everything' => ['ariana grande'],
+        'mr loverman' => ['ricky montgomery'],
+        'blinding lights' => ['the weeknd'],
+        'perfect' => ['ed sheeran'],
+        'sorai' => ['nadin amizah'],
+        'somebody s pleasure' => ['aziz hendra'],
+        'someone like you' => ['adele'],
+        'somewhere only we know' => ['keane'],
+        'someone you loved' => ['lewis capaldi'],
+        'something just like this' => ['the chainsmokers'],
+        'monokrom' => ['tulus'], 'hati hati di jalan' => ['tulus'], 'diri' => ['tulus'],
+        'interaksi' => ['tulus'], 'labirin' => ['tulus'], 'tujuh belas' => ['tulus'],
+        'jatuh suka' => ['tulus'], 'ruang sendiri' => ['tulus'], 'pamit' => ['tulus'],
+        'gajah' => ['tulus'], 'sepatu' => ['tulus'], 'teman hidup' => ['tulus'], 'sewindu' => ['tulus'],
+        'kata mereka ini berlebihan' => ['bernadya'], 'satu bulan' => ['bernadya'],
+        'untungnya' => ['bernadya'], 'hidup harus tetap berjalan' => ['bernadya'],
+        'kini mereka tahu' => ['bernadya'], 'apa mungkin' => ['bernadya'], 'sialan' => ['bernadya'],
+        'penjaga hati' => ['nadhif basalamah'], 'kota ini tak sama tanpamu' => ['nadhif basalamah'],
+        'sial' => ['mahalini'], 'sisa rasa' => ['mahalini'], 'melawan restu' => ['mahalini'],
+        'kisah sempurna' => ['mahalini'], 'celengan rindu' => ['fiersa besari'],
+        'april' => ['fiersa besari'], 'pelukku untuk pelukmu' => ['fiersa besari'],
+        'waktu yang salah' => ['fiersa besari'], 'evaluasi' => ['hindia'], 'secukupnya' => ['hindia'],
+        'rumah ke rumah' => ['hindia'], 'cincin' => ['hindia'], 'to the bone' => ['pamungkas'],
+        'one only' => ['pamungkas'], 'i love you but i m letting go' => ['pamungkas'],
+        'diam diam' => ['misellia'], 'duka' => ['last child'], 'bernafas tanpamu' => ['last child'],
+        'dan' => ['sheila on 7'], 'sephia' => ['sheila on 7'],
+        'anugerah terindah yang pernah ku miliki' => ['sheila on 7'], 'januari' => ['glenn fredly'],
+        'sekali ini saja' => ['glenn fredly'], 'kali kedua' => ['raisa'], 'terima kasih cinta' => ['afgan'],
+        'yellow' => ['coldplay'], 'fix you' => ['coldplay'], 'the scientist' => ['coldplay'],
+        'until i found you' => ['stephen sanchez'], 'golden hour' => ['jvke'], 'glimpse of us' => ['joji'],
+        'seasons' => ['wave to earth'], 'i wanna be yours' => ['arctic monkeys'], 'creep' => ['radiohead'],
+        'lover' => ['taylor swift'], 'all too well' => ['taylor swift'], 'cruel summer' => ['taylor swift'],
+        'die for you' => ['the weeknd']
+    ];
+
+    // Cek judul dan artis secara utuh agar satu kata pendek tidak mengambil
+    // makna lagu lain yang kebetulan memiliki judul sama.
     uksort($dictionary, fn($a, $b) => strlen($b) <=> strlen($a));
     foreach ($dictionary as $key => $meaning) {
-        $keyClean = trim(preg_replace('/\s+/', ' ', preg_replace('/[^a-z0-9]+/i', ' ', $key)));
-        if ($titleKey === $keyClean) {
+        $keyClean = normalizeMeaningValue($key);
+        $artists = $catalogArtists[$keyClean] ?? [];
+        $artistMatches = array_filter($artists, fn($expected) => $artistKey === normalizeMeaningValue($expected));
+        if ($titleKey === $keyClean && !empty($artistMatches)) {
             return $meaning;
         }
     }
@@ -172,7 +257,9 @@ function getSongMeaning($title, $artist, $lookUpLyrics = true) {
         if ($lyrics !== '') return buildMeaningFromLyrics($title, $artist, $lyrics);
     }
 
-    return 'Makna "' . $title . '" oleh ' . $artist . ' sedang disiapkan dari sumber lirik lagu.';
+    if (!$lookUpLyrics) return '';
+
+    return 'Makna tematik "' . $title . '" oleh ' . $artist . ' belum dapat diverifikasi dari lirik yang tersedia.';
 
     // ─── 2. Deteksi Kata Kunci Kesedihan / Perpisahan ───────────────
     if (preg_match('/(tak bahagia|bukan|usai|lepas|mati rasa|simpan|sedih|sad|cry|tears|pergi|hilang|leave|lonely|sepi|luka|break|sorry|maaf|ditinggal|patah|kecewa|ending|akhir|gagal|hampa|berpisah|lupa|forget|hurt|die|ghost|pain|alone|goodbye|pamit)/i', $fullClean)) {
