@@ -176,7 +176,8 @@ if (isset($searchData['tracks']['items']) && count($searchData['tracks']['items'
         // Tidak lagi memanggil iTunes API per lagu (menyebabkan loading lama)
         // Preview URL langsung dari Spotify, null jika tidak tersedia
 
-        $meaning = getSongMeaning($titleName, $artistName);
+        // Pencarian harus responsif; lirik lengkap diambil saat lagu benar-benar dipilih/disimpan.
+        $meaning = getSongMeaning($titleName, $artistName, false);
 
         if (isset($conn) && $conn) {
             $spotifyId = $item['id'];
