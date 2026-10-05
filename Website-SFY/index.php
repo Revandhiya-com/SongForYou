@@ -127,6 +127,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: rgba(255,255,255,0.03);
             animation-delay: -7s;
         }
+        body {
+            position: relative;
+        }
+        .cosmic-grain {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.48;
+            background-image:
+                radial-gradient(circle at 14% 21%, rgba(255,255,255,0.72) 0 1px, transparent 1.6px),
+                radial-gradient(circle at 77% 16%, rgba(255,255,255,0.5) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 88% 68%, rgba(255,255,255,0.42) 0 1px, transparent 1.4px),
+                radial-gradient(circle at 28% 78%, rgba(255,255,255,0.35) 0 1px, transparent 1.4px);
+            background-size: 280px 260px, 340px 320px, 390px 360px, 430px 400px;
+            mask-image: linear-gradient(to bottom, #000, transparent 92%);
+        }
         @keyframes ambient-float {
             to { transform: translate3d(2rem, -1.5rem, 0) scale(1.12); }
         }
@@ -197,6 +214,20 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             border-radius: 48% 52% 42% 58% / 50% 45% 55% 50%;
             background: linear-gradient(120deg, rgba(255,255,255,0.055), rgba(255,255,255,0.005));
             box-shadow: inset 0 0 70px rgba(255,255,255,0.025);
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            width: min(42rem, 88vw);
+            aspect-ratio: 2.2;
+            left: 50%;
+            top: 5.8rem;
+            transform: translateX(-50%) rotate(-8deg);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50%;
+            box-shadow: 0 0 36px rgba(255,255,255,0.025);
+            pointer-events: none;
         }
         .hero-pill {
             display: inline-flex;
@@ -1030,6 +1061,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     </style>
 </head>
 <body>
+    <div class="cosmic-grain" aria-hidden="true"></div>
 
     <!-- NAVBAR -->
     <header class="navbar app-container">
@@ -1493,26 +1525,129 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         // Audio Player Controller
-        function getPreviewHighlightTime(audio) {
+        const previewHighlightCache = new Map();
+        let previewAnalysisContext = null;
+        const songHighlightProfiles = {
+            // Dibuat spesifik dari permintaan: cuplikan Panasea dibuka di reff,
+            // dekat "Takkan ku berubah" / "Halang takkan pernah", bukan verse awal.
+            'panasea|rumahsakit': 0.64
+        };
+
+        function normaliseSongName(value) {
+            return (value || '')
+                .toLocaleLowerCase('id-ID')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim();
+        }
+
+        function getSongHighlightProfile(title, artist) {
+            const normalisedTitle = normaliseSongName(title);
+            const normalisedArtist = normaliseSongName(artist);
+            return Object.entries(songHighlightProfiles).find(([key]) => {
+                const [expectedTitle, expectedArtist] = key.split('|');
+                return normalisedTitle === expectedTitle && normalisedArtist.includes(expectedArtist);
+            })?.[1] ?? null;
+        }
+
+        function getPreviewHighlightTime(audio, title, artist) {
             const duration = audio.duration;
+            const preferredRatio = getSongHighlightProfile(title, artist);
             return Number.isFinite(duration) && duration > 0
-                // Preview iTunes biasanya menyimpan bagian hook di dua pertiga akhir;
-                // sisakan 12 detik agar reff tidak terpotong di ujung file.
-                ? Math.max(0, Math.min(Math.round(duration * 0.62), duration - 12))
+                // Source preview hanya memuat potongan lagu. Mulai jauh dari detik awal
+                // dan sisakan 12 detik untuk bagian hook/reff yang utuh.
+                ? Math.max(0, Math.min(Math.round(duration * (preferredRatio ?? 0.62)), duration - 12))
                 : PREVIEW_HIGHLIGHT_SECONDS;
         }
 
-        function playFromHighlight(audio, btnEl) {
-            const highlightTime = getPreviewHighlightTime(audio);
+        async function findMostEnergeticPreviewMoment(audio, title, artist) {
+            const url = audio.currentSrc || audio.src;
+            if (previewHighlightCache.has(url)) return previewHighlightCache.get(url);
+
+            const fallback = getPreviewHighlightTime(audio, title, artist);
+            // Lagu yang telah diberi titik reff khusus harus konsisten di setiap perangkat.
+            if (getSongHighlightProfile(title, artist) !== null) {
+                previewHighlightCache.set(url, fallback);
+                return fallback;
+            }
+            try {
+                const response = await fetch(url, { mode: 'cors' });
+                if (!response.ok) throw new Error('Preview tidak dapat dianalisis');
+                const buffer = await response.arrayBuffer();
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) throw new Error('Web Audio tidak tersedia');
+                previewAnalysisContext ||= new AudioContextClass();
+                const decoded = await previewAnalysisContext.decodeAudioData(buffer);
+                const windowSeconds = 0.25;
+                const step = Math.max(1, Math.floor(decoded.sampleRate * windowSeconds));
+                const energies = [];
+
+                for (let frame = 0; frame < decoded.length; frame += step) {
+                    let total = 0;
+                    let samples = 0;
+                    for (let i = frame; i < Math.min(frame + step, decoded.length); i += 64) {
+                        let sample = 0;
+                        for (let channel = 0; channel < decoded.numberOfChannels; channel++) sample += decoded.getChannelData(channel)[i] || 0;
+                        total += Math.abs(sample / decoded.numberOfChannels);
+                        samples++;
+                    }
+                    energies.push(samples ? total / samples : 0);
+                }
+
+                const segmentSeconds = Math.min(12, Math.max(6, decoded.duration - 2));
+                const segmentBlocks = Math.max(1, Math.round(segmentSeconds / windowSeconds));
+                const firstBlock = Math.min(Math.round(2 / windowSeconds), Math.max(0, energies.length - segmentBlocks));
+                let strongestScore = -Infinity;
+                let strongestBlock = firstBlock;
+
+                for (let start = firstBlock; start <= energies.length - segmentBlocks; start++) {
+                    let energy = 0;
+                    let movement = 0;
+                    for (let i = start; i < start + segmentBlocks; i++) {
+                        energy += energies[i];
+                        if (i > start) movement += Math.abs(energies[i] - energies[i - 1]);
+                    }
+                    // Energi tinggi + perubahan ritme memberi prioritas ke hook/reff,
+                    // bukan intro yang tenang atau outro yang menurun.
+                    const score = energy / segmentBlocks + (movement / Math.max(1, segmentBlocks - 1)) * 0.45;
+                    if (score > strongestScore) {
+                        strongestScore = score;
+                        strongestBlock = start;
+                    }
+                }
+
+                const bestMoment = Math.max(0, Math.min(strongestBlock * windowSeconds, decoded.duration - 12));
+                previewHighlightCache.set(url, bestMoment);
+                return bestMoment;
+            } catch (error) {
+                // Sebagian CDN preview tidak memberi akses CORS untuk analisis file.
+                // Posisi hook yang aman tetap dipakai agar audio tidak kembali ke intro.
+                previewHighlightCache.set(url, fallback);
+                return fallback;
+            }
+        }
+
+        async function playFromHighlight(audio, btnEl, title, artist) {
+            if (audio._sfyPreparing) return;
+            audio._sfyPreparing = true;
+            if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            const highlightTime = await findMostEnergeticPreviewMoment(audio, title, artist);
+            if (currentAudio !== audio) {
+                audio._sfyPreparing = false;
+                return;
+            }
             const highlightEnd = Number.isFinite(audio.duration) ? Math.min(highlightTime + 12, audio.duration) : null;
             let playbackStarted = false;
 
             const beginPlayback = () => {
                 if (playbackStarted || currentAudio !== audio) return;
                 playbackStarted = true;
+                audio._sfyPreparing = false;
                 audio.play().then(() => {
                     if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
                 }).catch(() => {
+                    audio._sfyPreparing = false;
                     showToast('Gagal memutar audio preview', 'error');
                 });
             };
@@ -1546,7 +1681,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     const isFinished = currentAudio.ended ||
                         (Number.isFinite(highlightEnd) && currentAudio.currentTime >= highlightEnd - 0.25);
                     if (isFinished) {
-                        playFromHighlight(currentAudio, btnEl);
+                        playFromHighlight(currentAudio, btnEl, title, artist);
                     } else {
                         currentAudio.play();
                         if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
@@ -1571,7 +1706,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 70% durasi
             // agar melewati intro dan langsung ke bagian hook/reff.
             audio.addEventListener('loadedmetadata', function onMetadataLoaded() {
-                playFromHighlight(audio, btnEl);
+                playFromHighlight(audio, btnEl, title, artist);
             }, { once: true });
             audio.load();
 
