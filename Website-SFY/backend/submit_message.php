@@ -9,6 +9,8 @@
  *               senderName    : string?,
  *               songKey       : string,
  *               message       : string,
+ *               lyricExcerpt  : string?,
+ *               lyricSection  : string?,
  *               images        : string?
  *               songDetails   : object
  *           }
@@ -48,6 +50,8 @@ $receiver    = isset($data['receiver'])    ? trim($data['receiver'])    : '';
 $senderName  = isset($data['senderName'])  ? trim($data['senderName'])  : 'Anonim';
 $songKey     = isset($data['songKey'])     ? trim($data['songKey'])     : '';
 $message     = isset($data['message'])     ? trim($data['message'])     : '';
+$lyricExcerpt = isset($data['lyricExcerpt']) ? trim($data['lyricExcerpt']) : '';
+$lyricSection = isset($data['lyricSection']) ? trim($data['lyricSection']) : '';
 $images      = isset($data['images'])      ? trim($data['images'])      : '';
 $songDetails = isset($data['songDetails']) ? $data['songDetails']       : null;
 
@@ -74,6 +78,11 @@ if (empty($message)) {
 if (strlen($message) > 5000) {
     http_response_code(422);
     echo json_encode(['success' => false, 'message' => 'Pesan terlalu panjang (maks 5000 karakter).']);
+    exit;
+}
+if (strlen($lyricExcerpt) > 280 || strlen($lyricSection) > 30) {
+    http_response_code(422);
+    echo json_encode(['success' => false, 'message' => 'Cuplikan lirik atau bagian lagu terlalu panjang.']);
     exit;
 }
 
@@ -218,8 +227,8 @@ try {
     // ─── INSERT ke tabel messages ────────────────────────────
     if (($dbDriver ?? 'mysql') === 'pgsql') {
         $stmt = $conn->prepare(
-            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
-             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :images, :slug)
              RETURNING id"
         );
         $stmt->execute([
@@ -228,6 +237,8 @@ try {
             ':recipient_name' => $receiver,
             ':sender_name'    => $senderName,
             ':message'        => $message,
+            ':lyric_excerpt'  => $lyricExcerpt,
+            ':lyric_section'  => $lyricSection,
             ':images'         => $imagesVal,
             ':slug'           => $slug,
         ]);
@@ -235,8 +246,8 @@ try {
         $newId  = $newRow ? (int)$newRow['id'] : 0;
     } else {
         $stmt = $conn->prepare(
-            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, images, slug)
-             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :images, :slug)"
+            "INSERT INTO messages (user_id, song_id, recipient_name, sender_name, message, lyric_excerpt, lyric_section, images, slug)
+             VALUES (:user_id, :song_id, :recipient_name, :sender_name, :message, :lyric_excerpt, :lyric_section, :images, :slug)"
         );
         $stmt->execute([
             ':user_id'        => $userId,
@@ -244,6 +255,8 @@ try {
             ':recipient_name' => $receiver,
             ':sender_name'    => $senderName,
             ':message'        => $message,
+            ':lyric_excerpt'  => $lyricExcerpt,
+            ':lyric_section'  => $lyricSection,
             ':images'         => $imagesVal,
             ':slug'           => $slug,
         ]);

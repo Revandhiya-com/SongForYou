@@ -536,6 +536,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .btn-clear-song:hover {
             color: #f5f5f5;
         }
+        .lyric-picker { display:none; margin-top:0.85rem; padding:1rem; border:1px solid rgba(255,255,255,0.16); border-radius:var(--radius-md); background:rgba(255,255,255,0.035); }
+        .lyric-picker.is-visible { display:block; }
+        .lyric-picker-head { display:flex; align-items:center; justify-content:space-between; gap:0.7rem; margin-bottom:0.65rem; }
+        .lyric-picker-title { color:var(--text-heading); font-size:0.84rem; font-weight:600; }
+        .lyric-counter { color:var(--text-subtle); font-size:0.72rem; }
+        .lyric-section-select { width:100%; margin-bottom:0.65rem; }
+        .lyric-textarea { min-height:88px; resize:vertical; }
+        .lyric-help { margin-top:0.55rem; color:var(--text-subtle); font-size:0.72rem; line-height:1.5; }
+        .lyric-preview { display:none; margin-top:0.7rem; padding:0.7rem 0.8rem; border-left:2px solid var(--accent-sage); color:var(--text-heading); font-family:var(--font-message); font-size:1.08rem; line-height:1.35; white-space:pre-line; }
+        .lyric-preview.is-visible { display:block; }
+        .lyric-quote { margin:0.8rem 0 0; padding:0.72rem 0.85rem; border-left:2px solid var(--accent-sage); color:var(--text-heading); font-family:var(--font-message); font-size:1.12rem; line-height:1.35; white-space:pre-line; background:rgba(255,255,255,0.035); }
+        .lyric-quote-label { display:block; margin-bottom:0.28rem; color:var(--accent-sage); font-family:var(--font-ui); font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; }
 
         /* DROPZONE */
         .upload-dropzone {
@@ -1066,6 +1078,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             </div>
                             <button type="button" class="btn-clear-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
                         </div>
+                        <div id="lyricPicker" class="lyric-picker">
+                            <div class="lyric-picker-head"><span class="lyric-picker-title"><i class="fa-solid fa-quote-left"></i> Cuplikan lirik untuk pesanmu</span><span id="lyricCounter" class="lyric-counter">0/280</span></div>
+                            <select id="lyricSectionInput" class="form-input lyric-section-select" aria-label="Bagian lagu"><option value="">Pilih bagian lagu (opsional)</option><option value="Intro">Intro</option><option value="Verse">Verse</option><option value="Pre-chorus">Pre-chorus</option><option value="Chorus">Chorus</option><option value="Bridge">Bridge</option><option value="Outro">Outro</option></select>
+                            <textarea id="lyricExcerptInput" class="form-textarea lyric-textarea" maxlength="280" placeholder="Tempel 1–2 baris lirik yang paling ingin kamu kirim…" aria-describedby="lyricHelp"></textarea>
+                            <p id="lyricHelp" class="lyric-help">Opsional. Pilih sendiri bagian liriknya; cuplikan akan tampil terpisah seperti catatan lagu.</p>
+                            <div id="lyricPreview" class="lyric-preview" aria-live="polite"></div>
+                        </div>
                     </div>
 
                     <!-- MESSAGE TEXTAREA -->
@@ -1332,10 +1351,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
             }
 
+            // Cuplikan lirik selalu melekat pada lagu yang dipilih.
+            document.getElementById('lyricExcerptInput').value = '';
+            document.getElementById('lyricSectionInput').value = '';
+            updateLyricPreview();
+
             document.getElementById('selectedBubbleImg').src = track.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
             document.getElementById('selectedBubbleTitle').innerText = track.title;
             document.getElementById('selectedBubbleArtist').innerText = track.artist;
             document.getElementById('selectedSongBubble').style.display = 'flex';
+            document.getElementById('lyricPicker').classList.add('is-visible');
 
             songInput.value = '';
             songDropdown.style.display = 'none';
@@ -1344,7 +1369,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function clearSelectedSong() {
             selectedSong = null;
             document.getElementById('selectedSongBubble').style.display = 'none';
+            document.getElementById('lyricPicker').classList.remove('is-visible');
+            document.getElementById('lyricExcerptInput').value = '';
+            document.getElementById('lyricSectionInput').value = '';
+            updateLyricPreview();
         }
+
+        function updateLyricPreview() {
+            const input = document.getElementById('lyricExcerptInput');
+            const preview = document.getElementById('lyricPreview');
+            const text = input.value.trim();
+            const section = document.getElementById('lyricSectionInput').value;
+            document.getElementById('lyricCounter').textContent = `${input.value.length}/280`;
+            preview.textContent = text ? `${section ? section + ' · ' : ''}“${text}”` : '';
+            preview.classList.toggle('is-visible', Boolean(text));
+        }
+        document.getElementById('lyricExcerptInput').addEventListener('input', updateLyricPreview);
+        document.getElementById('lyricSectionInput').addEventListener('change', updateLyricPreview);
 
         document.addEventListener('click', function(e) {
             if (songDropdown && !songInput.contains(e.target) && !songDropdown.contains(e.target)) {
@@ -1378,6 +1419,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             const receiver = document.getElementById('recipientInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
+            const lyricExcerpt = document.getElementById('lyricExcerptInput').value.trim();
+            const lyricSection = document.getElementById('lyricSectionInput').value;
 
             if (!receiver) { showToast('Harap isi nama penerima pesan.', 'error'); return; }
             if (!selectedSong) { showToast('Silakan cari dan pilih lagu terlebih dahulu.', 'error'); return; }
@@ -1392,6 +1435,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     senderName: 'Anonim',
                     songKey: selectedSong.spotifyId || selectedSong.trackId || '2IVsRhKrx8hlQBOWy4qebo',
                     message: message,
+                    lyricExcerpt: lyricExcerpt,
+                    lyricSection: lyricSection,
                     images: base64Photo,
                     songDetails: {
                         title: selectedSong.title,
@@ -1581,6 +1626,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const previewUrl = m.previewUrl || m.song_preview_url || '';
                 const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
                 const meaning = m.songMeaning || '';
+                const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
+                const lyricSection = m.lyricSection || m.lyric_section || '';
 
                 return `
                     <article class="feed-card" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})" aria-label="Buka pesan untuk ${escapeHtml(m.receiver || 'Seseorang')}">
@@ -1597,6 +1644,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             ` : ''}
 
                             <p class="card-message">${escapeHtml(m.message || '')}</p>
+                            ${lyricExcerpt ? `<blockquote class="lyric-quote"><span class="lyric-quote-label">${escapeHtml(lyricSection || 'Cuplikan lirik')}</span>${escapeHtml(lyricExcerpt)}</blockquote>` : ''}
 
                             ${meaning ? `
                                 <div class="meaning-box">
@@ -1653,6 +1701,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const previewUrl = m.previewUrl || m.song_preview_url || '';
             const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
             const meaning = m.songMeaning || '';
+            const lyricExcerpt = m.lyricExcerpt || m.lyric_excerpt || '';
+            const lyricSection = m.lyricSection || m.lyric_section || '';
 
             modalContent.innerHTML = `
                 <div style="margin-bottom:1.2rem;">
@@ -1664,6 +1714,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
 
                 <div class="modal-message">${escapeHtml(m.message || '')}</div>
+                ${lyricExcerpt ? `<blockquote class="lyric-quote"><span class="lyric-quote-label">${escapeHtml(lyricSection || 'Cuplikan lirik')}</span>${escapeHtml(lyricExcerpt)}</blockquote>` : ''}
 
                 ${meaning ? `
                     <div class="meaning-box" style="margin-bottom:1.5rem;">

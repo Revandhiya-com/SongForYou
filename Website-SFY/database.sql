@@ -44,6 +44,8 @@ CREATE TABLE `messages` (
   `recipient_name` VARCHAR(100) NOT NULL,
   `sender_name` VARCHAR(100) DEFAULT NULL,
   `message` TEXT NOT NULL,
+  `lyric_excerpt` VARCHAR(280) DEFAULT NULL,
+  `lyric_section` VARCHAR(30) DEFAULT NULL,
   `images` TEXT DEFAULT NULL,
   `slug` VARCHAR(255) NOT NULL UNIQUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
