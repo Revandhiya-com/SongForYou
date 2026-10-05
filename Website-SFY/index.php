@@ -2,7 +2,12 @@
 /*
  * /Website-SFY/index.php
  * SongForYou — Archive Your Feelings Through Music
- * Redesigned with Jesper Landberg visual aesthetic: dark mode, bold typography, smooth interactions & flawless mobile layout.
+ * Redesigned & Refined:
+ * - Removed "Dari Siapa?" (Sender) field per user request
+ * - Preserved Spotify & iTunes real-time search & official artwork
+ * - Enhanced audio playback with automatic 30s preview fallback
+ * - Structured Photo & Song Meaning display
+ * - Jesper Landberg aesthetic & full mobile zoom lock
  */
 header('Content-Type: text/html; charset=utf-8');
 
@@ -33,7 +38,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -43,7 +48,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             --bg-card-hover: #181820;
             --bg-input: #1a1a22;
             --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(255, 255, 255, 0.2);
+            --border-highlight: rgba(255, 255, 255, 0.18);
             --text-main: #f3f3f6;
             --text-muted: #8e8e9e;
             --accent-green: #1db954;
@@ -95,7 +100,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         /* CONTAINER & LAYOUT */
         .app-container {
-            max-width: 1200px;
+            max-width: 1160px;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
@@ -123,18 +128,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             color: var(--accent-green);
             font-size: 1.1rem;
         }
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
         .btn-nav {
             font-family: var(--font-heading);
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            padding: 0.6rem 1.2rem;
+            padding: 0.65rem 1.4rem;
             border-radius: 100px;
             border: 1px solid var(--border-color);
             background: rgba(255, 255, 255, 0.03);
@@ -150,7 +150,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         /* HERO SECTION */
         .hero-section {
-            padding: 4rem 0 3rem;
+            padding: 4.5rem 0 3.5rem;
             text-align: center;
             position: relative;
         }
@@ -158,7 +158,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.4rem 1rem;
+            padding: 0.4rem 1.1rem;
             border-radius: 100px;
             background: var(--accent-glow);
             border: 1px solid rgba(29, 185, 84, 0.3);
@@ -172,17 +172,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .hero-title {
             font-family: var(--font-serif);
-            font-size: clamp(2.5rem, 6vw, 4.8rem);
-            line-height: 1.1;
+            font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+            line-height: 1.12;
             font-weight: 400;
-            letter-spacing: -0.5px;
             color: var(--text-main);
             margin-bottom: 1.25rem;
         }
         .hero-title em {
             font-style: italic;
             color: var(--accent-green);
-            font-weight: 400;
         }
         .hero-desc {
             max-width: 580px;
@@ -190,7 +188,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-size: 1.05rem;
             line-height: 1.6;
             color: var(--text-muted);
-            font-weight: 400;
         }
         .hero-cta-group {
             display: flex;
@@ -205,7 +202,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            padding: 1rem 2rem;
+            padding: 1rem 2.2rem;
             border-radius: 100px;
             background: var(--text-main);
             color: var(--bg-dark);
@@ -229,7 +226,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            padding: 1rem 2rem;
+            padding: 1rem 2.2rem;
             border-radius: 100px;
             background: transparent;
             color: var(--text-main);
@@ -243,12 +240,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* STATS / PILLARS */
+        /* PILLARS GRID */
         .pillars-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.5rem;
-            margin: 3.5rem 0;
+            margin: 3rem 0 4rem;
         }
         .pillar-card {
             background: var(--bg-card);
@@ -282,7 +279,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .pillar-text {
             font-size: 0.88rem;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.55;
         }
 
         /* SECTION HEADERS */
@@ -316,7 +313,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             line-height: 1.5;
         }
 
-        /* CAROUSEL / FEATURED SECTION */
+        /* FEATURED CAROUSEL */
         .carousel-wrapper {
             position: relative;
             margin-bottom: 4rem;
@@ -345,26 +342,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             flex-direction: column;
             justify-content: space-between;
             transition: var(--transition);
+            cursor: pointer;
         }
         .carousel-card:hover {
             border-color: var(--border-highlight);
             transform: translateY(-4px);
         }
-        .card-tag {
+        .card-recipient-tag {
             font-family: var(--font-heading);
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-muted);
-
+            color: var(--accent-green);
         }
-        .card-recipient {
+        .card-recipient-name {
             font-family: var(--font-serif);
-            font-size: 1.35rem;
-            margin: 0.4rem 0 0.8rem;
+            font-size: 1.4rem;
+            margin: 0.3rem 0 0.8rem;
             color: var(--text-main);
-
         }
         .card-message-snippet {
             font-size: 0.9rem;
@@ -374,9 +370,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 1.25rem;
             font-style: italic;
-
         }
 
         /* FORM SECTION */
@@ -387,17 +381,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             padding: clamp(1.75rem, 4vw, 3.5rem);
             margin: 4rem 0;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            position: relative;
         }
         .form-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.75rem;
-        }
-        @media (min-width: 768px) {
-            .form-grid-2col {
-                grid-template-columns: 1fr 1fr;
-            }
         }
         .form-group {
             display: flex;
@@ -435,7 +423,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .form-textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 130px;
         }
 
         /* SONG SEARCH DROPDOWN */
@@ -447,20 +435,20 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             top: calc(100% + 6px);
             left: 0;
             right: 0;
-            background: #16161e;
+            background: #161620;
             border: 1px solid var(--border-highlight);
             border-radius: var(--radius-md);
-            max-height: 280px;
+            max-height: 300px;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
             display: none;
         }
         .song-option {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem 1rem;
+            gap: 0.9rem;
+            padding: 0.85rem 1.1rem;
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.04);
             transition: background 0.2s ease;
@@ -472,22 +460,38 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: rgba(255,255,255,0.08);
         }
         .song-option img {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
             object-fit: cover;
+            flex-shrink: 0;
+        }
+        .song-option-info {
+            flex: 1;
+            min-width: 0;
         }
         .song-option-info h5 {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .song-option-info p {
             font-size: 0.78rem;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .spotify-tag-badge {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            margin-left: 0.5rem;
         }
 
-        /* SELECTED SONG PREVIEW BUBBLE */
+        /* SELECTED SONG DISPLAY BOX */
         .selected-song-bubble {
             display: flex;
             align-items: center;
@@ -495,28 +499,37 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: rgba(29, 185, 84, 0.08);
             border: 1px solid rgba(29, 185, 84, 0.3);
             border-radius: var(--radius-md);
-            padding: 0.8rem 1rem;
-            margin-top: 0.5rem;
+            padding: 0.9rem 1.1rem;
+            margin-top: 0.6rem;
+            gap: 1rem;
         }
         .song-preview-meta {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.9rem;
+            min-width: 0;
         }
         .song-preview-meta img {
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
             object-fit: cover;
+            flex-shrink: 0;
         }
         .song-preview-meta h4 {
-            font-size: 0.92rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .song-preview-meta p {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .btn-remove-song {
             background: none;
@@ -526,16 +539,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-size: 1.1rem;
             padding: 0.4rem;
             transition: color 0.2s ease;
+            flex-shrink: 0;
         }
         .btn-remove-song:hover {
             color: #ff5555;
         }
 
-        /* FILE UPLOAD DROPZONE */
+        /* FILE DROPZONE */
         .file-dropzone {
             border: 2px dashed var(--border-color);
             border-radius: var(--radius-md);
-            padding: 1.5rem;
+            padding: 1.6rem;
             text-align: center;
             background: var(--bg-input);
             cursor: pointer;
@@ -556,7 +570,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             cursor: pointer;
         }
         .file-preview-thumb {
-            max-height: 140px;
+            max-height: 160px;
             border-radius: 8px;
             margin-top: 0.8rem;
             object-fit: cover;
@@ -566,17 +580,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         /* MESSAGES FEED GRID */
         .messages-search-bar {
             margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
         }
         .messages-search-input {
-            flex: 1;
+            width: 100%;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 100px;
-            padding: 0.85rem 1.5rem;
+            padding: 0.9rem 1.6rem;
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             outline: none;
             transition: var(--transition);
         }
@@ -587,7 +599,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         .messages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.75rem;
         }
         @media (max-width: 480px) {
@@ -596,6 +608,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }
         }
 
+        /* MESSAGE CARD STYLING */
         .message-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -606,7 +619,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             justify-content: space-between;
             transition: var(--transition);
             position: relative;
-            overflow: hidden;
         }
         .message-card:hover {
             border-color: var(--border-highlight);
@@ -616,23 +628,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .card-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
+            align-items: center;
+            margin-bottom: 1.1rem;
         }
         .card-to {
             font-family: var(--font-serif);
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             color: var(--text-main);
             line-height: 1.2;
-        }
-        .card-from {
-            font-family: var(--font-heading);
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-green);
-            margin-top: 0.2rem;
         }
         .card-date {
             font-size: 0.72rem;
@@ -641,7 +644,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .card-image-wrap {
             width: 100%;
-            height: 180px;
+            height: 200px;
             border-radius: var(--radius-md);
             overflow: hidden;
             margin-bottom: 1.2rem;
@@ -655,30 +658,57 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transition: transform 0.4s ease;
         }
         .card-image-wrap:hover img {
-            transform: scale(1.05);
+            transform: scale(1.04);
         }
         .card-body-text {
             font-size: 0.95rem;
             line-height: 1.65;
-            color: #d0d0dc;
-            margin-bottom: 1.4rem;
+            color: #d5d5e2;
+            margin-bottom: 1.2rem;
             word-wrap: break-word;
         }
 
-        /* CUSTOM SPOTIFY AUDIO PLAYER ROW */
-        .player-bar {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius-md);
-            padding: 0.75rem 1rem;
+        /* SONG MEANING BOX */
+        .song-meaning-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-green);
+            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .meaning-header {
+            font-family: var(--font-heading);
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+            margin-bottom: 0.3rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.4rem;
+        }
+        .meaning-text {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        /* AUDIO PLAYER BAR */
+        .player-bar {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
         }
         .player-cover {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
             object-fit: cover;
             flex-shrink: 0;
         }
@@ -687,19 +717,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             min-width: 0;
         }
         .player-title {
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.88rem;
+            font-weight: 700;
             color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .player-artist {
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
         .btn-play-icon {
             width: 38px;
@@ -712,15 +748,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            flex-shrink: 0;
             transition: transform 0.2s ease, background 0.2s ease;
         }
         .btn-play-icon:hover {
             transform: scale(1.08);
             background: #1ed760;
         }
+        .spotify-link-btn {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+        .spotify-link-btn:hover {
+            color: var(--accent-green);
+        }
 
-        /* MODAL */
+        /* MODAL OVERLAY */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -739,11 +783,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: var(--bg-card);
             border: 1px solid var(--border-highlight);
             border-radius: 24px;
-            max-width: 600px;
+            max-width: 620px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 2rem;
+            padding: 2.2rem;
             position: relative;
         }
         .btn-close-modal {
@@ -766,7 +810,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             background: rgba(255,255,255,0.25);
         }
 
-        /* TOAST NOTIFICATION */
+        /* TOAST */
         .toast-container {
             position: fixed;
             bottom: 2rem;
@@ -802,7 +846,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-size: 0.85rem;
         }
 
-        /* MOBILE ADJUSTMENTS */
+        /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
             .app-container {
                 padding: 0 1rem;
@@ -840,9 +884,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             <i class="fa-solid fa-music"></i>
             <span>SongForYou</span>
         </a>
-        <div class="nav-actions">
-            <a href="#formSection" class="btn-nav">Kirim Pesan</a>
-        </div>
+        <a href="#formSection" class="btn-nav">Kirim Pesan</a>
     </header>
 
     <!-- HERO SECTION -->
@@ -855,12 +897,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             Bisikkan Perasaanmu<br>Lewat <em>Lagu Spesial</em>
         </h1>
         <p class="hero-desc">
-            Sampaikan kata-kata yang tersimpan di hati bersama melodi favoritmu. Kirimkan pesan anonim atau pribadi untuk seseorang yang berharga.
+            Sampaikan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berharga dalam hidupmu.
         </p>
         <div class="hero-cta-group">
             <a href="#formSection" class="btn-primary">
                 <i class="fa-solid fa-paper-plane"></i>
-                Tulis Pesan Sekarang
+                Tulis Pesan Rahasia
             </a>
             <a href="#feedSection" class="btn-secondary">
                 Jelajahi Pesan
@@ -868,23 +910,23 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </section>
 
-    <!-- PILLARS / HIGHLIGHTS -->
+    <!-- PILLARS / FEATURES -->
     <div class="app-container">
         <div class="pillars-grid">
             <div class="pillar-card">
-                <div class="pillar-icon"><i class="fa-solid fa-user-secret"></i></div>
-                <h3 class="pillar-title">100% Rahasia & Anonim</h3>
-                <p class="pillar-text">Kamu bebas menyembunyikan identitasmu atau menuliskan inisial nama yang hanya kalian berdua yang paham.</p>
+                <div class="pillar-icon"><i class="fa-solid fa-heart"></i></div>
+                <h3 class="pillar-title">Pesan Untuk Sang Kekasih</h3>
+                <p class="pillar-text">Tuliskan kata-kata manis atau curahan hati yang ingin kamu sampaikan khusus untuknya.</p>
             </div>
             <div class="pillar-card">
                 <div class="pillar-icon"><i class="fa-brands fa-spotify"></i></div>
                 <h3 class="pillar-title">Integrasi Musik Spotify</h3>
-                <p class="pillar-text">Pilih lagu favorit langsung dari katalog Spotify untuk memperkuat setiap bait kata yang kamu tulis.</p>
+                <p class="pillar-text">Pilih lagu favorit lengkap dengan artwork resmi dan alunan melodinya.</p>
             </div>
             <div class="pillar-card">
-                <div class="pillar-icon"><i class="fa-solid fa-heart"></i></div>
-                <h3 class="pillar-title">Kenangan Yang Abadi</h3>
-                <p class="pillar-text">Pesan dan pilihan lagumu terarsip indah, menjadi melodi kenangan manis yang dapat diputar kapan saja.</p>
+                <div class="pillar-icon"><i class="fa-solid fa-compact-disc"></i></div>
+                <h3 class="pillar-title">Makna Lagu & Foto</h3>
+                <p class="pillar-text">Lengkapi pesanmu dengan foto kenangan indah dan penjelasan makna lagu yang menyentuh.</p>
             </div>
         </div>
     </div>
@@ -896,13 +938,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 <div class="section-tag">Pesan Terpilih</div>
                 <h2 class="section-title">Ungkapan Hati Terbaru</h2>
             </div>
-            <p class="section-desc">Momen-momen indah yang dibagikan oleh mereka yang berani mengungkapkan isi hatinya.</p>
+            <p class="section-desc">Momen-momen bermakna yang dibagikan lewat musik dan bait cerita.</p>
         </div>
         
         <div class="carousel-wrapper">
             <div class="carousel-track-container" id="carouselTrackContainer">
                 <div class="carousel-track" id="carouselTrack">
-                    <!-- Carousel items will be loaded dynamically -->
+                    <!-- Loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -916,20 +958,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <div class="section-tag">Kirim Pesan</div>
                     <h2 class="section-title">Bagikan Melodimu</h2>
                 </div>
-                <p class="section-desc">Isi formulir di bawah untuk mengirim pesan berserta lagu pilihanmu.</p>
+                <p class="section-desc">Isi formulir di bawah untuk mendedikasikan pesan dan lagu spesial.</p>
             </div>
 
             <form id="createMessageForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-grid">
-                    <div class="form-grid-2col" style="display:grid; gap:1.5rem;">
-                        <div class="form-group">
-                            <label class="form-label" for="recipientInput"><i class="fa-solid fa-user"></i> Untuk (Penerima)</label>
-                            <input type="text" id="recipientInput" name="recipient" class="form-input" placeholder="Nama atau Inisial (mis. Adinda)" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="senderInput"><i class="fa-solid fa-user-ninja"></i> Dari (Pengirim)</label>
-                            <input type="text" id="senderInput" name="sender" class="form-input" placeholder="Nama / Rahasia / Inisial" required>
-                        </div>
+                    <!-- RECIPIENT INPUT ONLY (NO "DARI SIAPA?") -->
+                    <div class="form-group">
+                        <label class="form-label" for="recipientInput"><i class="fa-solid fa-user"></i> Untuk (Nama / Inisial Penerima)</label>
+                        <input type="text" id="recipientInput" name="receiver" class="form-input" placeholder="Tuliskan nama atau inisial seseorang (mis. Adinda)" required>
                     </div>
 
                     <!-- SONG SEARCH INPUT -->
@@ -939,13 +976,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         
                         <div class="song-dropdown" id="songDropdown"></div>
                         
-                        <!-- HIDDEN METADATA INPUTS -->
-                        <input type="hidden" id="selectedSongTitle" name="song_title">
-                        <input type="hidden" id="selectedSongArtist" name="song_artist">
-                        <input type="hidden" id="selectedSongCover" name="song_cover">
-                        <input type="hidden" id="selectedSongPreview" name="song_preview">
-                        <input type="hidden" id="selectedSongKey" name="song_key">
-
                         <!-- SELECTED SONG DISPLAY -->
                         <div id="selectedSongBubble" class="selected-song-bubble" style="display:none;">
                             <div class="song-preview-meta">
@@ -959,6 +989,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         </div>
                     </div>
 
+                    <!-- MESSAGE INPUT -->
                     <div class="form-group">
                         <label class="form-label" for="messageInput"><i class="fa-solid fa-pen-nib"></i> Isi Pesan Rahasia</label>
                         <textarea id="messageInput" name="message" class="form-textarea" placeholder="Tuliskan cerita, perasaan, atau pesan hangatmu di sini..." required></textarea>
@@ -970,13 +1001,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div class="file-dropzone" onclick="document.getElementById('photoInput').click()">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem; color:var(--accent-green); margin-bottom:0.5rem;"></i>
                             <p style="font-size:0.88rem; color:var(--text-main);">Klik untuk memilih foto dari galeri HP / Komputer</p>
-                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">Format JPG, PNG, WEBP (Otomatis Dioptimalkan)</p>
-                            <input type="file" id="photoInput" name="photo" accept="image/*" onchange="handleFileSelected(event)">
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
+                            <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
                             <img id="photoPreviewThumb" class="file-preview-thumb" alt="Preview Photo">
                         </div>
                     </div>
 
-                    <button type="submit" id="btnSubmitForm" class="btn-primary" style="justify-content:center; width:100%; margin-top:1rem;">
+                    <button type="submit" id="btnSubmitForm" class="btn-primary" style="justify-content:center; width:100%; margin-top:0.5rem;">
                         <i class="fa-solid fa-paper-plane"></i>
                         Kirim Pesan Rahasia
                     </button>
@@ -992,15 +1023,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 <div class="section-tag">Arsip Pesan</div>
                 <h2 class="section-title">Semua Pesan & Melodi</h2>
             </div>
-            <p class="section-desc">Cari pesan berdasarkan nama penerima atau pengirim.</p>
+            <p class="section-desc">Cari pesan berdasarkan nama penerima atau judul lagu.</p>
         </div>
 
         <div class="messages-search-bar">
-            <input type="text" id="messagesFilterInput" class="messages-search-input" placeholder="Cari nama penerima / pengirim / lagu..." oninput="filterMessages()">
+            <input type="text" id="messagesFilterInput" class="messages-search-input" placeholder="Cari nama penerima atau lagu..." oninput="filterMessages()">
         </div>
 
         <div class="messages-grid" id="messagesGrid">
-            <!-- Dynamic Message Cards will load here -->
+            <!-- Loaded dynamically -->
         </div>
     </section>
 
@@ -1012,7 +1043,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
+    <!-- TOAST NOTIFICATIONS -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- FOOTER -->
@@ -1022,24 +1053,28 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </footer>
 
-    <!-- AUDIO PLAYER STATE & JS LOGIC -->
+    <!-- SCRIPT LOGIC -->
     <script>
-        // API Base helper
         function getApiUrl(path) {
             return `/backend/${path}`;
         }
+        function getAppUrl(path) {
+            if (!path) return '';
+            if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
+            return path.startsWith('/') ? path : '/' + path;
+        }
 
-        // Global State
         let allMessages = [];
         let currentAudio = null;
         let currentPlayBtn = null;
         let selectedSong = null;
+        let base64Photo = '';
 
         // Image compression helper (Canvas-based)
         function compressImage(file, maxWidth = 1000, quality = 0.75) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) {
-                    resolve(file);
+                    resolve('');
                     return;
                 }
                 const reader = new FileReader();
@@ -1059,36 +1094,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => {
-                            if (!blob) {
-                                resolve(file);
-                                return;
-                            }
-                            const compressedFile = new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            });
-                            resolve(compressedFile);
-                        }, 'image/jpeg', quality);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
                     };
-                    img.onerror = (err) => resolve(file);
+                    img.onerror = () => resolve('');
                 };
-                reader.onerror = (err) => resolve(file);
+                reader.onerror = () => resolve('');
             });
         }
 
-        // Handle File Selection Preview
-        function handleFileSelected(e) {
+        // Handle Photo Selection
+        async function handleFileSelected(e) {
             const file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    thumb.src = evt.target.result;
-                    thumb.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+                base64Photo = await compressImage(file, 1000, 0.75);
+                thumb.src = base64Photo;
+                thumb.style.display = 'block';
             } else {
+                base64Photo = '';
                 thumb.style.display = 'none';
             }
         }
@@ -1108,32 +1132,48 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 }
                 searchTimer = setTimeout(() => searchSongs(query), 300);
             });
+            songInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    songDropdown.style.display = 'block';
+                }
+            });
         }
 
         async function searchSongs(query) {
             try {
-                // First try Spotify search backend, fallback to iTunes Search API
                 let results = [];
+                // 1. Fetch Spotify Search Endpoint
                 try {
                     const res = await fetch(getApiUrl(`spotify_search.php?q=${encodeURIComponent(query)}`));
                     if (res.ok) {
                         const data = await res.json();
                         if (data.tracks && data.tracks.length > 0) {
-                            results = data.tracks;
+                            results = data.tracks.map(t => ({
+                                spotifyId: t.spotifyId || t.id || '',
+                                title: t.title || t.name || '',
+                                artist: t.artist || '',
+                                coverUrl: t.coverUrl || t.cover || '',
+                                spotifyUrl: t.spotifyUrl || '',
+                                previewUrl: t.previewUrl || '',
+                                meaning: t.meaning || ''
+                            }));
                         }
                     }
                 } catch(e) {}
 
+                // 2. iTunes Search API Fallback if needed
                 if (results.length === 0) {
-                    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&country=ID&media=music&entity=song&limit=8`);
+                    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&country=ID&media=music&entity=song&limit=10`);
                     if (itunesRes.ok) {
                         const itunesData = await itunesRes.json();
                         results = (itunesData.results || []).map(item => ({
-                            title: item.trackName,
-                            artist: item.artistName,
-                            cover: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '300x300bb') : '',
-                            preview: item.previewUrl || '',
-                            spotifyId: item.trackId ? String(item.trackId) : ''
+                            spotifyId: item.trackId ? String(item.trackId) : '',
+                            title: item.trackName || '',
+                            artist: item.artistName || '',
+                            coverUrl: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '300x300bb') : '',
+                            spotifyUrl: item.trackViewUrl || '',
+                            previewUrl: item.previewUrl || '',
+                            meaning: `Lagu "${item.trackName}" karya ${item.artistName} menggambarkan nuansa perasaan serta cerita cinta yang mendalam.`
                         }));
                     }
                 }
@@ -1146,17 +1186,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function renderSongDropdown(tracks) {
             if (!tracks || tracks.length === 0) {
-                songDropdown.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:0.85rem;">Tidak ada lagu ditemukan</div>';
+                songDropdown.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:0.85rem; text-align:center;">Lagu tidak ditemukan</div>';
                 songDropdown.style.display = 'block';
                 return;
             }
 
             songDropdown.innerHTML = tracks.map((t, idx) => `
                 <div class="song-option" onclick="selectSong(${idx})">
-                    <img src="${t.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" alt="Cover">
+                    <img src="${t.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" alt="Cover">
                     <div class="song-option-info">
                         <h5>${escapeHtml(t.title)}</h5>
-                        <p>${escapeHtml(t.artist)}</p>
+                        <p>${escapeHtml(t.artist)} <span class="spotify-tag-badge"><i class="fa-brands fa-spotify"></i></span></p>
                     </div>
                 </div>
             `).join('');
@@ -1165,18 +1205,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             songDropdown.style.display = 'block';
         }
 
-        function selectSong(index) {
+        async function selectSong(index) {
             const track = window._searchResults[index];
             if (!track) return;
 
             selectedSong = track;
-            document.getElementById('selectedSongTitle').value = track.title || '';
-            document.getElementById('selectedSongArtist').value = track.artist || '';
-            document.getElementById('selectedSongCover').value = track.cover || '';
-            document.getElementById('selectedSongPreview').value = track.preview || '';
-            document.getElementById('selectedSongKey').value = track.spotifyId || '';
 
-            document.getElementById('selectedBubbleImg').src = track.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
+            // Dynamically ensure previewUrl is available via iTunes if empty
+            if (!selectedSong.previewUrl && selectedSong.title && selectedSong.artist) {
+                selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
+            }
+
+            document.getElementById('selectedBubbleImg').src = track.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
             document.getElementById('selectedBubbleTitle').innerText = track.title;
             document.getElementById('selectedBubbleArtist').innerText = track.artist;
             document.getElementById('selectedSongBubble').style.display = 'flex';
@@ -1187,11 +1227,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function clearSelectedSong() {
             selectedSong = null;
-            document.getElementById('selectedSongTitle').value = '';
-            document.getElementById('selectedSongArtist').value = '';
-            document.getElementById('selectedSongCover').value = '';
-            document.getElementById('selectedSongPreview').value = '';
-            document.getElementById('selectedSongKey').value = '';
             document.getElementById('selectedSongBubble').style.display = 'none';
         }
 
@@ -1202,60 +1237,108 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }
         });
 
-        // Submit Form Handler with Compression
+        // Dynamic iTunes Audio Preview Helper
+        async function getItunesPreview(title, artist) {
+            try {
+                const cleanTitle = title.replace(/[\(\[\-].*$/, '').trim();
+                const cleanArtist = artist.split(',')[0].split('&')[0].trim();
+                const q = encodeURIComponent(`${cleanTitle} ${cleanArtist}`);
+                const res = await fetch(`https://itunes.apple.com/search?term=${q}&country=ID&media=music&entity=song&limit=5`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.results && data.results.length > 0) {
+                        for (let tr of data.results) {
+                            if (tr.previewUrl) return tr.previewUrl;
+                        }
+                    }
+                }
+            } catch(e) {}
+            return '';
+        }
+
+        // Submit Form Handler (NO "DARI SIAPA?" FIELD)
         async function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitForm');
             const originalBtnText = btn.innerHTML;
 
+            const receiver = document.getElementById('recipientInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
+
+            if (!receiver) {
+                showToast('Harap isi nama penerima pesan.', 'error');
+                return;
+            }
+            if (!selectedSong) {
+                showToast('Silakan cari dan pilih lagu terlebih dahulu.', 'error');
+                return;
+            }
+            if (!message) {
+                showToast('Harap isi pesan rahasiamu.', 'error');
+                return;
+            }
+
             try {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengompres & Mengirim...';
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Pesan...';
 
-                const form = document.getElementById('createMessageForm');
-                const formData = new FormData(form);
-
-                // Compress Photo if attached
-                const fileInput = document.getElementById('photoInput');
-                if (fileInput && fileInput.files.length > 0) {
-                    const originalFile = fileInput.files[0];
-                    const compressed = await compressImage(originalFile, 1000, 0.75);
-                    formData.set('photo', compressed);
-                }
+                const payload = {
+                    receiver: receiver,
+                    senderName: 'Anonim', // Default anonymous sender
+                    songKey: selectedSong.spotifyId || selectedSong.trackId || '2IVsRhKrx8hlQBOWy4qebo',
+                    message: message,
+                    images: base64Photo,
+                    songDetails: {
+                        title: selectedSong.title,
+                        artist: selectedSong.artist,
+                        coverUrl: selectedSong.coverUrl,
+                        spotifyUrl: selectedSong.spotifyUrl,
+                        previewUrl: selectedSong.previewUrl,
+                        meaning: selectedSong.meaning
+                    }
+                };
 
                 const res = await fetch(getApiUrl('submit_message.php'), {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await res.json();
-                if (data.status === 'success' || data.success) {
+                if (data.success) {
                     showToast('Pesan rahasiamu berhasil dikirim!');
-                    form.reset();
+                    document.getElementById('createMessageForm').reset();
                     clearSelectedSong();
+                    base64Photo = '';
                     document.getElementById('photoPreviewThumb').style.display = 'none';
                     fetchMessages();
                     document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    showToast('Gagal mengirim pesan: ' + (data.message || 'Terjadi kesalahan server'), 'error');
+                    showToast('Gagal mengirim: ' + (data.message || 'Terjadi kesalahan server'), 'error');
                 }
             } catch (err) {
                 console.error("Form submit error:", err);
-                showToast('Koneksi terganggu. Silakan coba lagi.', 'error');
+                showToast('Terjadi gangguan jaringan. Silakan coba lagi.', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnText;
             }
         }
 
-        // Audio Player Controller
-        function toggleAudioPlayback(previewUrl, btnEl) {
-            if (!previewUrl) {
-                showToast('Pratinjau audio tidak tersedia untuk lagu ini', 'error');
+        // Global Single-Audio Player Controller
+        async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
+            let urlToPlay = previewUrl;
+
+            if (!urlToPlay && title && artist) {
+                urlToPlay = await getItunesPreview(title, artist);
+            }
+
+            if (!urlToPlay) {
+                showToast('Audio preview tidak tersedia untuk lagu ini', 'error');
                 return;
             }
 
-            if (currentAudio && currentAudio.src === previewUrl) {
+            if (currentAudio && currentAudio.src === urlToPlay) {
                 if (currentAudio.paused) {
                     currentAudio.play();
                     if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
@@ -1271,7 +1354,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
             }
 
-            currentAudio = new Audio(previewUrl);
+            currentAudio = new Audio(urlToPlay);
             currentPlayBtn = btnEl;
 
             currentAudio.play().then(() => {
@@ -1306,19 +1389,19 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             const featured = messages.slice(0, 6);
             if (featured.length === 0) {
-                track.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Belum ada pesan unggulan.</div>';
+                track.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Belum ada pesan terbaru.</div>';
                 return;
             }
 
             track.innerHTML = featured.map(m => `
                 <div class="carousel-card" onclick="openFullScreenMessage(${m.id})">
                     <div>
-                        <div class="card-tag">Untuk:</div>
-                        <h4 class="card-recipient">${escapeHtml(m.recipient || 'Seseorang')}</h4>
+                        <div class="card-recipient-tag">Untuk:</div>
+                        <h4 class="card-recipient-name">${escapeHtml(m.receiver || 'Seseorang')}</h4>
                         <p class="card-message-snippet">"${escapeHtml(m.message || '')}"</p>
                     </div>
-                    <div style="font-size:0.75rem; color:var(--accent-green); font-family:var(--font-heading); font-weight:700;">
-                        — ${escapeHtml(m.sender || 'Anonim')}
+                    <div style="font-size:0.78rem; color:var(--accent-green); font-family:var(--font-heading); font-weight:700; margin-top:1rem;">
+                        <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}
                     </div>
                 </div>
             `).join('');
@@ -1334,23 +1417,21 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }
 
             grid.innerHTML = messages.map(m => {
-                const hasImage = m.photo_url || m.image_url;
-                const imgSrc = m.photo_url || m.image_url;
-                const hasSong = m.song_title || m.song_name;
-                const songTitle = m.song_title || m.song_name || '';
-                const songArtist = m.song_artist || m.artist || '';
-                const songCover = m.song_cover || m.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
-                const songPreview = m.song_preview || m.preview_url || '';
+                const hasImage = m.images || m.photo_url || m.image_url;
+                const imgSrc = getAppUrl(m.images || m.photo_url || m.image_url);
+                const songTitle = m.songTitle || m.song_title || 'Lagu Pilihan';
+                const songArtist = m.songArtist || m.song_artist || '';
+                const songCover = m.songCover || m.song_cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
+                const previewUrl = m.previewUrl || m.song_preview_url || '';
+                const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
+                const meaning = m.songMeaning || '';
 
                 return `
                     <div class="message-card">
                         <div>
                             <div class="card-header-row">
-                                <div>
-                                    <h3 class="card-to">Untuk ${escapeHtml(m.recipient || 'Seseorang')}</h3>
-                                    <div class="card-from">Dari: ${escapeHtml(m.sender || 'Anonim')}</div>
-                                </div>
-                                <span class="card-date">${formatDate(m.created_at)}</span>
+                                <h3 class="card-to">Untuk ${escapeHtml(m.receiver || 'Seseorang')}</h3>
+                                <span class="card-date">${formatDate(m.timestamp || m.created_at)}</span>
                             </div>
 
                             ${hasImage ? `
@@ -1360,20 +1441,29 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             ` : ''}
 
                             <p class="card-body-text">${escapeHtml(m.message || '')}</p>
+
+                            ${meaning ? `
+                                <div class="song-meaning-box">
+                                    <div class="meaning-header"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
+                                    <p class="meaning-text">${escapeHtml(meaning)}</p>
+                                </div>
+                            ` : ''}
                         </div>
 
-                        ${hasSong ? `
-                            <div class="player-bar">
-                                <img src="${songCover}" class="player-cover" alt="Cover">
-                                <div class="player-meta">
-                                    <div class="player-title">${escapeHtml(songTitle)}</div>
-                                    <div class="player-artist">${escapeHtml(songArtist)}</div>
-                                </div>
-                                <button class="btn-play-icon" onclick="toggleAudioPlayback('${songPreview}', this)">
+                        <!-- AUDIO PLAYER BAR -->
+                        <div class="player-bar">
+                            <img src="${songCover}" class="player-cover" alt="Cover">
+                            <div class="player-meta">
+                                <div class="player-title">${escapeHtml(songTitle)}</div>
+                                <div class="player-artist">${escapeHtml(songArtist)}</div>
+                            </div>
+                            <div class="player-controls">
+                                <button class="btn-play-icon" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
+                                <a href="${spotifyUrl}" target="_blank" class="spotify-link-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
                             </div>
-                        ` : ''}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1382,11 +1472,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function filterMessages() {
             const query = document.getElementById('messagesFilterInput').value.toLowerCase();
             const filtered = allMessages.filter(m => {
-                const rec = (m.recipient || '').toLowerCase();
-                const snd = (m.sender || '').toLowerCase();
+                const rec = (m.receiver || '').toLowerCase();
                 const msg = (m.message || '').toLowerCase();
-                const sng = (m.song_title || m.song_name || '').toLowerCase();
-                return rec.includes(query) || snd.includes(query) || msg.includes(query) || sng.includes(query);
+                const sng = (m.songTitle || m.song_title || '').toLowerCase();
+                const art = (m.songArtist || m.song_artist || '').toLowerCase();
+                return rec.includes(query) || msg.includes(query) || sng.includes(query) || art.includes(query);
             });
             renderMessages(filtered);
         }
@@ -1396,29 +1486,46 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!m) return;
 
             const modalContent = document.getElementById('modalContent');
-            const hasImage = m.photo_url || m.image_url;
-            const imgSrc = m.photo_url || m.image_url;
+            const hasImage = m.images || m.photo_url || m.image_url;
+            const imgSrc = getAppUrl(m.images || m.photo_url || m.image_url);
+            const songTitle = m.songTitle || m.song_title || 'Lagu Pilihan';
+            const songArtist = m.songArtist || m.song_artist || '';
+            const songCover = m.songCover || m.song_cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100';
+            const previewUrl = m.previewUrl || m.song_preview_url || '';
+            const spotifyUrl = m.songSpotifyUrl || m.song_spotify_url || `https://open.spotify.com/search/${encodeURIComponent(songTitle + ' ' + songArtist)}`;
+            const meaning = m.songMeaning || '';
 
             modalContent.innerHTML = `
-                <div style="margin-bottom:1rem;">
+                <div style="margin-bottom:1.2rem;">
                     <span style="font-family:var(--font-heading); font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent-green);">Untuk:</span>
-                    <h2 style="font-family:var(--font-serif); font-size:1.8rem; margin:0.2rem 0;">${escapeHtml(m.recipient || 'Seseorang')}</h2>
-                    <p style="font-size:0.85rem; color:var(--text-muted);">Dari: ${escapeHtml(m.sender || 'Anonim')} — ${formatDate(m.created_at)}</p>
+                    <h2 style="font-family:var(--font-serif); font-size:1.9rem; margin:0.2rem 0;">${escapeHtml(m.receiver || 'Seseorang')}</h2>
+                    <p style="font-size:0.8rem; color:var(--text-muted);">${formatDate(m.timestamp || m.created_at)}</p>
                 </div>
-                ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:cover; border-radius:12px; margin-bottom:1.2rem;">` : ''}
-                <p style="font-size:1rem; line-height:1.7; color:#e0e0ec; margin-bottom:1.5rem;">${escapeHtml(m.message || '')}</p>
-                ${(m.song_title || m.song_name) ? `
-                    <div class="player-bar">
-                        <img src="${m.song_cover || m.cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" class="player-cover">
-                        <div class="player-meta">
-                            <div class="player-title">${escapeHtml(m.song_title || m.song_name)}</div>
-                            <div class="player-artist">${escapeHtml(m.song_artist || m.artist || '')}</div>
-                        </div>
-                        <button class="btn-play-icon" onclick="toggleAudioPlayback('${m.song_preview || m.preview_url || ''}', this)">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
+
+                ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:360px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
+
+                <div style="font-size:1rem; line-height:1.7; color:#e0e0ec; margin-bottom:1.5rem; white-space:pre-wrap;">${escapeHtml(m.message || '')}</div>
+
+                ${meaning ? `
+                    <div class="song-meaning-box" style="margin-bottom:1.5rem;">
+                        <div class="meaning-header"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
+                        <p class="meaning-text">${escapeHtml(meaning)}</p>
                     </div>
                 ` : ''}
+
+                <div class="player-bar">
+                    <img src="${songCover}" class="player-cover" alt="Cover">
+                    <div class="player-meta">
+                        <div class="player-title">${escapeHtml(songTitle)}</div>
+                        <div class="player-artist">${escapeHtml(songArtist)}</div>
+                    </div>
+                    <div class="player-controls">
+                        <button class="btn-play-icon" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <a href="${spotifyUrl}" target="_blank" class="spotify-link-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
+                    </div>
+                </div>
             `;
 
             document.getElementById('messageModal').style.display = 'flex';
@@ -1436,13 +1543,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             });
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
+        function formatDate(dateInput) {
+            if (!dateInput) return '';
             try {
-                const d = new Date(dateStr);
+                const d = new Date(dateInput);
+                if (isNaN(d.getTime())) return String(dateInput);
                 return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
             } catch(e) {
-                return dateStr;
+                return String(dateInput);
             }
         }
 
@@ -1463,7 +1571,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }, 3500);
         }
 
-        // Init
         document.addEventListener('DOMContentLoaded', () => {
             fetchMessages();
         });
