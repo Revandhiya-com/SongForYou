@@ -1066,7 +1066,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
                             <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, atau WEBP — otomatis dibuat landscape 16:9</p>
-                            <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
+                            <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" onchange="handleFileSelected(event)">
                             <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
                         </div>
                     </div>
@@ -1114,7 +1114,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let base64Photo = '';
 
         // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
-        function compressImage(file, maxWidth = 1280, quality = 0.8) {
+        function compressImage(file, maxWidth = 960, quality = 0.72) {
             return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) { resolve(''); return; }
                 if (file.size > 10 * 1024 * 1024) { resolve(''); return; }
@@ -1124,8 +1124,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = () => {
-                        const targetWidth = maxWidth;
-                        const targetHeight = Math.round(targetWidth * 9 / 16);
+                        let targetWidth = maxWidth;
+                        let targetHeight = Math.round(targetWidth * 9 / 16);
                         const sourceRatio = img.width / img.height;
                         const targetRatio = targetWidth / targetHeight;
                         let sourceWidth = img.width;
@@ -1142,11 +1142,22 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             sourceY = Math.round((img.height - sourceHeight) / 2);
                         }
                         const canvas = document.createElement('canvas');
-                        canvas.width = targetWidth;
-                        canvas.height = targetHeight;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
+                        let output = '';
+                        let outputQuality = quality;
+
+                        // Batasi hasil ke sekitar 850 KB agar aman melewati request limit hosting.
+                        for (let attempt = 0; attempt < 4; attempt++) {
+                            canvas.width = targetWidth;
+                            canvas.height = targetHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
+                            output = canvas.toDataURL('image/jpeg', outputQuality);
+                            if (output.length <= 850 * 1024 || targetWidth <= 480) break;
+                            targetWidth = Math.round(targetWidth * 0.8);
+                            targetHeight = Math.round(targetWidth * 9 / 16);
+                            outputQuality = Math.max(0.55, outputQuality - 0.06);
+                        }
+                        resolve(output);
                     };
                     img.onerror = () => resolve('');
                 };
@@ -1348,7 +1359,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     body: JSON.stringify(payload)
                 });
 
-                const data = await res.json();
+                const responseText = await res.text();
+                let data = {};
+                try { data = JSON.parse(responseText); } catch (_) {}
                 if (data.success) {
                     showToast('Pesan rahasiamu berhasil dikirim!');
                     document.getElementById('createMessageForm').reset();
@@ -1358,7 +1371,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     fetchMessages();
                     document.getElementById('carouselTrack').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
-                    showToast('Gagal mengirim: ' + (data.message || 'Terjadi kesalahan server'), 'error');
+                    const fallback = res.status === 413
+                        ? 'Ukuran foto terlalu besar. Pilih foto lain lalu coba lagi.'
+                        : 'Terjadi kesalahan server.';
+                    showToast('Gagal mengirim: ' + (data.message || fallback), 'error');
                 }
             } catch (err) {
                 console.error("Form submit error:", err);
