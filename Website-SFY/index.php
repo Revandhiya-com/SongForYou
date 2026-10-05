@@ -868,10 +868,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .app-container { max-width: 1180px; }
         header.navbar {
             margin-top: 1rem;
-            padding: 1rem 0;
+            padding: 1rem 0.7rem;
             border-bottom-color: rgba(255,255,255,0.11);
         }
-        .brand-logo { letter-spacing: -0.65px; }
+        .brand-logo {
+            font-family: var(--font-message);
+            font-size: 1.55rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1;
+            transform: rotate(-3deg);
+        }
         .brand-logo-icon { background: #f5f5f5; color: #0b0b0b; border-radius: 9px; }
         .btn-nav-action, .btn-subtle {
             border-color: rgba(255,255,255,0.18);
@@ -932,8 +939,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         @media (max-width: 600px) {
             .app-container { padding-left: max(2rem, env(safe-area-inset-left)); padding-right: max(2rem, env(safe-area-inset-right)); }
-            header.navbar { padding: 1.15rem 0 1rem; }
-            .brand-logo { font-size: 1rem; }
+            header.navbar { padding: 1.15rem 0.7rem 1rem; }
+            .brand-logo { font-size: 1.4rem; }
             .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
             .hero-section { padding: 2.6rem 0 2.5rem; text-align: center; }
             .hero-section::before { height: 19rem; top: 0.5rem; }
@@ -975,7 +982,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <header class="navbar app-container">
         <a href="#" class="brand-logo">
             <div class="brand-logo-icon"><i class="fa-solid fa-music"></i></div>
-            <span>SongForYou</span>
+            <span>SFY</span>
         </a>
         <a href="#formSection" class="btn-nav-action">Kirim Pesan</a>
     </header>
@@ -1123,7 +1130,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let currentPlayBtn = null;
         let selectedSong = null;
         let base64Photo = '';
-        const PREVIEW_HIGHLIGHT_SECONDS = 12;
+        const PREVIEW_HIGHLIGHT_SECONDS = 17;
 
         // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
         function compressImage(file, maxWidth = 960, quality = 0.72) {
