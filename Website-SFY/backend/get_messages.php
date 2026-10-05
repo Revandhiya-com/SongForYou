@@ -94,13 +94,20 @@ try {
             $pUrl = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/77/59/2b77594c-8cc6-c252-9f90-d4be3af9d30d/mzaf_11665507368448228605.plus.aac.p.m4a';
         }
 
+        $storedMeaning = trim((string)($row['song_meaning'] ?? ''));
         $title = $row['song_title'] ?? '';
         $artist = $row['song_artist'] ?? '';
         $catalogMeaning = getSongMeaning($title, $artist, false, $row['song_key'] ?? '');
-        // Jangan memakai nilai lama dari database sebagai fallback, karena
-        // sebagian besar berisi template. Hanya katalog yang telah cocok
-        // dengan judul dan artis yang boleh tampil di pesan.
-        $meaning = hasUsableSongMeaning($catalogMeaning) ? $catalogMeaning : '';
+        // Makna per-ID dari kamus selalu diprioritaskan. Untuk lagu yang
+        // belum masuk kamus, gunakan makna yang memang tersimpan di katalog
+        // database, selama bukan pola template lama.
+        if (hasUsableSongMeaning($catalogMeaning)) {
+            $meaning = $catalogMeaning;
+        } elseif (hasUsableSongMeaning($storedMeaning)) {
+            $meaning = $storedMeaning;
+        } else {
+            $meaning = '';
+        }
 
         $messages[] = [
             'id'             => (int)$row['id'],
