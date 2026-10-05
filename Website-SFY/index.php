@@ -28,10 +28,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <title>SongForYou — Bisikkan Perasaanmu Lewat Lagu</title>
     <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.">
 
-    <!-- Fonts: Plus Jakarta Sans & Instrument Serif / Cormorant Garamond for warm human feel -->
+    <!-- Fonts: Plus Jakarta Sans & expressive Playfair Display for messages -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,6 +51,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             --accent-sage: #34d399;
             --accent-dim: rgba(52, 211, 153, 0.12);
             --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-message: 'Playfair Display', Georgia, serif;
             --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
             --radius-xl: 20px;
             --radius-lg: 14px;
@@ -69,7 +70,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         html, body {
             width: 100%;
             height: 100%;
-            background-color: var(--bg-main);
+            background:
+                radial-gradient(circle at 12% 12%, rgba(52, 211, 153, 0.13), transparent 25rem),
+                radial-gradient(circle at 90% 28%, rgba(96, 165, 250, 0.13), transparent 24rem),
+                radial-gradient(circle at 48% 88%, rgba(244, 114, 182, 0.08), transparent 27rem),
+                var(--bg-main);
             color: var(--text-heading);
             font-family: var(--font-sans);
             overflow-x: hidden;
@@ -96,6 +101,35 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             max-width: 1120px;
             margin: 0 auto;
             padding: 0 1.5rem;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            z-index: -1;
+            border-radius: 50%;
+            filter: blur(1px);
+            pointer-events: none;
+            animation: ambient-float 14s ease-in-out infinite alternate;
+        }
+        body::before {
+            width: 18rem;
+            height: 18rem;
+            top: 42%;
+            left: -10rem;
+            background: rgba(20, 184, 166, 0.09);
+        }
+        body::after {
+            width: 20rem;
+            height: 20rem;
+            top: 10%;
+            right: -12rem;
+            background: rgba(168, 85, 247, 0.08);
+            animation-delay: -7s;
+        }
+        @keyframes ambient-float {
+            to { transform: translate3d(2rem, -1.5rem, 0) scale(1.12); }
         }
 
         /* NAVBAR */
@@ -148,6 +182,22 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .hero-section {
             padding: 5rem 0 3.5rem;
             text-align: center;
+            position: relative;
+            isolation: isolate;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            width: min(62rem, 100%);
+            height: 23rem;
+            left: 50%;
+            top: 1.7rem;
+            transform: translateX(-50%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 48% 52% 42% 58% / 50% 45% 55% 50%;
+            background: linear-gradient(120deg, rgba(52,211,153,0.06), rgba(59,130,246,0.05), rgba(244,114,182,0.05));
+            box-shadow: inset 0 0 70px rgba(255,255,255,0.025);
         }
         .hero-pill {
             display: inline-flex;
@@ -473,9 +523,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .upload-dropzone {
             border: 2px dashed var(--border-subtle);
             border-radius: var(--radius-md);
+            min-height: 180px;
             padding: 1.5rem;
             text-align: center;
-            background: var(--bg-input);
+            background:
+                linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(59, 130, 246, 0.06)),
+                var(--bg-input);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
@@ -494,11 +547,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             cursor: pointer;
         }
         .photo-preview {
-            max-height: 150px;
-            border-radius: 8px;
-            margin-top: 0.8rem;
+            width: 126px;
+            height: 126px;
+            border-radius: 14px;
+            margin-top: 0.9rem;
             object-fit: cover;
             display: none;
+            border: 2px solid rgba(255,255,255,0.18);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.28);
         }
 
         /* FEED GRID */
@@ -579,11 +635,24 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transform: scale(1.04);
         }
         .card-message {
-            font-size: 0.92rem;
-            color: #cbd5e1;
-            line-height: 1.65;
+            font-family: var(--font-message);
+            font-size: 1.15rem;
+            font-style: italic;
+            color: #e5e7eb;
+            line-height: 1.6;
             margin-bottom: 1.1rem;
             word-wrap: break-word;
+        }
+        .card-message::before { content: '\201C'; color: var(--accent-sage); font-size: 1.35em; margin-right: 0.08em; }
+        .card-message::after { content: '\201D'; color: var(--accent-sage); font-size: 1.35em; margin-left: 0.08em; }
+        .modal-message {
+            font-family: var(--font-message);
+            font-size: 1.22rem;
+            font-style: italic;
+            line-height: 1.7;
+            color: #e5e7eb;
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
         }
 
         /* SONG MEANING BOX */
@@ -754,10 +823,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         @media (max-width: 600px) {
             .app-container { padding: 0 1rem; }
-            .hero-title { font-size: 2.3rem; }
+            header.navbar { padding: 1.15rem 0 1rem; }
+            .brand-logo { font-size: 1rem; }
+            .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
+            .hero-section { padding: 3.2rem 0 2rem; }
+            .hero-section::before { height: 19rem; top: 0.5rem; }
+            .hero-title { font-size: 2.35rem; }
+            .hero-subtitle { font-size: 0.93rem; margin-bottom: 1.7rem; }
             .btn-main, .btn-subtle { width: 100%; justify-content: center; }
             .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
             .feed-card { padding: 1.2rem; }
+            .section-header { margin: 3.2rem 0 1.35rem; }
+            .section-desc { font-size: 0.86rem; }
+            .carousel-item { flex-basis: min(83vw, 310px); }
+            .upload-dropzone { min-height: 165px; padding: 1.2rem; }
+            .card-img-wrap { height: 220px; }
+            .card-message { font-size: 1.06rem; }
+            .modal-message { font-size: 1.08rem; }
+            .audio-bar { gap: 0.65rem; padding: 0.7rem; }
+            .audio-title, .audio-artist { max-width: 135px; }
             .toast-wrap { left: 1rem; right: 1rem; bottom: 1rem; }
         }
     </style>
@@ -1337,7 +1421,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                 ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
 
-                <div style="font-size:0.95rem; line-height:1.7; color:#cbd5e1; margin-bottom:1.5rem; white-space:pre-wrap;">${escapeHtml(m.message || '')}</div>
+                <div class="modal-message">${escapeHtml(m.message || '')}</div>
 
                 ${meaning ? `
                     <div class="meaning-box" style="margin-bottom:1.5rem;">
