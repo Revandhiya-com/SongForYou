@@ -1437,6 +1437,34 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         // Audio Player Controller
+        function getPreviewHighlightTime(audio) {
+            const duration = audio.duration;
+            return Number.isFinite(duration) && duration > 0
+                ? Math.max(0, Math.min(duration * 0.7, duration - 3))
+                : PREVIEW_HIGHLIGHT_SECONDS;
+        }
+
+        function playFromHighlight(audio, btnEl) {
+            const highlightTime = getPreviewHighlightTime(audio);
+            let playbackStarted = false;
+
+            const beginPlayback = () => {
+                if (playbackStarted || currentAudio !== audio) return;
+                playbackStarted = true;
+                audio.play().then(() => {
+                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                }).catch(() => {
+                    showToast('Gagal memutar audio preview', 'error');
+                });
+            };
+
+            // Tunggu audio benar-benar selesai berpindah posisi sebelum play.
+            audio.addEventListener('seeked', beginPlayback, { once: true });
+            audio.currentTime = highlightTime;
+            // Fallback untuk browser yang tidak memicu event seeked pada stream tertentu.
+            window.setTimeout(beginPlayback, 700);
+        }
+
         async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
             let urlToPlay = previewUrl;
 
@@ -1451,8 +1479,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             if (currentAudio && currentAudio.src === urlToPlay) {
                 if (currentAudio.paused) {
-                    currentAudio.play();
-                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    const isFinished = currentAudio.ended ||
+                        (Number.isFinite(currentAudio.duration) && currentAudio.currentTime >= currentAudio.duration - 0.25);
+                    if (isFinished) {
+                        playFromHighlight(currentAudio, btnEl);
+                    } else {
+                        currentAudio.play();
+                        if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    }
                 } else {
                     currentAudio.pause();
                     if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-play"></i>';
@@ -1470,26 +1504,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             audio.preload = 'auto';
             currentPlayBtn = btnEl;
 
-            // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 65% durasi
+            // Preview umumnya berdurasi 30 detik. Mulai dari sekitar 70% durasi
             // agar melewati intro dan langsung ke bagian hook/reff.
-            audio.addEventListener('loadedmetadata', function playFromHighlight() {
-                const duration = audio.duration;
-                const highlightTime = Number.isFinite(duration) && duration > 0
-                    ? Math.min(duration * 0.65, duration - 4)
-                    : PREVIEW_HIGHLIGHT_SECONDS;
-                audio.currentTime = Math.max(0, highlightTime);
-                audio.play().then(() => {
-                    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    // Beberapa browser memulai stream dari 0 terlebih dahulu.
-                    // Terapkan ulang seek setelah playback aktif agar konsisten.
-                    window.setTimeout(() => {
-                        if (currentAudio === audio && !audio.paused) {
-                            audio.currentTime = Math.max(0, highlightTime);
-                        }
-                    }, 350);
-                }).catch(() => {
-                    showToast('Gagal memutar audio preview', 'error');
-                });
+            audio.addEventListener('loadedmetadata', function onMetadataLoaded() {
+                playFromHighlight(audio, btnEl);
             }, { once: true });
             audio.load();
 
