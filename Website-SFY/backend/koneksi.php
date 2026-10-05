@@ -203,12 +203,17 @@ try {
                 recipient_name VARCHAR(100) NOT NULL,
                 sender_name VARCHAR(100) DEFAULT NULL,
                 message TEXT NOT NULL,
-                images TEXT DEFAULT NULL,
+                images MEDIUMTEXT DEFAULT NULL,
                 slug VARCHAR(255) NOT NULL UNIQUE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (song_id) REFERENCES songs (id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
+    }
+
+    // Base64 foto landscape bisa lebih besar dari batas TEXT MySQL (64 KB).
+    if ($dbDriver === 'mysql') {
+        $conn->exec("ALTER TABLE messages MODIFY images MEDIUMTEXT NULL");
     }
 
     $checkSongs = $conn->query("SELECT COUNT(*) AS cnt FROM songs")->fetch();

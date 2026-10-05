@@ -563,8 +563,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             cursor: pointer;
         }
         .photo-preview {
-            width: 126px;
-            height: 126px;
+            width: min(100%, 320px);
+            aspect-ratio: 16 / 9;
+            height: auto;
             border-radius: 14px;
             margin-top: 0.9rem;
             object-fit: cover;
@@ -635,7 +636,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .card-img-wrap {
             width: 100%;
-            height: 190px;
+            aspect-ratio: 16 / 9;
+            height: auto;
             border-radius: var(--radius-md);
             overflow: hidden;
             margin-bottom: 1.1rem;
@@ -948,9 +950,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .carousel-item.has-photo .item-to { margin-bottom: 0.2rem; }
             .item-song-pill { font-size: 0.57rem; padding-top: 0.4rem; margin-top: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
-            .card-img-wrap { height: 220px; }
-            .card-message { font-size: 1.06rem; }
-            .modal-message { font-size: 1.12rem; }
+            .card-img-wrap { aspect-ratio: 16 / 9; }
+            .card-message { font-size: 1.18rem; line-height: 1.68; }
+            .modal-message { font-size: 1.24rem; }
             .audio-bar { gap: 0.65rem; padding: 0.7rem; }
             .audio-title, .audio-artist { max-width: 135px; }
             .toast-wrap { left: 1rem; right: 1rem; bottom: 1rem; }
@@ -994,6 +996,20 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             <div class="carousel-flex" id="carouselTrack">
                 <!-- Loaded dynamically -->
             </div>
+        </div>
+    </section>
+
+    <!-- ALL MESSAGES: selalu diisi dari database yang sama dengan admin -->
+    <section class="app-container" id="messagesSection">
+        <div class="section-header">
+            <div>
+                <div class="section-tagline">Arsip pesan</div>
+                <h2 class="section-title">Semua pesan.</h2>
+            </div>
+        </div>
+        <input type="search" id="messagesFilterInput" class="filter-input" placeholder="Cari penerima, isi pesan, atau lagu..." oninput="filterMessages()">
+        <div class="feed-grid" id="messagesGrid" aria-live="polite">
+            <!-- Loaded dynamically from the messages database -->
         </div>
     </section>
 
@@ -1047,7 +1063,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         <div class="upload-dropzone" onclick="document.getElementById('photoInput').click()">
                             <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
-                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
+                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">JPG, PNG, atau WEBP — otomatis dibuat landscape 16:9</p>
                             <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
                             <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
                         </div>
@@ -1095,27 +1111,39 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let selectedSong = null;
         let base64Photo = '';
 
-        // Canvas Image Compression
-        function compressImage(file, maxWidth = 1000, quality = 0.75) {
+        // Semua foto dinormalisasi menjadi JPEG landscape 16:9 agar seragam di kartu pesan.
+        function compressImage(file, maxWidth = 1280, quality = 0.8) {
             return new Promise((resolve) => {
                 if (!file || !file.type.startsWith('image/')) { resolve(''); return; }
+                if (file.size > 10 * 1024 * 1024) { resolve(''); return; }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
                     const img = new Image();
                     img.src = e.target.result;
                     img.onload = () => {
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
+                        const targetWidth = maxWidth;
+                        const targetHeight = Math.round(targetWidth * 9 / 16);
+                        const sourceRatio = img.width / img.height;
+                        const targetRatio = targetWidth / targetHeight;
+                        let sourceWidth = img.width;
+                        let sourceHeight = img.height;
+                        let sourceX = 0;
+                        let sourceY = 0;
+
+                        // Crop dari tengah tanpa mengubah proporsi foto.
+                        if (sourceRatio > targetRatio) {
+                            sourceWidth = Math.round(img.height * targetRatio);
+                            sourceX = Math.round((img.width - sourceWidth) / 2);
+                        } else {
+                            sourceHeight = Math.round(img.width / targetRatio);
+                            sourceY = Math.round((img.height - sourceHeight) / 2);
                         }
                         const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
+                        canvas.width = targetWidth;
+                        canvas.height = targetHeight;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
+                        ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
                         resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = () => resolve('');
@@ -1128,7 +1156,21 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
             if (file) {
-                base64Photo = await compressImage(file, 1000, 0.75);
+                if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                    showToast('Gunakan foto berformat JPG, PNG, atau WEBP.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('Ukuran foto maksimal 10 MB.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+                base64Photo = await compressImage(file);
+                if (!base64Photo) {
+                    showToast('Foto tidak dapat diproses. Coba foto lain.', 'error');
+                    return;
+                }
                 thumb.src = base64Photo;
                 thumb.style.display = 'block';
             } else {

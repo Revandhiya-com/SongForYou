@@ -44,7 +44,7 @@ try {
              FROM messages m
              LEFT JOIN songs s ON m.song_id = s.id
              WHERE LOWER(m.recipient_name) LIKE :search
-             ORDER BY m.created_at DESC"
+             ORDER BY m.id DESC"
         );
         $stmt->execute([':search' => '%' . $search . '%']);
     } else {
@@ -66,7 +66,7 @@ try {
                 s.preview_url AS song_preview_url
              FROM messages m
              LEFT JOIN songs s ON m.song_id = s.id
-             ORDER BY m.created_at DESC"
+             ORDER BY m.id DESC"
         );
         $stmt->execute();
     }

@@ -196,44 +196,23 @@ try {
     $userId = 0;
 
     // ─── Proses Unggah Gambar (Base64) jika ada ────────────────
+    // Simpan data URL di database, bukan filesystem serverless yang bersifat sementara.
     $imagesVal = '';
     if (!empty($images)) {
-        if (strpos($images, 'data:image/') === 0) {
-            $parts = explode(',', $images);
-            if (count($parts) === 2) {
-                $header     = $parts[0];
-                $dataBase64 = $parts[1];
-
-                $ext = 'png';
-                if (preg_match('/data:image\/([a-zA-Z0-9+]+);base64/', $header, $matches)) {
-                    $ext = $matches[1];
-                    if ($ext === 'jpeg') $ext = 'jpg';
-                }
-
-                $decodedData = base64_decode($dataBase64);
-                if ($decodedData !== false) {
-                    try {
-                        $uploadDir = dirname(__DIR__) . '/uploads';
-                        if (!file_exists($uploadDir)) {
-                            @mkdir($uploadDir, 0777, true);
-                        }
-
-                        $filename = uniqid('img_', true) . '.' . $ext;
-                        $filePath = $uploadDir . '/' . $filename;
-
-                        if (@file_put_contents($filePath, $decodedData) !== false) {
-                            $imagesVal = 'uploads/' . $filename;
-                        } else {
-                            $imagesVal = $images;
-                        }
-                    } catch (Exception $e) {
-                        $imagesVal = $images;
-                    }
-                }
-            }
-        } else {
-            $imagesVal = $images;
+        if (!preg_match('#^data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$#', $images, $imageMatch)) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'message' => 'Format foto harus JPG, PNG, atau WEBP.']);
+            exit;
         }
+
+        $decodedData = base64_decode($imageMatch[2], true);
+        if ($decodedData === false || strlen($decodedData) > 2 * 1024 * 1024) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'message' => 'Ukuran foto setelah diproses maksimal 2 MB.']);
+            exit;
+        }
+
+        $imagesVal = $images;
     }
 
     // ─── INSERT ke tabel messages ────────────────────────────
