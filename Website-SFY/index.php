@@ -919,22 +919,27 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
 
         @media (max-width: 600px) {
-            .app-container { padding: 0 1rem; }
+            .app-container { padding: 0 1.1rem; }
             header.navbar { padding: 1.15rem 0 1rem; }
             .brand-logo { font-size: 1rem; }
             .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
-            .hero-section { padding: 3.2rem 0 2rem; }
+            .hero-section { padding: 2.6rem 0 2.5rem; }
             .hero-section::before { height: 19rem; top: 0.5rem; }
             .hero-title { font-size: 2.35rem; }
-            .btn-main, .btn-subtle { width: 100%; justify-content: center; }
+            .hero-actions .btn-main { width: auto; min-width: 0; justify-content: center; padding: 0.82rem 1.05rem; }
+            .btn-subtle { width: auto; justify-content: center; }
             .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
             .feed-card { padding: 1.2rem; }
-            .section-header { margin: 3.2rem 0 1.35rem; }
+            .section-header { margin: 2.2rem 0 1rem; }
             .section-desc { font-size: 0.86rem; }
-            .carousel-flex { display: flex; overflow-x: auto; padding: 0 0 0.4rem; scroll-snap-type: x mandatory; }
-            .carousel-item { flex: 0 0 86vw; min-height: 330px; scroll-snap-align: start; }
-            .item-body { padding: 1.15rem 1.2rem 1.25rem; }
-            .item-text { font-size: 1.06rem; }
+            .carousel-container { overflow: visible; }
+            .carousel-flex { display: grid; grid-template-columns: 1fr; gap: 0.8rem; padding: 0; }
+            .carousel-item { min-height: 0; width: 100%; }
+            .carousel-item.no-photo { min-height: 210px; }
+            .item-body { padding: 1rem 1.1rem 1.05rem; }
+            .item-text { font-size: 1.55rem; -webkit-line-clamp: 2; }
+            .item-media { aspect-ratio: 16 / 8; }
+            .item-song-pill { padding-top: 0.65rem; margin-top: 0.75rem; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { height: 220px; }
             .card-message { font-size: 1.06rem; }
