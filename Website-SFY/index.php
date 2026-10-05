@@ -38,18 +38,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
     <style>
         :root {
-            --bg-main: #0b0b0e;
-            --bg-surface: #13131a;
-            --bg-surface-hover: #191924;
-            --bg-input: #171720;
+            --bg-main: #070707;
+            --bg-surface: #101010;
+            --bg-surface-hover: #191919;
+            --bg-input: #0d0d0d;
             --border-subtle: rgba(255, 255, 255, 0.07);
             --border-glow: rgba(255, 255, 255, 0.16);
-            --text-heading: #f8fafc;
-            --text-body: #94a3b8;
-            --text-subtle: #64748b;
-            --accent-soft: #20c997;
-            --accent-sage: #34d399;
-            --accent-dim: rgba(52, 211, 153, 0.12);
+            --text-heading: #f5f5f5;
+            --text-body: #a3a3a3;
+            --text-subtle: #737373;
+            --accent-soft: #e5e5e5;
+            --accent-sage: #e5e5e5;
+            --accent-dim: rgba(255, 255, 255, 0.10);
             --font-serif: 'Cormorant Garamond', Georgia, serif;
             --font-message: 'Playfair Display', Georgia, serif;
             --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
@@ -71,9 +71,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             width: 100%;
             height: 100%;
             background:
-                radial-gradient(circle at 12% 12%, rgba(52, 211, 153, 0.13), transparent 25rem),
-                radial-gradient(circle at 90% 28%, rgba(96, 165, 250, 0.13), transparent 24rem),
-                radial-gradient(circle at 48% 88%, rgba(244, 114, 182, 0.08), transparent 27rem),
+                radial-gradient(circle at 12% 8%, rgba(255,255,255,0.08), transparent 22rem),
+                radial-gradient(circle at 90% 36%, rgba(255,255,255,0.05), transparent 28rem),
                 var(--bg-main);
             color: var(--text-heading);
             font-family: var(--font-sans);
@@ -109,7 +108,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             position: fixed;
             z-index: -1;
             border-radius: 50%;
-            filter: blur(1px);
+            filter: blur(2px);
             pointer-events: none;
             animation: ambient-float 14s ease-in-out infinite alternate;
         }
@@ -118,14 +117,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             height: 18rem;
             top: 42%;
             left: -10rem;
-            background: rgba(20, 184, 166, 0.09);
+            background: rgba(255,255,255,0.04);
         }
         body::after {
             width: 20rem;
             height: 20rem;
             top: 10%;
             right: -12rem;
-            background: rgba(168, 85, 247, 0.08);
+            background: rgba(255,255,255,0.03);
             animation-delay: -7s;
         }
         @keyframes ambient-float {
@@ -196,7 +195,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transform: translateX(-50%);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 48% 52% 42% 58% / 50% 45% 55% 50%;
-            background: linear-gradient(120deg, rgba(52,211,153,0.06), rgba(59,130,246,0.05), rgba(244,114,182,0.05));
+            background: linear-gradient(120deg, rgba(255,255,255,0.055), rgba(255,255,255,0.005));
             box-shadow: inset 0 0 70px rgba(255,255,255,0.025);
         }
         .hero-pill {
@@ -227,7 +226,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .hero-title em {
             font-style: italic;
             color: #ffffff;
-            border-bottom: 1px solid var(--accent-sage);
+            border-bottom: 1px solid rgba(255,255,255,0.55);
         }
         .hero-subtitle {
             max-width: 560px;
@@ -261,7 +260,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .btn-main:hover {
             transform: translateY(-2px);
-            background: #f1f5f9;
+            background: #e5e5e5;
             box-shadow: 0 14px 35px rgba(255,255,255,0.15);
         }
         .btn-subtle {
@@ -295,7 +294,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: var(--accent-sage);
+            color: #d4d4d4;
             margin-bottom: 0.4rem;
         }
         .section-title {
@@ -323,25 +322,43 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .carousel-flex {
             display: flex;
-            gap: 1.25rem;
+            gap: 1.5rem;
+            padding: 0.25rem 0.15rem 1.25rem;
         }
         .carousel-item {
-            flex: 0 0 310px;
+            flex: 0 0 min(74vw, 680px);
+            min-height: 390px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
-            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             transition: var(--transition);
             cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            isolation: isolate;
+        }
+        .carousel-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.12), transparent 68%);
+            transform: translateX(-130%);
+            transition: transform 0.7s cubic-bezier(.2,.8,.2,1);
         }
         .carousel-item:hover {
-            border-color: var(--border-glow);
+            border-color: rgba(255,255,255,0.42);
             background: var(--bg-surface-hover);
-            transform: translateY(-4px);
+            transform: translateY(-8px) rotate(-0.35deg);
+            box-shadow: 0 24px 50px rgba(0,0,0,0.42);
         }
+        .carousel-item:hover::after { transform: translateX(130%); }
+        .item-media { width: 100%; aspect-ratio: 16 / 8; overflow: hidden; background: #1b1b1b; border-bottom: 1px solid var(--border-subtle); }
+        .item-media img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); transition: transform 0.7s cubic-bezier(.2,.8,.2,1), filter 0.5s ease; }
+        .carousel-item:hover .item-media img { transform: scale(1.05); filter: grayscale(1) contrast(1.15); }
+        .item-body { padding: 1.35rem 1.5rem 1.45rem; display: flex; flex: 1; flex-direction: column; justify-content: space-between; }
         .item-to {
             font-family: var(--font-serif);
             font-size: 1.4rem;
@@ -349,9 +366,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             margin-bottom: 0.6rem;
         }
         .item-text {
-            font-size: 0.88rem;
-            color: var(--text-body);
-            line-height: 1.6;
+            font-family: var(--font-message);
+            font-size: 1.16rem;
+            color: #e5e5e5;
+            line-height: 1.45;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -410,7 +428,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .form-input:focus, .form-textarea:focus {
             border-color: var(--accent-sage);
-            background: #1c1c28;
+            background: #181818;
             box-shadow: 0 0 0 3px var(--accent-dim);
         }
         .form-textarea {
@@ -424,7 +442,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             top: calc(100% + 6px);
             left: 0;
             right: 0;
-            background: #181822;
+            background: #181818;
             border: 1px solid var(--border-glow);
             border-radius: var(--radius-md);
             max-height: 280px;
@@ -479,8 +497,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(52, 211, 153, 0.06);
-            border: 1px solid rgba(52, 211, 153, 0.25);
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: var(--radius-md);
             padding: 0.85rem 1rem;
             margin-top: 0.5rem;
@@ -516,7 +534,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transition: color 0.2s ease;
         }
         .btn-clear-song:hover {
-            color: #f87171;
+            color: #f5f5f5;
         }
 
         /* DROPZONE */
@@ -526,16 +544,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             min-height: 180px;
             padding: 1.5rem;
             text-align: center;
-            background:
-                linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(59, 130, 246, 0.06)),
-                var(--bg-input);
+            background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015)), var(--bg-input);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
         }
         .upload-dropzone:hover {
             border-color: var(--accent-sage);
-            background: rgba(52, 211, 153, 0.03);
+            background: rgba(255,255,255,0.06);
         }
         .upload-dropzone input[type="file"] {
             position: absolute;
@@ -643,13 +659,15 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             margin-bottom: 1.1rem;
             word-wrap: break-word;
         }
-        .card-message::before { content: '\201C'; color: var(--accent-sage); font-size: 1.35em; margin-right: 0.08em; }
-        .card-message::after { content: '\201D'; color: var(--accent-sage); font-size: 1.35em; margin-left: 0.08em; }
+        .card-message::before { content: '\201C'; color: #d4d4d4; font-size: 1.35em; margin-right: 0.08em; }
+        .card-message::after { content: '\201D'; color: #d4d4d4; font-size: 1.35em; margin-left: 0.08em; }
         .modal-message {
             font-family: var(--font-message);
-            font-size: 1.22rem;
+            font-size: clamp(1.3rem, 2.4vw, 1.72rem);
+            font-weight: 500;
             font-style: italic;
             line-height: 1.7;
+            letter-spacing: -0.025em;
             color: #e5e7eb;
             margin-bottom: 1.5rem;
             white-space: pre-wrap;
@@ -658,7 +676,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         /* SONG MEANING BOX */
         .meaning-box {
             background: rgba(255, 255, 255, 0.025);
-            border-left: 3px solid var(--accent-sage);
+            border-left: 3px solid #d4d4d4;
             border-radius: 4px;
             padding: 0.75rem 0.95rem;
             margin-bottom: 1.1rem;
@@ -725,7 +743,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: var(--accent-sage);
+            background: #f5f5f5;
             color: #0b0b0e;
             border: none;
             display: flex;
@@ -736,7 +754,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
         .btn-play-audio:hover {
             transform: scale(1.06);
-            background: #6ee7b7;
+            background: #ffffff;
         }
         .spotify-btn {
             color: var(--text-subtle);
@@ -801,7 +819,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             gap: 0.75rem;
         }
         .toast-item {
-            background: #181822;
+            background: #181818;
             border: 1px solid var(--border-glow);
             border-left: 4px solid var(--accent-sage);
             color: var(--text-heading);
@@ -829,17 +847,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .hero-section { padding: 3.2rem 0 2rem; }
             .hero-section::before { height: 19rem; top: 0.5rem; }
             .hero-title { font-size: 2.35rem; }
-            .hero-subtitle { font-size: 0.93rem; margin-bottom: 1.7rem; }
             .btn-main, .btn-subtle { width: 100%; justify-content: center; }
             .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
             .feed-card { padding: 1.2rem; }
             .section-header { margin: 3.2rem 0 1.35rem; }
             .section-desc { font-size: 0.86rem; }
-            .carousel-item { flex-basis: min(83vw, 310px); }
+            .carousel-item { flex-basis: 88vw; min-height: 350px; }
+            .item-body { padding: 1.15rem 1.2rem 1.25rem; }
+            .item-text { font-size: 1.06rem; }
             .upload-dropzone { min-height: 165px; padding: 1.2rem; }
             .card-img-wrap { height: 220px; }
             .card-message { font-size: 1.06rem; }
-            .modal-message { font-size: 1.08rem; }
+            .modal-message { font-size: 1.22rem; }
             .audio-bar { gap: 0.65rem; padding: 0.7rem; }
             .audio-title, .audio-artist { max-width: 135px; }
             .toast-wrap { left: 1rem; right: 1rem; bottom: 1rem; }
@@ -859,23 +878,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
     <!-- HERO SECTION -->
     <section class="hero-section app-container">
-        <div class="hero-pill">
-            <i class="fa-brands fa-spotify"></i>
-            <span>Arsip Musik & Perasaan</span>
-        </div>
         <h1 class="hero-title">
-            Abadikan Perasaanmu<br>Dalam <em>Alunan Musik</em>
+            Kirim rasa lewat<br><em>sebuah lagu.</em>
         </h1>
-        <p class="hero-subtitle">
-            Sampaikan pesan tersirat dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.
-        </p>
         <div class="hero-actions">
             <a href="#formSection" class="btn-main">
                 <i class="fa-solid fa-paper-plane"></i>
-                Tulis Pesan Rahasia
-            </a>
-            <a href="#feedSection" class="btn-subtle">
-                Jelajahi Pesan
+                Tulis pesan
             </a>
         </div>
     </section>
@@ -884,10 +893,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <section class="app-container">
         <div class="section-header">
             <div>
-                <div class="section-tagline">Ungkapan Terpilih</div>
-                <h2 class="section-title">Cerita & Melodi Terbaru</h2>
+                <div class="section-tagline">Ungkapan terpilih</div>
+                <h2 class="section-title">Untuk didengar.</h2>
             </div>
-            <p class="section-desc">Momen-momen indah yang diabadikan lewat alunan lagu kenangan.</p>
         </div>
         
         <div class="carousel-container">
@@ -905,7 +913,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <div class="section-tagline">Dedikasikan Lagu</div>
                     <h2 class="section-title">Kirim Pesan Rahasia</h2>
                 </div>
-                <p class="section-desc">Pilih lagu spesial dan tuliskan kalimat yang ingin kamu sampaikan padanya.</p>
             </div>
 
             <form id="createMessageForm" onsubmit="handleFormSubmit(event)">
@@ -918,7 +925,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                     <!-- SONG SEARCH FIELD -->
                     <div class="form-field">
-                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify" style="color:var(--accent-sage);"></i> Cari Lagu Spesial</label>
+                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify"></i> Cari Lagu</label>
                         <input type="text" id="songSearchInput" class="form-input" placeholder="Ketik judul lagu atau nama penyanyi..." autocomplete="off">
                         
                         <div class="search-dropdown" id="songDropdown"></div>
@@ -946,7 +953,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     <div class="form-field">
                         <label class="form-label"><i class="fa-regular fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
                         <div class="upload-dropzone" onclick="document.getElementById('photoInput').click()">
-                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:var(--accent-sage); margin-bottom:0.4rem;"></i>
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:#e5e5e5; margin-bottom:0.4rem;"></i>
                             <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
                             <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
                             <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
@@ -963,25 +970,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         </div>
     </section>
 
-    <!-- MESSAGES FEED SECTION -->
-    <section id="feedSection" class="app-container">
-        <div class="section-header">
-            <div>
-                <div class="section-tagline">Arsip Cerita</div>
-                <h2 class="section-title">Pesan & Melodi Tersimpan</h2>
-            </div>
-            <p class="section-desc">Cari pesan berdasarkan nama penerima atau judul lagu.</p>
-        </div>
-
-        <input type="text" id="messagesFilterInput" class="filter-input" placeholder="Cari pesan atau lagu..." oninput="filterMessages()">
-
-        <div class="feed-grid" id="messagesGrid">
-            <!-- Loaded dynamically -->
-        </div>
-    </section>
-
     <!-- MODAL -->
-    <div class="modal-bg" id="messageModal">
+    <div class="modal-bg" id="messageModal" onclick="if (event.target === this) closeFullScreenMessage()">
         <div class="modal-box">
             <button class="btn-close" onclick="closeFullScreenMessage()"><i class="fa-solid fa-xmark"></i></button>
             <div id="modalContent"></div>
@@ -994,7 +984,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <!-- FOOTER -->
     <footer>
         <div class="app-container">
-            <p>&copy; <?php echo date('Y'); ?> SongForYou. Diabadikan lewat lagu & perasaan.</p>
+            <p>&copy; <?php echo date('Y'); ?> SongForYou</p>
         </div>
     </footer>
 
@@ -1230,7 +1220,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     base64Photo = '';
                     document.getElementById('photoPreviewThumb').style.display = 'none';
                     fetchMessages();
-                    document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('carouselTrack').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
                     showToast('Gagal mengirim: ' + (data.message || 'Terjadi kesalahan server'), 'error');
                 }
@@ -1311,18 +1301,25 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 return;
             }
 
-            track.innerHTML = featured.map(m => `
-                <div class="carousel-item" onclick="openFullScreenMessage(${m.id})">
-                    <div>
+            track.innerHTML = featured.map(m => {
+                const hasImage = m.images || m.photo_url || m.image_url;
+                const image = hasImage ? getAppUrl(m.images || m.photo_url || m.image_url) : (m.songCover || m.song_cover || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=900');
+                return `
+                <div class="carousel-item" onclick="openFullScreenMessage(${m.id})" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') openFullScreenMessage(${m.id})">
+                    <div class="item-media"><img src="${image}" alt="Kenangan untuk ${escapeHtml(m.receiver || 'Seseorang')}"></div>
+                    <div class="item-body">
+                      <div>
                         <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
                         <h4 class="item-to">${escapeHtml(m.receiver || 'Seseorang')}</h4>
                         <p class="item-text">"${escapeHtml(m.message || '')}"</p>
-                    </div>
+                      </div>
                     <div class="item-song-pill">
                         <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}
                     </div>
+                    </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function renderMessages(messages) {
@@ -1450,7 +1447,19 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function closeFullScreenMessage() {
             document.getElementById('messageModal').style.display = 'none';
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            if (currentPlayBtn) currentPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            currentPlayBtn = null;
         }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('messageModal').style.display === 'flex') {
+                closeFullScreenMessage();
+            }
+        });
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -1473,8 +1482,8 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const toast = document.createElement('div');
             toast.className = 'toast-item';
             if (type === 'error') {
-                toast.style.borderColor = '#f87171';
-                toast.style.borderLeftColor = '#f87171';
+                toast.style.borderColor = '#a3a3a3';
+                toast.style.borderLeftColor = '#a3a3a3';
             }
             toast.innerText = msg;
             container.appendChild(toast);
