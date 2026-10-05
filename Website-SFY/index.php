@@ -945,6 +945,58 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .modal-box { max-width: 720px; border-radius: 18px; background: #111; }
         .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
 
+        /* LIVING INTERACTIONS — keeps the editorial SongForYou layout, with a little more presence. */
+        .hero-soundscape {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            height: 24px;
+            margin: 0 0 1.15rem;
+            color: rgba(255,255,255,0.72);
+        }
+        .hero-soundscape span {
+            display: block;
+            width: 2px;
+            height: var(--bar-height);
+            border-radius: 99px;
+            background: currentColor;
+            transform-origin: center;
+            animation: soundscape 1.3s ease-in-out infinite alternate;
+            animation-delay: var(--bar-delay);
+        }
+        @keyframes soundscape {
+            from { transform: scaleY(0.42); opacity: 0.42; }
+            to { transform: scaleY(1); opacity: 1; }
+        }
+        .motion-ready [data-reveal] {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+        }
+        .motion-ready [data-reveal].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .carousel-item.is-tiltable,
+        .feed-card.is-tiltable {
+            transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift, 0px));
+            transform-style: preserve-3d;
+            transition: transform 170ms ease-out, border-color 180ms ease, box-shadow 180ms ease;
+            will-change: transform;
+        }
+        .carousel-item.is-tiltable:hover,
+        .feed-card.is-tiltable:hover {
+            border-color: rgba(255,255,255,0.46);
+            box-shadow: 0 22px 42px rgba(0,0,0,0.38);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .hero-soundscape span { animation: none; }
+            .carousel-item.is-tiltable,
+            .feed-card.is-tiltable { transform: none !important; transition: none; }
+        }
+
         @media (max-width: 600px) {
             .app-container { padding-left: max(2rem, env(safe-area-inset-left)); padding-right: max(2rem, env(safe-area-inset-right)); }
             header.navbar { padding: 1.15rem 0.7rem 1rem; }
@@ -996,7 +1048,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     </header>
 
     <!-- HERO SECTION -->
-    <section class="hero-section app-container">
+    <section class="hero-section app-container" data-reveal>
+        <div class="hero-soundscape" aria-hidden="true">
+            <span style="--bar-height:8px;--bar-delay:-0.2s"></span><span style="--bar-height:17px;--bar-delay:-0.7s"></span><span style="--bar-height:11px;--bar-delay:-0.45s"></span><span style="--bar-height:23px;--bar-delay:-1s"></span><span style="--bar-height:14px;--bar-delay:-0.35s"></span><span style="--bar-height:19px;--bar-delay:-0.8s"></span><span style="--bar-height:9px;--bar-delay:-0.55s"></span>
+        </div>
         <h1 class="hero-title">
             Kirim rasa lewat<br><em>sebuah lagu.</em>
         </h1>
@@ -1009,7 +1064,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     </section>
 
     <!-- FEATURED CAROUSEL SECTION -->
-    <section class="app-container">
+    <section class="app-container" data-reveal>
         <div class="section-header">
             <div>
                 <div class="section-tagline">Ungkapan terpilih</div>
@@ -1025,7 +1080,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     </section>
 
     <!-- Pesan hanya ditampilkan setelah pengguna melakukan pencarian. -->
-    <section class="app-container" id="messagesSection">
+    <section class="app-container" id="messagesSection" data-reveal>
         <div class="section-header">
             <div>
                 <div class="section-tagline">Temukan pesan</div>
@@ -1039,7 +1094,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     </section>
 
     <!-- FORM SECTION -->
-    <section id="formSection" class="app-container">
+    <section id="formSection" class="app-container" data-reveal>
         <div class="form-card">
             <div class="section-header" style="margin-top:0;">
                 <div>
@@ -1578,6 +1633,59 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         // Fetch & Render Messages
+        let revealObserver = null;
+
+        function revealWithin(root = document) {
+            const elements = root.querySelectorAll ? root.querySelectorAll('[data-reveal]') : [];
+            elements.forEach((element) => {
+                if (!document.documentElement.classList.contains('motion-ready')) return;
+                if (revealObserver) revealObserver.observe(element);
+                else element.classList.add('is-visible');
+            });
+        }
+
+        function enableCardTilt(card) {
+            if (card.dataset.tiltReady || !window.matchMedia('(pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            card.dataset.tiltReady = 'true';
+            card.classList.add('is-tiltable');
+
+            card.addEventListener('pointermove', (event) => {
+                const bounds = card.getBoundingClientRect();
+                const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+                const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+                card.style.setProperty('--tilt-x', `${-y * 4}deg`);
+                card.style.setProperty('--tilt-y', `${x * 5}deg`);
+                card.style.setProperty('--lift', '-5px');
+            }, { passive: true });
+            card.addEventListener('pointerleave', () => {
+                card.style.removeProperty('--tilt-x');
+                card.style.removeProperty('--tilt-y');
+                card.style.removeProperty('--lift');
+            });
+        }
+
+        function makeCardsInteractive(root = document) {
+            root.querySelectorAll?.('.carousel-item, .feed-card').forEach(enableCardTilt);
+        }
+
+        function initializeInterfaceMotion() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            document.documentElement.classList.add('motion-ready');
+
+            if ('IntersectionObserver' in window) {
+                revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        entry.target.classList.add('is-visible');
+                        revealObserver.unobserve(entry.target);
+                    });
+                }, { threshold: 0.12 });
+            }
+
+            revealWithin();
+            makeCardsInteractive();
+        }
+
         async function fetchMessages() {
             try {
                 const res = await fetch(getApiUrl('get_messages.php'));
@@ -1620,6 +1728,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 </div>
             `;
             }).join('');
+            makeCardsInteractive(track);
         }
 
         function renderMessages(messages, isSearch = false) {
@@ -1687,6 +1796,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     </article>
                 `;
             }).join('');
+            makeCardsInteractive(grid);
         }
 
         function filterMessages() {
@@ -1810,6 +1920,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initializeInterfaceMotion();
             fetchMessages();
             window.addEventListener('pointermove', (event) => {
                 document.body.style.setProperty('--cursor-x', `${(event.clientX / window.innerWidth) * 100}%`);
