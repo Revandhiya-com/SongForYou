@@ -919,13 +919,14 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .modal-message { font-size: clamp(1.9rem, 4vw, 3rem); line-height: 1.16; color: #f5f5f5; }
 
         @media (max-width: 600px) {
-            .app-container { padding: 0 1.1rem; }
+            .app-container { padding: 0 1.45rem; }
             header.navbar { padding: 1.15rem 0 1rem; }
             .brand-logo { font-size: 1rem; }
             .btn-nav-action { padding: 0.52rem 0.8rem; font-size: 0.72rem; }
-            .hero-section { padding: 2.6rem 0 2.5rem; }
+            .hero-section { padding: 2.6rem 0 2.5rem; text-align: center; }
             .hero-section::before { height: 19rem; top: 0.5rem; }
             .hero-title { font-size: 2rem; line-height: 0.98; letter-spacing: -0.075em; margin-bottom: 1.45rem; }
+            .hero-actions { justify-content: center; }
             .hero-actions .btn-main { width: auto; min-width: 0; justify-content: center; padding: 0.82rem 1.05rem; }
             .btn-subtle { width: auto; justify-content: center; }
             .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
@@ -934,10 +935,11 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             .section-title { font-size: 1.45rem; line-height: 1; }
             .section-tagline { font-size: 0.62rem; margin-bottom: 0.3rem; }
             .section-desc { font-size: 0.86rem; }
-            .carousel-container { overflow: visible; }
-            .carousel-flex { display: grid; grid-template-columns: 1fr; gap: 0.8rem; padding: 0; }
-            .carousel-item { min-height: 0; width: 100%; }
-            .carousel-item.no-photo { min-height: 210px; }
+            .carousel-container { overflow-x: auto; margin-right: -1.45rem; padding-right: 1.45rem; scrollbar-width: none; }
+            .carousel-container::-webkit-scrollbar { display: none; }
+            .carousel-flex { display: flex; gap: 0.8rem; padding: 0 0 0.35rem; scroll-snap-type: x mandatory; }
+            .carousel-item { flex: 0 0 min(76vw, 300px); min-height: 0; scroll-snap-align: start; }
+            .carousel-item.no-photo { min-height: 205px; }
             .item-body { padding: 1rem 1.1rem 1.05rem; }
             .item-text { font-size: 1.28rem; line-height: 1.12; -webkit-line-clamp: 2; }
             .item-media { aspect-ratio: 16 / 8; }
