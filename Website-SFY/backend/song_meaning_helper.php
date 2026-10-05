@@ -7,16 +7,45 @@
 function fetchLyricsForMeaning($title, $artist) {
     static $cache = [];
     $artist = trim(explode(',', $artist)[0]);
-    $cacheKey = strtolower($artist . '|' . $title);
+    $cacheKey = mb_strtolower($artist . '|' . $title, 'UTF-8');
     if (array_key_exists($cacheKey, $cache)) return $cache[$cacheKey];
 
+    // LRCLIB menyediakan pencarian berbasis judul + artis dan memiliki
+    // cakupan yang lebih baik untuk lagu populer maupun rilisan internasional.
+    $lrcUrl = 'https://lrclib.net/api/search?track_name=' . rawurlencode($title) .
+        '&artist_name=' . rawurlencode($artist);
+    $ch = curl_init($lrcUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 2,
+        CURLOPT_TIMEOUT => 4,
+        CURLOPT_USERAGENT => 'SongForYou/1.0 (meaning lookup)'
+    ]);
+    $response = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $tracks = $response ? json_decode($response, true) : null;
+    if ($status === 200 && is_array($tracks)) {
+        $titleKey = normalizeMeaningValue($title);
+        $artistKey = getPrimaryArtistKey($artist);
+        foreach ($tracks as $track) {
+            $trackTitle = normalizeMeaningValue($track['trackName'] ?? $track['name'] ?? '');
+            $trackArtist = getPrimaryArtistKey($track['artistName'] ?? '');
+            if ($trackTitle !== $titleKey || $trackArtist !== $artistKey) continue;
+            $lyrics = trim((string)($track['plainLyrics'] ?? $track['syncedLyrics'] ?? ''));
+            if ($lyrics !== '') return $cache[$cacheKey] = $lyrics;
+        }
+    }
+
+    // Fallback untuk katalog yang belum ada di LRCLIB.
     $url = 'https://api.lyrics.ovh/v1/' . rawurlencode($artist) . '/' . rawurlencode($title);
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CONNECTTIMEOUT => 2,
         CURLOPT_TIMEOUT => 4,
-        CURLOPT_USERAGENT => 'SongForYou/1.0'
+        CURLOPT_USERAGENT => 'SongForYou/1.0 (meaning lookup)'
     ]);
     $response = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
