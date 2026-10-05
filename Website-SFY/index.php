@@ -1371,6 +1371,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         function updateClipTime() {
             selectedClipStart = Number(document.getElementById('clipStartInput').value) || 0;
             document.getElementById('clipTime').textContent = `Mulai 0:${String(selectedClipStart).padStart(2, '0')}`;
+            // Saat preview masih bermain, perpindahan slider langsung mencari titik baru.
+            if (selectedClipAudio && !selectedClipAudio.paused && Number.isFinite(selectedClipAudio.duration)) {
+                selectedClipAudio.currentTime = Math.min(selectedClipStart, Math.max(0, selectedClipAudio.duration - 0.1));
+            }
         }
         document.getElementById('clipStartInput').addEventListener('input', updateClipTime);
 
