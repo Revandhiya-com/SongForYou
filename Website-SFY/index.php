@@ -2,12 +2,7 @@
 /*
  * /Website-SFY/index.php
  * SongForYou — Archive Your Feelings Through Music
- * Redesigned & Refined:
- * - Removed "Dari Siapa?" (Sender) field per user request
- * - Preserved Spotify & iTunes real-time search & official artwork
- * - Enhanced audio playback with automatic 30s preview fallback
- * - Structured Photo & Song Meaning display
- * - Jesper Landberg aesthetic & full mobile zoom lock
+ * Handcrafted Aesthetic: Human, fluid, organic dark theme with soft typography & zero AI-slop vibe.
  */
 header('Content-Type: text/html; charset=utf-8');
 
@@ -31,36 +26,36 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SongForYou — Bisikkan Perasaanmu Lewat Lagu</title>
-    <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu spesial untuk seseorang yang berarti dalam hidupmu.">
+    <meta name="description" content="Kirimkan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.">
 
-    <!-- Fonts: DM Serif Display, Syne, Inter -->
+    <!-- Fonts: Plus Jakarta Sans & Instrument Serif / Cormorant Garamond for warm human feel -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-dark: #08080a;
-            --bg-card: #121216;
-            --bg-card-hover: #181820;
-            --bg-input: #1a1a22;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(255, 255, 255, 0.18);
-            --text-main: #f3f3f6;
-            --text-muted: #8e8e9e;
-            --accent-green: #1db954;
-            --accent-glow: rgba(29, 185, 84, 0.15);
-            --accent-warm: #e5c07b;
-            --font-serif: 'DM Serif Display', Georgia, serif;
-            --font-heading: 'Syne', sans-serif;
-            --font-body: 'Inter', system-ui, sans-serif;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg-main: #0b0b0e;
+            --bg-surface: #13131a;
+            --bg-surface-hover: #191924;
+            --bg-input: #171720;
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-glow: rgba(255, 255, 255, 0.16);
+            --text-heading: #f8fafc;
+            --text-body: #94a3b8;
+            --text-subtle: #64748b;
+            --accent-soft: #20c997;
+            --accent-sage: #34d399;
+            --accent-dim: rgba(52, 211, 153, 0.12);
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         /* RESET & BASE */
@@ -74,268 +69,216 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         html, body {
             width: 100%;
             height: 100%;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-body);
+            background-color: var(--bg-main);
+            color: var(--text-heading);
+            font-family: var(--font-sans);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
+            line-height: 1.6;
         }
 
         /* SCROLLBAR */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
+            background: var(--bg-main);
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
 
-        /* CONTAINER & LAYOUT */
+        /* CONTAINER */
         .app-container {
-            max-width: 1160px;
+            max-width: 1120px;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
 
-        /* HEADER / NAVBAR */
+        /* NAVBAR */
         header.navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.75rem 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 2rem 0 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
         }
         .brand-logo {
-            font-family: var(--font-heading);
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.3px;
+            color: var(--text-heading);
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.6rem;
         }
-        .brand-logo i {
-            color: var(--accent-green);
-            font-size: 1.1rem;
+        .brand-logo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            color: var(--accent-sage);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
         }
-        .btn-nav {
-            font-family: var(--font-heading);
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 0.65rem 1.4rem;
+        .btn-nav-action {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.6rem 1.4rem;
             border-radius: 100px;
-            border: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-heading);
             text-decoration: none;
             transition: var(--transition);
         }
-        .btn-nav:hover {
-            border-color: var(--text-main);
-            background: var(--text-main);
-            color: var(--bg-dark);
+        .btn-nav-action:hover {
+            border-color: var(--border-glow);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         /* HERO SECTION */
         .hero-section {
-            padding: 4.5rem 0 3.5rem;
+            padding: 5rem 0 3.5rem;
             text-align: center;
-            position: relative;
         }
-        .hero-badge {
+        .hero-pill {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.4rem 1.1rem;
+            padding: 0.35rem 1rem;
             border-radius: 100px;
-            background: var(--accent-glow);
-            border: 1px solid rgba(29, 185, 84, 0.3);
-            color: var(--accent-green);
-            font-family: var(--font-heading);
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1.75rem;
+        }
+        .hero-pill i {
+            color: var(--accent-sage);
         }
         .hero-title {
             font-family: var(--font-serif);
-            font-size: clamp(2.4rem, 5.5vw, 4.5rem);
-            line-height: 1.12;
+            font-size: clamp(2.6rem, 6vw, 4.8rem);
+            line-height: 1.08;
             font-weight: 400;
-            color: var(--text-main);
+            color: var(--text-heading);
             margin-bottom: 1.25rem;
+            letter-spacing: -0.5px;
         }
         .hero-title em {
             font-style: italic;
-            color: var(--accent-green);
+            color: #ffffff;
+            border-bottom: 1px solid var(--accent-sage);
         }
-        .hero-desc {
-            max-width: 580px;
+        .hero-subtitle {
+            max-width: 560px;
             margin: 0 auto 2.5rem;
-            font-size: 1.05rem;
-            line-height: 1.6;
-            color: var(--text-muted);
+            font-size: 1.02rem;
+            color: var(--text-body);
+            font-weight: 400;
         }
-        .hero-cta-group {
+        .hero-actions {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
         }
-        .btn-primary {
-            font-family: var(--font-heading);
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 1rem 2.2rem;
+        .btn-main {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.95rem 2.2rem;
             border-radius: 100px;
-            background: var(--text-main);
-            color: var(--bg-dark);
-            border: 1px solid var(--text-main);
+            background: #ffffff;
+            color: #0b0b0e;
+            border: 1px solid #ffffff;
             text-decoration: none;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+            box-shadow: 0 10px 25px rgba(255,255,255,0.08);
         }
-        .btn-primary:hover {
+        .btn-main:hover {
             transform: translateY(-2px);
-            background: #ffffff;
-            box-shadow: 0 14px 40px rgba(255,255,255,0.2);
+            background: #f1f5f9;
+            box-shadow: 0 14px 35px rgba(255,255,255,0.15);
         }
-        .btn-secondary {
-            font-family: var(--font-heading);
-            font-size: 0.82rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 1rem 2.2rem;
+        .btn-subtle {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.95rem 2.2rem;
             border-radius: 100px;
             background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            border: 1px solid var(--border-subtle);
             text-decoration: none;
             cursor: pointer;
             transition: var(--transition);
         }
-        .btn-secondary:hover {
-            border-color: var(--border-highlight);
-            background: rgba(255, 255, 255, 0.05);
+        .btn-subtle:hover {
+            border-color: var(--border-glow);
+            background: rgba(255, 255, 255, 0.04);
         }
 
-        /* PILLARS GRID */
-        .pillars-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.5rem;
-            margin: 3rem 0 4rem;
-        }
-        .pillar-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem;
-            transition: var(--transition);
-        }
-        .pillar-card:hover {
-            border-color: var(--border-highlight);
-            transform: translateY(-3px);
-        }
-        .pillar-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-green);
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-        .pillar-title {
-            font-family: var(--font-heading);
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 0.4rem;
-        }
-        .pillar-text {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            line-height: 1.55;
-        }
-
-        /* SECTION HEADERS */
+        /* SECTION HEADER */
         .section-header {
-            margin: 4rem 0 2rem;
+            margin: 4.5rem 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             flex-wrap: wrap;
             gap: 1rem;
         }
-        .section-tag {
-            font-family: var(--font-heading);
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 2px;
+        .section-tagline {
+            font-size: 0.78rem;
+            font-weight: 600;
             text-transform: uppercase;
-            color: var(--accent-green);
-            margin-bottom: 0.5rem;
+            letter-spacing: 1.5px;
+            color: var(--accent-sage);
+            margin-bottom: 0.4rem;
         }
         .section-title {
             font-family: var(--font-serif);
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 400;
             line-height: 1.15;
+            color: var(--text-heading);
         }
         .section-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            max-width: 500px;
-            line-height: 1.5;
+            color: var(--text-body);
+            font-size: 0.92rem;
+            max-width: 480px;
         }
 
-        /* FEATURED CAROUSEL */
-        .carousel-wrapper {
-            position: relative;
-            margin-bottom: 4rem;
-        }
-        .carousel-track-container {
+        /* CAROUSEL TRACK */
+        .carousel-container {
             overflow-x: auto;
             scroll-behavior: smooth;
+            padding: 0.5rem 0 1rem;
             scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding: 0.5rem 0;
         }
-        .carousel-track-container::-webkit-scrollbar {
+        .carousel-container::-webkit-scrollbar {
             display: none;
         }
-        .carousel-track {
+        .carousel-flex {
             display: flex;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
-        .carousel-card {
-            flex: 0 0 320px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+        .carousel-item {
+            flex: 0 0 310px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
             display: flex;
@@ -344,62 +287,61 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             transition: var(--transition);
             cursor: pointer;
         }
-        .carousel-card:hover {
-            border-color: var(--border-highlight);
+        .carousel-item:hover {
+            border-color: var(--border-glow);
+            background: var(--bg-surface-hover);
             transform: translateY(-4px);
         }
-        .card-recipient-tag {
-            font-family: var(--font-heading);
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--accent-green);
-        }
-        .card-recipient-name {
+        .item-to {
             font-family: var(--font-serif);
             font-size: 1.4rem;
-            margin: 0.3rem 0 0.8rem;
-            color: var(--text-main);
+            color: var(--text-heading);
+            margin-bottom: 0.6rem;
         }
-        .card-message-snippet {
-            font-size: 0.9rem;
+        .item-text {
+            font-size: 0.88rem;
+            color: var(--text-body);
             line-height: 1.6;
-            color: #b0b0c0;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
             font-style: italic;
         }
+        .item-song-pill {
+            font-size: 0.78rem;
+            color: var(--accent-sage);
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 500;
+        }
 
         /* FORM SECTION */
-        .form-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: clamp(1.75rem, 4vw, 3.5rem);
+        .form-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: clamp(1.75rem, 4vw, 3.2rem);
             margin: 4rem 0;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
         }
         .form-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.75rem;
+            gap: 1.5rem;
         }
-        .form-group {
+        .form-field {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.5rem;
             position: relative;
         }
         .form-label {
-            font-family: var(--font-heading);
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-body);
             display: flex;
             align-items: center;
             gap: 0.4rem;
@@ -407,160 +349,142 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         .form-input, .form-textarea {
             width: 100%;
             background: var(--bg-input);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
-            padding: 1rem 1.2rem;
-            color: var(--text-main);
-            font-family: var(--font-body);
-            font-size: 0.95rem;
+            padding: 0.9rem 1.1rem;
+            color: var(--text-heading);
+            font-family: var(--font-sans);
+            font-size: 0.92rem;
             outline: none;
             transition: var(--transition);
         }
         .form-input:focus, .form-textarea:focus {
-            border-color: var(--accent-green);
-            background: #1e1e28;
-            box-shadow: 0 0 0 4px var(--accent-glow);
+            border-color: var(--accent-sage);
+            background: #1c1c28;
+            box-shadow: 0 0 0 3px var(--accent-dim);
         }
         .form-textarea {
             resize: vertical;
-            min-height: 130px;
+            min-height: 120px;
         }
 
-        /* SONG SEARCH DROPDOWN */
-        .song-search-container {
-            position: relative;
-        }
-        .song-dropdown {
+        /* SEARCH DROPDOWN */
+        .search-dropdown {
             position: absolute;
             top: calc(100% + 6px);
             left: 0;
             right: 0;
-            background: #161620;
-            border: 1px solid var(--border-highlight);
+            background: #181822;
+            border: 1px solid var(--border-glow);
             border-radius: var(--radius-md);
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
             z-index: 100;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
             display: none;
         }
-        .song-option {
+        .search-option {
             display: flex;
             align-items: center;
-            gap: 0.9rem;
-            padding: 0.85rem 1.1rem;
+            gap: 0.85rem;
+            padding: 0.8rem 1rem;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
             transition: background 0.2s ease;
         }
-        .song-option:last-child {
+        .search-option:last-child {
             border-bottom: none;
         }
-        .song-option:hover {
-            background: rgba(255,255,255,0.08);
+        .search-option:hover {
+            background: rgba(255,255,255,0.06);
         }
-        .song-option img {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
+        .search-option img {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
             object-fit: cover;
-            flex-shrink: 0;
         }
-        .song-option-info {
+        .search-option-info {
             flex: 1;
             min-width: 0;
         }
-        .song-option-info h5 {
-            font-size: 0.9rem;
+        .search-option-info h5 {
+            font-size: 0.88rem;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-heading);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .song-option-info p {
+        .search-option-info p {
             font-size: 0.78rem;
-            color: var(--text-muted);
+            color: var(--text-body);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        .spotify-tag-badge {
-            font-size: 0.75rem;
-            color: var(--accent-green);
-            margin-left: 0.5rem;
         }
 
-        /* SELECTED SONG DISPLAY BOX */
-        .selected-song-bubble {
+        /* SELECTED SONG DISPLAY */
+        .selected-song-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(29, 185, 84, 0.08);
-            border: 1px solid rgba(29, 185, 84, 0.3);
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid rgba(52, 211, 153, 0.25);
             border-radius: var(--radius-md);
-            padding: 0.9rem 1.1rem;
-            margin-top: 0.6rem;
-            gap: 1rem;
+            padding: 0.85rem 1rem;
+            margin-top: 0.5rem;
         }
-        .song-preview-meta {
+        .selected-song-meta {
             display: flex;
             align-items: center;
-            gap: 0.9rem;
+            gap: 0.85rem;
             min-width: 0;
         }
-        .song-preview-meta img {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
+        .selected-song-meta img {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
             object-fit: cover;
-            flex-shrink: 0;
         }
-        .song-preview-meta h4 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .selected-song-meta h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-heading);
         }
-        .song-preview-meta p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .selected-song-meta p {
+            font-size: 0.78rem;
+            color: var(--text-body);
         }
-        .btn-remove-song {
+        .btn-clear-song {
             background: none;
             border: none;
-            color: var(--text-muted);
+            color: var(--text-subtle);
             cursor: pointer;
             font-size: 1.1rem;
-            padding: 0.4rem;
+            padding: 0.3rem;
             transition: color 0.2s ease;
-            flex-shrink: 0;
         }
-        .btn-remove-song:hover {
-            color: #ff5555;
+        .btn-clear-song:hover {
+            color: #f87171;
         }
 
-        /* FILE DROPZONE */
-        .file-dropzone {
-            border: 2px dashed var(--border-color);
+        /* DROPZONE */
+        .upload-dropzone {
+            border: 2px dashed var(--border-subtle);
             border-radius: var(--radius-md);
-            padding: 1.6rem;
+            padding: 1.5rem;
             text-align: center;
             background: var(--bg-input);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
         }
-        .file-dropzone:hover {
-            border-color: var(--accent-green);
-            background: rgba(29, 185, 84, 0.04);
+        .upload-dropzone:hover {
+            border-color: var(--accent-sage);
+            background: rgba(52, 211, 153, 0.03);
         }
-        .file-dropzone input[type="file"] {
+        .upload-dropzone input[type="file"] {
             position: absolute;
             top: 0;
             left: 0;
@@ -569,180 +493,171 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             opacity: 0;
             cursor: pointer;
         }
-        .file-preview-thumb {
-            max-height: 160px;
+        .photo-preview {
+            max-height: 150px;
             border-radius: 8px;
             margin-top: 0.8rem;
             object-fit: cover;
             display: none;
         }
 
-        /* MESSAGES FEED GRID */
-        .messages-search-bar {
-            margin-bottom: 2rem;
-        }
-        .messages-search-input {
+        /* FEED GRID */
+        .filter-input {
             width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: 100px;
-            padding: 0.9rem 1.6rem;
-            color: var(--text-main);
-            font-size: 0.92rem;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-heading);
+            font-size: 0.9rem;
             outline: none;
+            margin-bottom: 2rem;
             transition: var(--transition);
         }
-        .messages-search-input:focus {
-            border-color: var(--border-highlight);
-            background: var(--bg-card-hover);
+        .filter-input:focus {
+            border-color: var(--border-glow);
+            background: var(--bg-surface-hover);
         }
 
-        .messages-grid {
+        .feed-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.75rem;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 1.5rem;
         }
         @media (max-width: 480px) {
-            .messages-grid {
+            .feed-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* MESSAGE CARD STYLING */
-        .message-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+        /* MESSAGE CARD */
+        .feed-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
-            padding: 1.6rem;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: var(--transition);
-            position: relative;
         }
-        .message-card:hover {
-            border-color: var(--border-highlight);
-            background: var(--bg-card-hover);
+        .feed-card:hover {
+            border-color: var(--border-glow);
+            background: var(--bg-surface-hover);
             transform: translateY(-3px);
         }
-        .card-header-row {
+        .card-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.1rem;
+            margin-bottom: 1rem;
         }
-        .card-to {
+        .card-recipient {
             font-family: var(--font-serif);
             font-size: 1.35rem;
-            color: var(--text-main);
-            line-height: 1.2;
+            color: var(--text-heading);
         }
         .card-date {
             font-size: 0.72rem;
-            color: var(--text-muted);
-            white-space: nowrap;
+            color: var(--text-subtle);
         }
-        .card-image-wrap {
+        .card-img-wrap {
             width: 100%;
-            height: 200px;
+            height: 190px;
             border-radius: var(--radius-md);
             overflow: hidden;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.1rem;
             cursor: pointer;
-            position: relative;
         }
-        .card-image-wrap img {
+        .card-img-wrap img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.4s ease;
         }
-        .card-image-wrap:hover img {
+        .card-img-wrap:hover img {
             transform: scale(1.04);
         }
-        .card-body-text {
-            font-size: 0.95rem;
+        .card-message {
+            font-size: 0.92rem;
+            color: #cbd5e1;
             line-height: 1.65;
-            color: #d5d5e2;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.1rem;
             word-wrap: break-word;
         }
 
         /* SONG MEANING BOX */
-        .song-meaning-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid var(--accent-green);
-            border-radius: 6px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.2rem;
+        .meaning-box {
+            background: rgba(255, 255, 255, 0.025);
+            border-left: 3px solid var(--accent-sage);
+            border-radius: 4px;
+            padding: 0.75rem 0.95rem;
+            margin-bottom: 1.1rem;
         }
-        .meaning-header {
-            font-family: var(--font-heading);
+        .meaning-lbl {
             font-size: 0.72rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent-green);
-            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--accent-sage);
+            margin-bottom: 0.2rem;
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
-        .meaning-text {
-            font-size: 0.84rem;
-            color: var(--text-muted);
+        .meaning-txt {
+            font-size: 0.82rem;
+            color: var(--text-body);
             line-height: 1.5;
             font-style: italic;
         }
 
         /* AUDIO PLAYER BAR */
-        .player-bar {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
+        .audio-bar {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: var(--radius-md);
-            padding: 0.8rem 1rem;
+            padding: 0.75rem 0.95rem;
             display: flex;
             align-items: center;
-            gap: 0.9rem;
+            gap: 0.85rem;
         }
-        .player-cover {
-            width: 46px;
-            height: 46px;
-            border-radius: 8px;
+        .audio-cover {
+            width: 42px;
+            height: 42px;
+            border-radius: 6px;
             object-fit: cover;
             flex-shrink: 0;
         }
-        .player-meta {
+        .audio-info {
             flex: 1;
             min-width: 0;
         }
-        .player-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: var(--text-main);
+        .audio-title {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-heading);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .player-artist {
-            font-size: 0.76rem;
-            color: var(--text-muted);
+        .audio-artist {
+            font-size: 0.75rem;
+            color: var(--text-body);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .player-controls {
+        .audio-actions {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             flex-shrink: 0;
         }
-        .btn-play-icon {
-            width: 38px;
-            height: 38px;
+        .btn-play-audio {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: var(--accent-green);
-            color: #000;
+            background: var(--accent-sage);
+            color: #0b0b0e;
             border: none;
             display: flex;
             align-items: center;
@@ -750,68 +665,64 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             cursor: pointer;
             transition: transform 0.2s ease, background 0.2s ease;
         }
-        .btn-play-icon:hover {
-            transform: scale(1.08);
-            background: #1ed760;
+        .btn-play-audio:hover {
+            transform: scale(1.06);
+            background: #6ee7b7;
         }
-        .spotify-link-btn {
-            color: var(--text-muted);
+        .spotify-btn {
+            color: var(--text-subtle);
             font-size: 1.1rem;
             transition: color 0.2s ease;
             text-decoration: none;
         }
-        .spotify-link-btn:hover {
-            color: var(--accent-green);
+        .spotify-btn:hover {
+            color: var(--accent-sage);
         }
 
-        /* MODAL OVERLAY */
-        .modal-overlay {
+        /* MODAL */
+        .modal-bg {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             z-index: 1000;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
         }
-        .modal-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-highlight);
-            border-radius: 24px;
-            max-width: 620px;
+        .modal-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-xl);
+            max-width: 600px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 2.2rem;
+            padding: 2rem;
             position: relative;
         }
-        .btn-close-modal {
+        .btn-close {
             position: absolute;
             top: 1.2rem;
             right: 1.2rem;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.08);
             border: none;
-            color: var(--text-main);
-            width: 36px;
-            height: 36px;
+            color: var(--text-heading);
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s ease;
-        }
-        .btn-close-modal:hover {
-            background: rgba(255,255,255,0.25);
         }
 
         /* TOAST */
-        .toast-container {
+        .toast-wrap {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
@@ -820,59 +731,34 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             flex-direction: column;
             gap: 0.75rem;
         }
-        .toast {
-            background: #1e1e28;
-            border: 1px solid var(--border-highlight);
-            border-left: 4px solid var(--accent-green);
-            color: var(--text-main);
-            padding: 1rem 1.4rem;
+        .toast-item {
+            background: #181822;
+            border: 1px solid var(--border-glow);
+            border-left: 4px solid var(--accent-sage);
+            color: var(--text-heading);
+            padding: 0.9rem 1.3rem;
             border-radius: var(--radius-md);
             font-size: 0.88rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
 
         /* FOOTER */
         footer {
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-subtle);
             padding: 3rem 0;
-            margin-top: 6rem;
+            margin-top: 5rem;
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text-subtle);
             font-size: 0.85rem;
         }
 
-        /* MOBILE RESPONSIVE */
         @media (max-width: 600px) {
-            .app-container {
-                padding: 0 1rem;
-            }
-            .hero-title {
-                font-size: 2.2rem;
-            }
-            .hero-desc {
-                font-size: 0.92rem;
-            }
-            .btn-primary, .btn-secondary {
-                width: 100%;
-                justify-content: center;
-            }
-            .form-section {
-                padding: 1.5rem 1.2rem;
-                border-radius: 16px;
-            }
-            .message-card {
-                padding: 1.25rem;
-            }
-            .toast-container {
-                left: 1rem;
-                right: 1rem;
-                bottom: 1rem;
-            }
+            .app-container { padding: 0 1rem; }
+            .hero-title { font-size: 2.3rem; }
+            .btn-main, .btn-subtle { width: 100%; justify-content: center; }
+            .form-card { padding: 1.4rem 1.1rem; border-radius: 16px; }
+            .feed-card { padding: 1.2rem; }
+            .toast-wrap { left: 1rem; right: 1rem; bottom: 1rem; }
         }
     </style>
 </head>
@@ -881,133 +767,110 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <!-- NAVBAR -->
     <header class="navbar app-container">
         <a href="#" class="brand-logo">
-            <i class="fa-solid fa-music"></i>
+            <div class="brand-logo-icon"><i class="fa-solid fa-music"></i></div>
             <span>SongForYou</span>
         </a>
-        <a href="#formSection" class="btn-nav">Kirim Pesan</a>
+        <a href="#formSection" class="btn-nav-action">Kirim Pesan</a>
     </header>
 
     <!-- HERO SECTION -->
     <section class="hero-section app-container">
-        <div class="hero-badge">
+        <div class="hero-pill">
             <i class="fa-brands fa-spotify"></i>
-            <span>Music & Emotion Archive</span>
+            <span>Arsip Musik & Perasaan</span>
         </div>
         <h1 class="hero-title">
-            Bisikkan Perasaanmu<br>Lewat <em>Lagu Spesial</em>
+            Abadikan Perasaanmu<br>Dalam <em>Alunan Musik</em>
         </h1>
-        <p class="hero-desc">
-            Sampaikan pesan rahasia, ungkapan hati, dan lagu kenangan untuk seseorang yang berharga dalam hidupmu.
+        <p class="hero-subtitle">
+            Sampaikan pesan tersirat dan lagu kenangan untuk seseorang yang berarti dalam hidupmu.
         </p>
-        <div class="hero-cta-group">
-            <a href="#formSection" class="btn-primary">
+        <div class="hero-actions">
+            <a href="#formSection" class="btn-main">
                 <i class="fa-solid fa-paper-plane"></i>
                 Tulis Pesan Rahasia
             </a>
-            <a href="#feedSection" class="btn-secondary">
+            <a href="#feedSection" class="btn-subtle">
                 Jelajahi Pesan
             </a>
         </div>
     </section>
 
-    <!-- PILLARS / FEATURES -->
-    <div class="app-container">
-        <div class="pillars-grid">
-            <div class="pillar-card">
-                <div class="pillar-icon"><i class="fa-solid fa-heart"></i></div>
-                <h3 class="pillar-title">Pesan Untuk Sang Kekasih</h3>
-                <p class="pillar-text">Tuliskan kata-kata manis atau curahan hati yang ingin kamu sampaikan khusus untuknya.</p>
-            </div>
-            <div class="pillar-card">
-                <div class="pillar-icon"><i class="fa-brands fa-spotify"></i></div>
-                <h3 class="pillar-title">Integrasi Musik Spotify</h3>
-                <p class="pillar-text">Pilih lagu favorit lengkap dengan artwork resmi dan alunan melodinya.</p>
-            </div>
-            <div class="pillar-card">
-                <div class="pillar-icon"><i class="fa-solid fa-compact-disc"></i></div>
-                <h3 class="pillar-title">Makna Lagu & Foto</h3>
-                <p class="pillar-text">Lengkapi pesanmu dengan foto kenangan indah dan penjelasan makna lagu yang menyentuh.</p>
-            </div>
-        </div>
-    </div>
-
     <!-- FEATURED CAROUSEL SECTION -->
     <section class="app-container">
         <div class="section-header">
             <div>
-                <div class="section-tag">Pesan Terpilih</div>
-                <h2 class="section-title">Ungkapan Hati Terbaru</h2>
+                <div class="section-tagline">Ungkapan Terpilih</div>
+                <h2 class="section-title">Cerita & Melodi Terbaru</h2>
             </div>
-            <p class="section-desc">Momen-momen bermakna yang dibagikan lewat musik dan bait cerita.</p>
+            <p class="section-desc">Momen-momen indah yang diabadikan lewat alunan lagu kenangan.</p>
         </div>
         
-        <div class="carousel-wrapper">
-            <div class="carousel-track-container" id="carouselTrackContainer">
-                <div class="carousel-track" id="carouselTrack">
-                    <!-- Loaded dynamically -->
-                </div>
+        <div class="carousel-container">
+            <div class="carousel-flex" id="carouselTrack">
+                <!-- Loaded dynamically -->
             </div>
         </div>
     </section>
 
     <!-- FORM SECTION -->
     <section id="formSection" class="app-container">
-        <div class="form-section">
+        <div class="form-card">
             <div class="section-header" style="margin-top:0;">
                 <div>
-                    <div class="section-tag">Kirim Pesan</div>
-                    <h2 class="section-title">Bagikan Melodimu</h2>
+                    <div class="section-tagline">Dedikasikan Lagu</div>
+                    <h2 class="section-title">Kirim Pesan Rahasia</h2>
                 </div>
-                <p class="section-desc">Isi formulir di bawah untuk mendedikasikan pesan dan lagu spesial.</p>
+                <p class="section-desc">Pilih lagu spesial dan tuliskan kalimat yang ingin kamu sampaikan padanya.</p>
             </div>
 
             <form id="createMessageForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-grid">
-                    <!-- RECIPIENT INPUT ONLY (NO "DARI SIAPA?") -->
-                    <div class="form-group">
-                        <label class="form-label" for="recipientInput"><i class="fa-solid fa-user"></i> Untuk (Nama / Inisial Penerima)</label>
-                        <input type="text" id="recipientInput" name="receiver" class="form-input" placeholder="Tuliskan nama atau inisial seseorang (mis. Adinda)" required>
+                    <!-- RECIPIENT FIELD ONLY (NO SENDER FIELD) -->
+                    <div class="form-field">
+                        <label class="form-label" for="recipientInput"><i class="fa-regular fa-user"></i> Untuk (Nama / Inisial Penerima)</label>
+                        <input type="text" id="recipientInput" class="form-input" placeholder="Tulis nama penerima (mis. Adinda)" required>
                     </div>
 
-                    <!-- SONG SEARCH INPUT -->
-                    <div class="form-group song-search-container">
-                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify" style="color:var(--accent-green);"></i> Cari Lagu Spesial</label>
+                    <!-- SONG SEARCH FIELD -->
+                    <div class="form-field">
+                        <label class="form-label" for="songSearchInput"><i class="fa-brands fa-spotify" style="color:var(--accent-sage);"></i> Cari Lagu Spesial</label>
                         <input type="text" id="songSearchInput" class="form-input" placeholder="Ketik judul lagu atau nama penyanyi..." autocomplete="off">
                         
-                        <div class="song-dropdown" id="songDropdown"></div>
+                        <div class="search-dropdown" id="songDropdown"></div>
                         
                         <!-- SELECTED SONG DISPLAY -->
-                        <div id="selectedSongBubble" class="selected-song-bubble" style="display:none;">
-                            <div class="song-preview-meta">
+                        <div id="selectedSongBubble" class="selected-song-card" style="display:none;">
+                            <div class="selected-song-meta">
                                 <img id="selectedBubbleImg" src="" alt="Album Cover">
                                 <div>
                                     <h4 id="selectedBubbleTitle">Judul Lagu</h4>
                                     <p id="selectedBubbleArtist">Penyanyi</p>
                                 </div>
                             </div>
-                            <button type="button" class="btn-remove-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
+                            <button type="button" class="btn-clear-song" onclick="clearSelectedSong()"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>
 
-                    <!-- MESSAGE INPUT -->
-                    <div class="form-group">
-                        <label class="form-label" for="messageInput"><i class="fa-solid fa-pen-nib"></i> Isi Pesan Rahasia</label>
-                        <textarea id="messageInput" name="message" class="form-textarea" placeholder="Tuliskan cerita, perasaan, atau pesan hangatmu di sini..." required></textarea>
+                    <!-- MESSAGE TEXTAREA -->
+                    <div class="form-field">
+                        <label class="form-label" for="messageInput"><i class="fa-regular fa-comment"></i> Isi Pesan Rahasia</label>
+                        <textarea id="messageInput" class="form-textarea" placeholder="Tuliskan cerita, perasaan, atau harapan hangatmu..." required></textarea>
                     </div>
 
                     <!-- PHOTO UPLOAD -->
-                    <div class="form-group">
-                        <label class="form-label"><i class="fa-solid fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
-                        <div class="file-dropzone" onclick="document.getElementById('photoInput').click()">
-                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem; color:var(--accent-green); margin-bottom:0.5rem;"></i>
-                            <p style="font-size:0.88rem; color:var(--text-main);">Klik untuk memilih foto dari galeri HP / Komputer</p>
-                            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
+                    <div class="form-field">
+                        <label class="form-label"><i class="fa-regular fa-image"></i> Lampirkan Foto / Kenangan (Opsional)</label>
+                        <div class="upload-dropzone" onclick="document.getElementById('photoInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem; color:var(--accent-sage); margin-bottom:0.4rem;"></i>
+                            <p style="font-size:0.86rem; color:var(--text-heading);">Klik untuk memilih foto dari perangkatmu</p>
+                            <p style="font-size:0.75rem; color:var(--text-body); margin-top:0.2rem;">Format JPG, PNG, WEBP</p>
                             <input type="file" id="photoInput" accept="image/*" onchange="handleFileSelected(event)">
-                            <img id="photoPreviewThumb" class="file-preview-thumb" alt="Preview Photo">
+                            <img id="photoPreviewThumb" class="photo-preview" alt="Preview Photo">
                         </div>
                     </div>
 
-                    <button type="submit" id="btnSubmitForm" class="btn-primary" style="justify-content:center; width:100%; margin-top:0.5rem;">
+                    <button type="submit" id="btnSubmitForm" class="btn-main" style="justify-content:center; width:100%; margin-top:0.5rem;">
                         <i class="fa-solid fa-paper-plane"></i>
                         Kirim Pesan Rahasia
                     </button>
@@ -1020,44 +883,40 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
     <section id="feedSection" class="app-container">
         <div class="section-header">
             <div>
-                <div class="section-tag">Arsip Pesan</div>
-                <h2 class="section-title">Semua Pesan & Melodi</h2>
+                <div class="section-tagline">Arsip Cerita</div>
+                <h2 class="section-title">Pesan & Melodi Tersimpan</h2>
             </div>
             <p class="section-desc">Cari pesan berdasarkan nama penerima atau judul lagu.</p>
         </div>
 
-        <div class="messages-search-bar">
-            <input type="text" id="messagesFilterInput" class="messages-search-input" placeholder="Cari nama penerima atau lagu..." oninput="filterMessages()">
-        </div>
+        <input type="text" id="messagesFilterInput" class="filter-input" placeholder="Cari pesan atau lagu..." oninput="filterMessages()">
 
-        <div class="messages-grid" id="messagesGrid">
+        <div class="feed-grid" id="messagesGrid">
             <!-- Loaded dynamically -->
         </div>
     </section>
 
-    <!-- MODAL POPUP FOR EXPANDED MESSAGE / PHOTO -->
-    <div class="modal-overlay" id="messageModal">
-        <div class="modal-card">
-            <button class="btn-close-modal" onclick="closeFullScreenMessage()"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL -->
+    <div class="modal-bg" id="messageModal">
+        <div class="modal-box">
+            <button class="btn-close" onclick="closeFullScreenMessage()"><i class="fa-solid fa-xmark"></i></button>
             <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATIONS -->
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- TOAST CONTAINER -->
+    <div class="toast-wrap" id="toastContainer"></div>
 
     <!-- FOOTER -->
     <footer>
         <div class="app-container">
-            <p>&copy; <?php echo date('Y'); ?> SongForYou. Dibuat dengan perasaan & melodi.</p>
+            <p>&copy; <?php echo date('Y'); ?> SongForYou. Diabadikan lewat lagu & perasaan.</p>
         </div>
     </footer>
 
-    <!-- SCRIPT LOGIC -->
+    <!-- SCRIPT ENGINE -->
     <script>
-        function getApiUrl(path) {
-            return `/backend/${path}`;
-        }
+        function getApiUrl(path) { return `/backend/${path}`; }
         function getAppUrl(path) {
             if (!path) return '';
             if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
@@ -1070,13 +929,10 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         let selectedSong = null;
         let base64Photo = '';
 
-        // Image compression helper (Canvas-based)
+        // Canvas Image Compression
         function compressImage(file, maxWidth = 1000, quality = 0.75) {
             return new Promise((resolve) => {
-                if (!file || !file.type.startsWith('image/')) {
-                    resolve('');
-                    return;
-                }
+                if (!file || !file.type.startsWith('image/')) { resolve(''); return; }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
@@ -1094,8 +950,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                        resolve(compressedBase64);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = () => resolve('');
                 };
@@ -1103,7 +958,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             });
         }
 
-        // Handle Photo Selection
         async function handleFileSelected(e) {
             const file = e.target.files[0];
             const thumb = document.getElementById('photoPreviewThumb');
@@ -1117,7 +971,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }
         }
 
-        // Song Search Logic
+        // Song Search
         const songInput = document.getElementById('songSearchInput');
         const songDropdown = document.getElementById('songDropdown');
         let searchTimer = null;
@@ -1125,24 +979,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         if (songInput) {
             songInput.addEventListener('input', function() {
                 clearTimeout(searchTimer);
-                const query = this.value.trim();
-                if (query.length < 2) {
-                    songDropdown.style.display = 'none';
-                    return;
-                }
-                searchTimer = setTimeout(() => searchSongs(query), 300);
+                const q = this.value.trim();
+                if (q.length < 2) { songDropdown.style.display = 'none'; return; }
+                searchTimer = setTimeout(() => searchSongs(q), 300);
             });
             songInput.addEventListener('focus', function() {
-                if (this.value.trim().length >= 2) {
-                    songDropdown.style.display = 'block';
-                }
+                if (this.value.trim().length >= 2) songDropdown.style.display = 'block';
             });
         }
 
         async function searchSongs(query) {
             try {
                 let results = [];
-                // 1. Fetch Spotify Search Endpoint
                 try {
                     const res = await fetch(getApiUrl(`spotify_search.php?q=${encodeURIComponent(query)}`));
                     if (res.ok) {
@@ -1161,7 +1009,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                     }
                 } catch(e) {}
 
-                // 2. iTunes Search API Fallback if needed
                 if (results.length === 0) {
                     const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&country=ID&media=music&entity=song&limit=10`);
                     if (itunesRes.ok) {
@@ -1173,7 +1020,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                             coverUrl: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '300x300bb') : '',
                             spotifyUrl: item.trackViewUrl || '',
                             previewUrl: item.previewUrl || '',
-                            meaning: `Lagu "${item.trackName}" karya ${item.artistName} menggambarkan nuansa perasaan serta cerita cinta yang mendalam.`
+                            meaning: `Lagu "${item.trackName}" oleh ${item.artistName} mengalunkan perasaan mendalam dan makna cerita yang menyentuh.`
                         }));
                     }
                 }
@@ -1186,17 +1033,17 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
         function renderSongDropdown(tracks) {
             if (!tracks || tracks.length === 0) {
-                songDropdown.innerHTML = '<div style="padding:1rem; color:var(--text-muted); font-size:0.85rem; text-align:center;">Lagu tidak ditemukan</div>';
+                songDropdown.innerHTML = '<div style="padding:0.9rem; color:var(--text-body); font-size:0.85rem; text-align:center;">Lagu tidak ditemukan</div>';
                 songDropdown.style.display = 'block';
                 return;
             }
 
             songDropdown.innerHTML = tracks.map((t, idx) => `
-                <div class="song-option" onclick="selectSong(${idx})">
+                <div class="search-option" onclick="selectSong(${idx})">
                     <img src="${t.coverUrl || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" alt="Cover">
-                    <div class="song-option-info">
+                    <div class="search-option-info">
                         <h5>${escapeHtml(t.title)}</h5>
-                        <p>${escapeHtml(t.artist)} <span class="spotify-tag-badge"><i class="fa-brands fa-spotify"></i></span></p>
+                        <p>${escapeHtml(t.artist)}</p>
                     </div>
                 </div>
             `).join('');
@@ -1210,8 +1057,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!track) return;
 
             selectedSong = track;
-
-            // Dynamically ensure previewUrl is available via iTunes if empty
             if (!selectedSong.previewUrl && selectedSong.title && selectedSong.artist) {
                 selectedSong.previewUrl = await getItunesPreview(selectedSong.title, selectedSong.artist);
             }
@@ -1230,14 +1075,12 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             document.getElementById('selectedSongBubble').style.display = 'none';
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (songDropdown && !songInput.contains(e.target) && !songDropdown.contains(e.target)) {
                 songDropdown.style.display = 'none';
             }
         });
 
-        // Dynamic iTunes Audio Preview Helper
         async function getItunesPreview(title, artist) {
             try {
                 const cleanTitle = title.replace(/[\(\[\-].*$/, '').trim();
@@ -1256,7 +1099,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             return '';
         }
 
-        // Submit Form Handler (NO "DARI SIAPA?" FIELD)
+        // Form Submit Handler
         async function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitForm');
@@ -1265,18 +1108,9 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             const receiver = document.getElementById('recipientInput').value.trim();
             const message = document.getElementById('messageInput').value.trim();
 
-            if (!receiver) {
-                showToast('Harap isi nama penerima pesan.', 'error');
-                return;
-            }
-            if (!selectedSong) {
-                showToast('Silakan cari dan pilih lagu terlebih dahulu.', 'error');
-                return;
-            }
-            if (!message) {
-                showToast('Harap isi pesan rahasiamu.', 'error');
-                return;
-            }
+            if (!receiver) { showToast('Harap isi nama penerima pesan.', 'error'); return; }
+            if (!selectedSong) { showToast('Silakan cari dan pilih lagu terlebih dahulu.', 'error'); return; }
+            if (!message) { showToast('Harap isi pesan rahasiamu.', 'error'); return; }
 
             try {
                 btn.disabled = true;
@@ -1284,7 +1118,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
                 const payload = {
                     receiver: receiver,
-                    senderName: 'Anonim', // Default anonymous sender
+                    senderName: 'Anonim',
                     songKey: selectedSong.spotifyId || selectedSong.trackId || '2IVsRhKrx8hlQBOWy4qebo',
                     message: message,
                     images: base64Photo,
@@ -1325,7 +1159,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             }
         }
 
-        // Global Single-Audio Player Controller
+        // Audio Player Controller
         async function toggleAudioPlayback(previewUrl, title, artist, btnEl) {
             let urlToPlay = previewUrl;
 
@@ -1389,18 +1223,18 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             const featured = messages.slice(0, 6);
             if (featured.length === 0) {
-                track.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">Belum ada pesan terbaru.</div>';
+                track.innerHTML = '<div style="color:var(--text-body); font-size:0.85rem;">Belum ada pesan terbaru.</div>';
                 return;
             }
 
             track.innerHTML = featured.map(m => `
-                <div class="carousel-card" onclick="openFullScreenMessage(${m.id})">
+                <div class="carousel-item" onclick="openFullScreenMessage(${m.id})">
                     <div>
-                        <div class="card-recipient-tag">Untuk:</div>
-                        <h4 class="card-recipient-name">${escapeHtml(m.receiver || 'Seseorang')}</h4>
-                        <p class="card-message-snippet">"${escapeHtml(m.message || '')}"</p>
+                        <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
+                        <h4 class="item-to">${escapeHtml(m.receiver || 'Seseorang')}</h4>
+                        <p class="item-text">"${escapeHtml(m.message || '')}"</p>
                     </div>
-                    <div style="font-size:0.78rem; color:var(--accent-green); font-family:var(--font-heading); font-weight:700; margin-top:1rem;">
+                    <div class="item-song-pill">
                         <i class="fa-brands fa-spotify"></i> ${escapeHtml(m.songTitle || 'Lagu Pilihan')}
                     </div>
                 </div>
@@ -1412,7 +1246,7 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             if (!grid) return;
 
             if (messages.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Belum ada pesan yang tersimpan. Jadilah yang pertama mengirim pesan!</div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--text-body);">Belum ada pesan tersimpan. Jadilah yang pertama membuat kenangan!</div>';
                 return;
             }
 
@@ -1427,41 +1261,40 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const meaning = m.songMeaning || '';
 
                 return `
-                    <div class="message-card">
+                    <div class="feed-card">
                         <div>
-                            <div class="card-header-row">
-                                <h3 class="card-to">Untuk ${escapeHtml(m.receiver || 'Seseorang')}</h3>
+                            <div class="card-top">
+                                <h3 class="card-recipient">Untuk ${escapeHtml(m.receiver || 'Seseorang')}</h3>
                                 <span class="card-date">${formatDate(m.timestamp || m.created_at)}</span>
                             </div>
 
                             ${hasImage ? `
-                                <div class="card-image-wrap" onclick="openFullScreenMessage(${m.id})">
-                                    <img src="${imgSrc}" alt="Photo">
+                                <div class="card-img-wrap" onclick="openFullScreenMessage(${m.id})">
+                                    <img src="${imgSrc}" alt="Photo Attachment">
                                 </div>
                             ` : ''}
 
-                            <p class="card-body-text">${escapeHtml(m.message || '')}</p>
+                            <p class="card-message">${escapeHtml(m.message || '')}</p>
 
                             ${meaning ? `
-                                <div class="song-meaning-box">
-                                    <div class="meaning-header"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
-                                    <p class="meaning-text">${escapeHtml(meaning)}</p>
+                                <div class="meaning-box">
+                                    <div class="meaning-lbl"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
+                                    <p class="meaning-txt">${escapeHtml(meaning)}</p>
                                 </div>
                             ` : ''}
                         </div>
 
-                        <!-- AUDIO PLAYER BAR -->
-                        <div class="player-bar">
-                            <img src="${songCover}" class="player-cover" alt="Cover">
-                            <div class="player-meta">
-                                <div class="player-title">${escapeHtml(songTitle)}</div>
-                                <div class="player-artist">${escapeHtml(songArtist)}</div>
+                        <div class="audio-bar">
+                            <img src="${songCover}" class="audio-cover" alt="Cover">
+                            <div class="audio-info">
+                                <div class="audio-title">${escapeHtml(songTitle)}</div>
+                                <div class="audio-artist">${escapeHtml(songArtist)}</div>
                             </div>
-                            <div class="player-controls">
-                                <button class="btn-play-icon" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                            <div class="audio-actions">
+                                <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                                     <i class="fa-solid fa-play"></i>
                                 </button>
-                                <a href="${spotifyUrl}" target="_blank" class="spotify-link-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
+                                <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
                             </div>
                         </div>
                     </div>
@@ -1470,13 +1303,13 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
         }
 
         function filterMessages() {
-            const query = document.getElementById('messagesFilterInput').value.toLowerCase();
+            const q = document.getElementById('messagesFilterInput').value.toLowerCase();
             const filtered = allMessages.filter(m => {
                 const rec = (m.receiver || '').toLowerCase();
                 const msg = (m.message || '').toLowerCase();
                 const sng = (m.songTitle || m.song_title || '').toLowerCase();
                 const art = (m.songArtist || m.song_artist || '').toLowerCase();
-                return rec.includes(query) || msg.includes(query) || sng.includes(query) || art.includes(query);
+                return rec.includes(q) || msg.includes(q) || sng.includes(q) || art.includes(q);
             });
             renderMessages(filtered);
         }
@@ -1497,33 +1330,33 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
 
             modalContent.innerHTML = `
                 <div style="margin-bottom:1.2rem;">
-                    <span style="font-family:var(--font-heading); font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent-green);">Untuk:</span>
-                    <h2 style="font-family:var(--font-serif); font-size:1.9rem; margin:0.2rem 0;">${escapeHtml(m.receiver || 'Seseorang')}</h2>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">${formatDate(m.timestamp || m.created_at)}</p>
+                    <div style="font-size:0.75rem; color:var(--text-body); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Untuk:</div>
+                    <h2 style="font-family:var(--font-serif); font-size:1.8rem; margin:0.2rem 0; color:var(--text-heading);">${escapeHtml(m.receiver || 'Seseorang')}</h2>
+                    <p style="font-size:0.78rem; color:var(--text-subtle);">${formatDate(m.timestamp || m.created_at)}</p>
                 </div>
 
-                ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:360px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
+                ${hasImage ? `<img src="${imgSrc}" style="width:100%; max-height:350px; object-fit:contain; background:#000; border-radius:12px; margin-bottom:1.2rem;">` : ''}
 
-                <div style="font-size:1rem; line-height:1.7; color:#e0e0ec; margin-bottom:1.5rem; white-space:pre-wrap;">${escapeHtml(m.message || '')}</div>
+                <div style="font-size:0.95rem; line-height:1.7; color:#cbd5e1; margin-bottom:1.5rem; white-space:pre-wrap;">${escapeHtml(m.message || '')}</div>
 
                 ${meaning ? `
-                    <div class="song-meaning-box" style="margin-bottom:1.5rem;">
-                        <div class="meaning-header"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
-                        <p class="meaning-text">${escapeHtml(meaning)}</p>
+                    <div class="meaning-box" style="margin-bottom:1.5rem;">
+                        <div class="meaning-lbl"><i class="fa-solid fa-quote-left"></i> Makna Lagu:</div>
+                        <p class="meaning-txt">${escapeHtml(meaning)}</p>
                     </div>
                 ` : ''}
 
-                <div class="player-bar">
-                    <img src="${songCover}" class="player-cover" alt="Cover">
-                    <div class="player-meta">
-                        <div class="player-title">${escapeHtml(songTitle)}</div>
-                        <div class="player-artist">${escapeHtml(songArtist)}</div>
+                <div class="audio-bar">
+                    <img src="${songCover}" class="audio-cover" alt="Cover">
+                    <div class="audio-info">
+                        <div class="audio-title">${escapeHtml(songTitle)}</div>
+                        <div class="audio-artist">${escapeHtml(songArtist)}</div>
                     </div>
-                    <div class="player-controls">
-                        <button class="btn-play-icon" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
+                    <div class="audio-actions">
+                        <button class="btn-play-audio" onclick="toggleAudioPlayback('${previewUrl}', '${escapeHtml(songTitle)}', '${escapeHtml(songArtist)}', this)">
                             <i class="fa-solid fa-play"></i>
                         </button>
-                        <a href="${spotifyUrl}" target="_blank" class="spotify-link-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="${spotifyUrl}" target="_blank" class="spotify-btn" title="Buka di Spotify"><i class="fa-brands fa-spotify"></i></a>
                     </div>
                 </div>
             `;
@@ -1535,7 +1368,6 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
             document.getElementById('messageModal').style.display = 'none';
         }
 
-        // Helpers
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>"']/g, function(m) {
@@ -1549,18 +1381,16 @@ if (preg_match('/\/admin\/?$/i', $parsedPath)) {
                 const d = new Date(dateInput);
                 if (isNaN(d.getTime())) return String(dateInput);
                 return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-            } catch(e) {
-                return String(dateInput);
-            }
+            } catch(e) { return String(dateInput); }
         }
 
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = 'toast';
+            toast.className = 'toast-item';
             if (type === 'error') {
-                toast.style.borderColor = '#ff5555';
-                toast.style.borderLeftColor = '#ff5555';
+                toast.style.borderColor = '#f87171';
+                toast.style.borderLeftColor = '#f87171';
             }
             toast.innerText = msg;
             container.appendChild(toast);
